@@ -1,12 +1,15 @@
 // Alerts for riders. Every trigger fires on a trip, a stop time, a driver
 // report or an announcement, never on a position update (see CLAUDE.md).
 
-import { initializeApp } from 'firebase-admin/app';
-import { FieldValue, getFirestore, type DocumentSnapshot, type Timestamp } from 'firebase-admin/firestore';
+export { createDriver, setDriverPin } from './drivers.js';
+export { mirrorBusDriver } from './mirror.js';
+
+import { FieldValue, type DocumentSnapshot, type Timestamp } from 'firebase-admin/firestore';
 import { getMessaging } from 'firebase-admin/messaging';
 import { logger } from 'firebase-functions';
-import { setGlobalOptions } from 'firebase-functions/v2';
 import { onDocumentCreated } from 'firebase-functions/v2/firestore';
+
+import { db } from './app.js';
 
 import {
   approachingRiders,
@@ -22,10 +25,6 @@ import {
 import type { Language, MessageParams } from './messages.js';
 import { deliver, type Recipient } from './push.js';
 
-initializeApp();
-setGlobalOptions({ region: 'asia-south1', maxInstances: 10 });
-
-const db = getFirestore();
 
 interface Student extends Rider {
   language: Language;

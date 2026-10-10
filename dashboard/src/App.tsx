@@ -1,6 +1,6 @@
 import { LoginPage } from './auth/LoginPage';
 import { useOfficeSession } from './auth/useOfficeSession';
-import { HomePage } from './HomePage';
+import { Shell } from './Shell';
 
 export default function App() {
   const session = useOfficeSession();
@@ -11,6 +11,6 @@ export default function App() {
     case 'signedOut':
       return <LoginPage notice={session.notice} />;
     case 'office':
-      return <HomePage name={session.name} />;
+      return <Shell name={session.name} />;
   }
 }

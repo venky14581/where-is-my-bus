@@ -58,10 +58,32 @@ describe('reading routes, buses and route access', () => {
 });
 
 describe('writing base data', () => {
+  const route = (overrides = {}) => ({
+    name: 'New', city: 'Coimbatore', active: true,
+    stops: [{ id: 'a' }, { id: 'campus' }], stopIds: ['a', 'campus'], ...overrides,
+  });
+
   test('only the office can add or change routes, buses and access', async () => {
-    await assertSucceeds(setDoc(doc(office(), 'routes/cbe-2'), { name: 'New', city: 'Coimbatore', stopIds: ['a'] }));
+    await assertSucceeds(setDoc(doc(office(), 'routes/cbe-2'), route({ guestFare: 40 })));
     await assertSucceeds(updateDoc(doc(office(), 'buses/bus-01'), { driverId: null }));
     await assertSucceeds(updateDoc(doc(office(), 'routeAccess/cbe-1'), { acceptsFrom: ['cbe-2'] }));
+  });
+
+  test('office edits must leave routes and buses usable', async () => {
+    const db = office();
+    await assertFails(setDoc(doc(db, 'routes/cbe-2'), route({ stopIds: ['a'] })));
+    await assertFails(setDoc(doc(db, 'routes/cbe-2'), route({ stops: [{ id: 'a' }], stopIds: ['a'] })));
+    await assertFails(setDoc(doc(db, 'routes/cbe-2'), route({ name: '' })));
+    await assertFails(setDoc(doc(db, 'routes/cbe-2'), route({ guestFare: -5 })));
+    await assertFails(updateDoc(doc(db, 'buses/bus-01'), { capacity: 0 }));
+    await assertFails(updateDoc(doc(db, 'buses/bus-01'), { routeId: 'no-such-route' }));
+    await assertSucceeds(updateDoc(doc(db, 'buses/bus-01'), { capacity: 55, routeId: null }));
+  });
+
+  test('booking settings: everyone with access reads, only the office writes', async () => {
+    await assertSucceeds(setDoc(doc(office(), 'settings/booking'), { opensAt: '18:00', closesMinutesBefore: 30 }));
+    await assertSucceeds(getDoc(doc(verified(), 'settings/booking')));
+    await assertFails(setDoc(doc(verified(), 'settings/booking'), { opensAt: '00:00' }));
   });
 
   test('students and drivers cannot', async () => {
