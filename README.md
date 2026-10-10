@@ -98,7 +98,8 @@ Nothing here touches a real Firebase project: the app and dashboard use the
    every sign-in until the page is reloaded again. Debug web builds, Android,
    iOS and real projects are not affected.
 
-4. Office dashboard at http://localhost:5173:
+4. Office dashboard at http://localhost:5173 (live map, buses, routes and
+   stops, drivers, announcements, fares and booking):
 
    ```bash
    npm --prefix dashboard run dev
@@ -147,6 +148,10 @@ npm run test:rules
 
 ```bash
 npm run test:functions
+```
+
+```bash
+npm --prefix dashboard test
 ```
 
 ## Connecting a real Firebase project

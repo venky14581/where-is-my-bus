@@ -16,7 +16,8 @@ Users: driver (driver mode in the app), day scholar (student app), hosteller or 
 - Module 4 (Live map): done 10 Oct 2026. See `docs/modules/module-04-live-map.md`.
 - Module 5 (Arrival time): done 10 Oct 2026. See `docs/modules/module-05-arrival-time.md`.
 - Module 6 (Alerts): built and tested on the emulators, 11 Oct 2026. See `docs/modules/module-06-alerts.md`. Real push delivery still needs a real Firebase project (pay-as-you-go plan for Cloud Functions) and a phone.
-- Next step: Module 7 (Office dashboard). Still open: the Module 3 screen-off test and Module 6 push test on a real Android phone.
+- Module 7 (Office dashboard): done 11 Oct 2026. See `docs/modules/module-07-office-dashboard.md`.
+- Next step: Module 8 (Pass and QR scan). Still open: the Module 3 screen-off test and Module 6 push test on a real Android phone.
 
 ## Decisions made in the planning chat, in order
 
@@ -169,12 +170,14 @@ How to run and test everything is in `README.md`. Things that are easy to get wr
 - Which screens a role may open is decided only in `app/lib/routing/redirect.dart`; the rules enforce the same split on the server. Add new routes for a role under `/student/...` or `/driver/...` so they inherit it.
 - `firestore.rules` closes every path not listed. Each module opens only the paths it needs and adds tests in `tests/rules/`.
 - Routes, buses and route access come from `data/base-data.json`. After changing stops run `npm run build-paths` (OSRM) and then `npm run seed`. The last stop of every route is the campus.
-- Live positions: Realtime Database instance `demo-whereismybus-default-rtdb` (the emulator only applies `database.rules.json` to `<projectId>-default-rtdb`). Its rules cannot read Firestore, so `busDrivers/{busId}` mirrors `buses/{busId}.driverId`; anything that changes a bus's driver must update both.
+- Live positions: Realtime Database instance `demo-whereismybus-default-rtdb` (the emulator only applies `database.rules.json` to `<projectId>-default-rtdb`; anything that builds a database URL must use that name, including Cloud Functions, where the emulator's FIREBASE_CONFIG points elsewhere). Its rules cannot read Firestore, so `busDrivers/{busId}` mirrors `buses/{busId}.driverId`; the `mirrorBusDriver` function keeps it in step, so just edit the bus.
 - `--dart-define=SIMULATE_DRIVE=true` (debug builds only) drives the bus along its route without a phone. Simulated stop times use a 5× faster clock; never point a simulated build at a real project.
 - On the web, avoid bitwise tricks on negative numbers (`~x`): web ints give unsigned 32-bit results. Run pure-logic tests with `flutter test --platform chrome` when in doubt.
 - `npm run simulate-bus [busId]` moves a bus in the emulators without a driver, for working on student screens.
 - `app/lib/l10n/generated/` sometimes vanishes, so `flutter run` fails with "Error when reading 'lib/l10n/generated/app_localizations.dart'". Cause: Flutter keeps one build cache per configuration and, when switching configuration, deletes the previous one's outputs that the current build did not record (`trackSharedBuildDirectory` in flutter_tools). It has happened right after adding packages, so the `pub get` that follows probably triggers it; not proven. The files are committed: run `flutter gen-l10n` and try again. (An earlier note blamed mixing shells; that was wrong.)
 - Cloud Functions live in `functions/` (TypeScript). `npm run emulators` builds them first and allows 60 s for a cold load. They trigger on trips, stop times, reports and announcements only. Every trigger must be safe to run twice (delivery is at least once): claim a `functionRuns/{key}` marker or use a transaction. On the emulators, notifications go to `pushLog` instead of FCM.
+- Driver logins are created and their PINs reset only through the office-only callable functions `createDriver` and `setDriverPin`.
 - All user-facing app text goes in
+- Driver logins are created and their PINs reset only through the office-only callable functions `createDriver` and `setDriverPin`.
 - All user-facing app text goes in `app/lib/l10n/app_en.arb` and `app_ta.arb`, then `flutter gen-l10n`.
 - A module is done when its Done-when table in `docs/modules/` passes. Update the Status section above when it does.

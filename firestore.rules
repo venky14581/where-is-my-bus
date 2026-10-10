@@ -3,6 +3,7 @@ rules_version = '2';
 // Paths not listed here stay closed until the module that needs them opens
 // them. Module 1: users. Module 2: routes, buses, routeAccess. Module 3: trips.
 // Module 6: alert settings, devices, driver reports, alerts, announcements.
+// Module 7: validation of office edits, settings (fares and booking window).
 // Server-only paths (pushLog, functionRuns, trips/*/approachingSent) stay
 // closed to clients.
 service cloud.firestore {
@@ -158,14 +159,38 @@ service cloud.firestore {
       }
     }
 
-    // Only the office edits base data. The import script and the dashboard
-    // keep stopIds in step with stops.
+    // Only the office edits base data, and only in a shape the apps can use.
+    // The import script and the dashboard keep stopIds in step with stops.
+    function validRoute(data) {
+      return data.name is string && data.name.size() > 0 && data.name.size() <= 80
+        && data.city is string && data.city.size() > 0
+        && data.stops is list && data.stops.size() >= 2 && data.stops.size() <= 60
+        && data.stopIds is list && data.stopIds.size() == data.stops.size()
+        && (!('guestFare' in data) || data.guestFare == null
+            || (data.guestFare is number && data.guestFare >= 0 && data.guestFare <= 1000));
+    }
+
+    function validBus(data) {
+      return data.number is string && data.number.size() > 0 && data.number.size() <= 20
+        && data.capacity is int && data.capacity >= 1 && data.capacity <= 120
+        && (data.routeId == null || exists(routePath(data.routeId)))
+        && (data.driverId == null || data.driverId is string);
+    }
+
     match /routes/{routeId} {
       allow read: if canReadBaseData();
-      allow write: if isOffice();
+      allow create, update: if isOffice() && validRoute(request.resource.data);
+      allow delete: if isOffice();
     }
 
     match /buses/{busId} {
+      allow read: if canReadBaseData();
+      allow create, update: if isOffice() && validBus(request.resource.data);
+      allow delete: if isOffice();
+    }
+
+    // settings/booking: when guest booking opens and closes (Module 10).
+    match /settings/{name} {
       allow read: if canReadBaseData();
       allow write: if isOffice();
     }

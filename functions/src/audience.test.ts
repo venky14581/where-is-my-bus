@@ -142,3 +142,36 @@ describe('messages', () => {
     expect(render('approaching', 'en', { ...params, stopsAway: 1 }).body).toContain('1 stop from');
   });
 });
+
+describe('driver accounts', async () => {
+  const { normalizeDriverId, validPin, validName, driverEmailFor } = await import('./drivers.js');
+
+  test('driver IDs are normalised and checked like the app does', () => {
+    expect(normalizeDriverId(' drv-007 ')).toBe('DRV-007');
+    expect(normalizeDriverId('D1')).toBeNull();
+    expect(normalizeDriverId('DRV 7')).toBeNull();
+    expect(driverEmailFor('DRV-007')).toBe('drv-007@drivers.whereismybus.invalid');
+  });
+
+  test('PINs are exactly 6 digits and names are required', () => {
+    expect(validPin('482913')).toBe(true);
+    expect(validPin('48291')).toBe(false);
+    expect(validPin(482913)).toBe(false);
+    expect(validName('  ')).toBe(false);
+    expect(validName('Murugan S')).toBe(true);
+  });
+});
+
+describe('bus driver mirror', async () => {
+  const { databaseUrl } = await import('./mirror.js');
+
+  test('writes to the default instance, where the rules apply', () => {
+    const regional = 'https://wimb-default-rtdb.asia-southeast1.firebasedatabase.app';
+    expect(databaseUrl({ FIREBASE_CONFIG: JSON.stringify({ projectId: 'wimb', databaseURL: regional }) })).toBe(regional);
+    // The emulator names a namespace after the project; ignore it.
+    expect(databaseUrl({
+      FUNCTIONS_EMULATOR: 'true',
+      FIREBASE_CONFIG: JSON.stringify({ projectId: 'demo-whereismybus', databaseURL: 'http://127.0.0.1:9000/?ns=demo-whereismybus' }),
+    })).toBe('https://demo-whereismybus-default-rtdb.firebaseio.com');
+  });
+});
