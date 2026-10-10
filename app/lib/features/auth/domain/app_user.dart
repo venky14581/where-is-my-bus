@@ -37,6 +37,18 @@ class AppUser {
   /// `en` or `ta`. Null until a driver picks one at first login.
   final String? language;
 
+  AppUser copyWith({String? name, String? routeId, String? stopId, String? language}) => AppUser(
+        uid: uid,
+        name: name ?? this.name,
+        role: role,
+        email: email,
+        driverId: driverId,
+        routeId: routeId ?? this.routeId,
+        stopId: stopId ?? this.stopId,
+        passValid: passValid,
+        language: language ?? this.language,
+      );
+
   /// Returns null when the document has no recognisable role, so a malformed
   /// profile is treated the same as a missing one.
   static AppUser? tryFromMap(String uid, Map<String, dynamic> data) {

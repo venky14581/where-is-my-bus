@@ -105,12 +105,13 @@ void main() {
       auth.verifyEmail(_studentEmail);
       await _tap(tester, find.widgetWithText(FilledButton, "I've verified"));
 
-      expect(find.text('Hello, Asha Raman'), findsOneWidget);
-      expect(find.text('No route chosen yet'), findsOneWidget);
+      // New students pick their route and stop next.
+      expect(find.text('Where do you travel from?'), findsOneWidget);
     });
 
     testWidgets('a verified student signs in straight to the home screen and can sign out', (tester) async {
-      final auth = FakeAuthRepository()..addStudent(_studentEmail, 'bus-pass-123');
+      final auth = FakeAuthRepository()
+        ..addStudent(_studentEmail, 'bus-pass-123', routeId: 'cbe-gandhipuram', stopId: 'ukkadam');
       await pumpApp(tester, auth);
 
       await _tap(tester, find.text("I'm a student"));
@@ -118,6 +119,7 @@ void main() {
       await _enter(tester, 'Password', 'bus-pass-123');
       await _tap(tester, find.widgetWithText(FilledButton, 'Sign in'));
       expect(find.text('Hello, Asha'), findsOneWidget);
+      expect(find.text('Ukkadam'), findsOneWidget);
 
       await _tap(tester, find.byIcon(Icons.more_vert));
       await _tap(tester, find.text('Sign out'));

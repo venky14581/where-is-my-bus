@@ -174,13 +174,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get routeNotChosenTitle => 'No route chosen yet';
-
-  @override
-  String get routeNotChosenBody =>
-      'You\'ll pick your city, route and stop here. After that the app opens on your bus every time.';
-
-  @override
   String get accountProblemTitle => 'Can\'t open this account';
 
   @override
@@ -253,4 +246,70 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorUnknown => 'Something went wrong. Try again.';
+
+  @override
+  String get chooseCityTitle => 'Where do you travel from?';
+
+  @override
+  String get chooseRouteTitle => 'Choose your route';
+
+  @override
+  String get chooseStopTitle => 'Choose your stop';
+
+  @override
+  String get chooseStopBody =>
+      'The app opens on this bus every time. You can change it later.';
+
+  @override
+  String stopCount(int count) {
+    return '$count stops';
+  }
+
+  @override
+  String routeCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count routes',
+      one: '1 route',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String firstPickupAt(String time) {
+    return 'First pickup $time';
+  }
+
+  @override
+  String get saveButton => 'Save';
+
+  @override
+  String get noRoutesYet => 'No routes have been added yet. Check back later.';
+
+  @override
+  String get yourStopTitle => 'Your stop';
+
+  @override
+  String busDueAt(String time) {
+    return 'Bus due at $time';
+  }
+
+  @override
+  String get changeButton => 'Change';
+
+  @override
+  String get routeMissing =>
+      'Your route or stop is no longer running. Choose another.';
+
+  @override
+  String get chooseRouteButton => 'Choose route';
+
+  @override
+  String busNumber(String number) {
+    return 'Bus $number';
+  }
+
+  @override
+  String get tripTrackingNotReady => 'Trip tracking isn\'t switched on yet.';
 }

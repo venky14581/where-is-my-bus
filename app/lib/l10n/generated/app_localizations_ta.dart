@@ -174,13 +174,6 @@ class AppLocalizationsTa extends AppLocalizations {
   }
 
   @override
-  String get routeNotChosenTitle => 'இன்னும் வழித்தடம் தேர்வு செய்யப்படவில்லை';
-
-  @override
-  String get routeNotChosenBody =>
-      'உங்கள் நகரம், வழித்தடம், நிறுத்தம் ஆகியவற்றை இங்கே தேர்வு செய்வீர்கள். அதன் பிறகு செயலி ஒவ்வொரு முறையும் உங்கள் பேருந்தையே காட்டும்.';
-
-  @override
   String get accountProblemTitle => 'இந்தக் கணக்கைத் திறக்க முடியவில்லை';
 
   @override
@@ -255,4 +248,72 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get errorUnknown => 'ஏதோ தவறு நடந்தது. மீண்டும் முயலவும்.';
+
+  @override
+  String get chooseCityTitle => 'எங்கிருந்து பயணம் செய்கிறீர்கள்?';
+
+  @override
+  String get chooseRouteTitle => 'உங்கள் வழித்தடத்தைத் தேர்ந்தெடுக்கவும்';
+
+  @override
+  String get chooseStopTitle => 'உங்கள் நிறுத்தத்தைத் தேர்ந்தெடுக்கவும்';
+
+  @override
+  String get chooseStopBody =>
+      'செயலி ஒவ்வொரு முறையும் இந்தப் பேருந்தையே காட்டும். பின்னர் மாற்றலாம்.';
+
+  @override
+  String stopCount(int count) {
+    return '$count நிறுத்தங்கள்';
+  }
+
+  @override
+  String routeCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count வழித்தடங்கள்',
+      one: '1 வழித்தடம்',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String firstPickupAt(String time) {
+    return 'முதல் ஏற்றம் $time';
+  }
+
+  @override
+  String get saveButton => 'சேமி';
+
+  @override
+  String get noRoutesYet =>
+      'இன்னும் வழித்தடங்கள் சேர்க்கப்படவில்லை. பின்னர் பார்க்கவும்.';
+
+  @override
+  String get yourStopTitle => 'உங்கள் நிறுத்தம்';
+
+  @override
+  String busDueAt(String time) {
+    return 'பேருந்து வரும் நேரம் $time';
+  }
+
+  @override
+  String get changeButton => 'மாற்று';
+
+  @override
+  String get routeMissing =>
+      'உங்கள் வழித்தடம் அல்லது நிறுத்தம் இப்போது இயங்கவில்லை. வேறொன்றைத் தேர்ந்தெடுக்கவும்.';
+
+  @override
+  String get chooseRouteButton => 'வழித்தடத்தைத் தேர்ந்தெடு';
+
+  @override
+  String busNumber(String number) {
+    return 'பேருந்து $number';
+  }
+
+  @override
+  String get tripTrackingNotReady =>
+      'பயணக் கண்காணிப்பு இன்னும் இயக்கப்படவில்லை.';
 }

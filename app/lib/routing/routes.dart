@@ -9,6 +9,7 @@ abstract final class Routes {
   static const studentForgotPassword = '/student/forgot-password';
   static const studentVerifyEmail = '/student/verify-email';
   static const studentFinishSetup = '/student/finish-setup';
+  static const studentChooseRoute = '/student/choose-route';
 
   static const driverHome = '/driver';
   static const driverSignIn = '/driver/sign-in';

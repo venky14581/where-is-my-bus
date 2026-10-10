@@ -11,7 +11,8 @@ Users: driver (driver mode in the app), day scholar (student app), hosteller or 
 ## Status
 
 - Module 1 (Setup and login): done 10 Oct 2026. See `docs/modules/module-01-setup-and-login.md`.
-- Next step: Module 2 (Route and bus data).
+- Module 2 (Route and bus data): done 10 Oct 2026. See `docs/modules/module-02-route-and-bus-data.md`. The route data in `data/base-data.json` is a placeholder until the transport office supplies the real stops and timings.
+- Next step: Module 3 (Driver trip and GPS). Needs an Android phone and Android Studio.
 
 ## Decisions made in the planning chat, in order
 
@@ -163,5 +164,6 @@ How to run and test everything is in `README.md`. Things that are easy to get wr
 - Driver login: driver ID `DRV001` signs in to Firebase Auth as `drv001@drivers.whereismybus.invalid` with the 6-digit PIN as password (`driverEmailFor` in `app/lib/features/auth/domain/credentials.dart`). Office-created driver accounts must use the same mapping.
 - Which screens a role may open is decided only in `app/lib/routing/redirect.dart`; the rules enforce the same split on the server. Add new routes for a role under `/student/...` or `/driver/...` so they inherit it.
 - `firestore.rules` closes every path not listed. Each module opens only the paths it needs and adds tests in `tests/rules/`.
+- Routes, buses and route access come from `data/base-data.json`. After changing stops run `npm run build-paths` (OSRM) and then `npm run seed`. The last stop of every route is the campus.
 - All user-facing app text goes in `app/lib/l10n/app_en.arb` and `app_ta.arb`, then `flutter gen-l10n`.
 - A module is done when its Done-when table in `docs/modules/` passes. Update the Status section above when it does.

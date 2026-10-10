@@ -9,7 +9,8 @@ are in [CLAUDE.md](CLAUDE.md); progress per module is in [docs/modules](docs/mod
 | `app/` | Flutter app: students and drivers (Android, iOS; web for development) |
 | `dashboard/` | React dashboard for the transport office |
 | `firestore.rules`, `database.rules.json` | Security rules |
-| `scripts/seed-emulators.mjs` | Demo accounts for the local emulators |
+| `data/` | Routes, buses and route access (`base-data.json`), and road paths from OSRM |
+| `scripts/seed-emulators.mjs` | Loads demo accounts and `data/` into the local emulators |
 | `tests/rules/` | Security-rules tests |
 
 ## Requirements
@@ -52,6 +53,12 @@ Nothing here touches a real Firebase project: the app and dashboard use the
    ```
 
    The test passwords and driver PINs are in `scripts/seed-emulators.mjs`.
+   After editing the stops in `data/base-data.json`, refresh the road paths
+   first:
+
+   ```bash
+   npm run build-paths
+   ```
 
 3. Student and driver app in Chrome:
 
@@ -59,10 +66,12 @@ Nothing here touches a real Firebase project: the app and dashboard use the
    cd app && flutter run -d chrome
    ```
 
-   Use `flutter run` (a debug build) for web. A release web build pointed at
-   the emulators loses the signed-in session on page reload, because Firebase
-   Auth checks the saved user before the app can redirect it to the emulator.
-   Android, iOS and real projects are not affected.
+   Use `flutter run` (a debug build) for web. Do not use a release web build
+   (`flutter build web`) with the emulators: when a page reload finds a
+   signed-in user, Firebase Auth checks that user against production before
+   the app can point it at the emulator, signs them out, and then refuses
+   every sign-in until the page is reloaded again. Debug web builds, Android,
+   iOS and real projects are not affected.
 
 4. Office dashboard at http://localhost:5173:
 

@@ -26,6 +26,7 @@ beforeEach(async () => {
     const db = ctx.firestore();
     await setDoc(doc(db, 'users/office1'), { name: 'Office', role: 'office' });
     await setDoc(doc(db, 'users/driver1'), { name: 'Murugan', role: 'driver', driverId: 'DRV001', language: null });
+    await setDoc(doc(db, 'routes/cbe-1'), { name: 'Gandhipuram – Campus', city: 'Coimbatore', stopIds: ['gandhipuram', 'campus'] });
     await setDoc(doc(db, 'users/student2'), {
       name: 'Other', email: 'other@cb.students.amrita.edu', role: 'student',
       routeId: null, stopId: null, passValid: false, language: 'en',
@@ -123,6 +124,13 @@ describe('updating profiles', () => {
     await assertSucceeds(updateDoc(doc(asStudent2(), 'users/student2'), { routeId: 'cbe-1', stopId: 'gandhipuram' }));
   });
 
+  test('a student can only save a stop that is on an existing route', async () => {
+    await assertFails(updateDoc(doc(asStudent2(), 'users/student2'), { routeId: 'cbe-1', stopId: 'palakkad' }));
+    await assertFails(updateDoc(doc(asStudent2(), 'users/student2'), { routeId: 'no-such-route', stopId: 'gandhipuram' }));
+    await assertFails(updateDoc(doc(asStudent2(), 'users/student2'), { routeId: 'cbe-1', stopId: null }));
+    await assertFails(updateDoc(doc(asStudent2(), 'users/student2'), { routeId: null, stopId: 'gandhipuram' }));
+  });
+
   test('a student cannot change role, pass or email', async () => {
     await assertFails(updateDoc(doc(asStudent2(), 'users/student2'), { role: 'office' }));
     await assertFails(updateDoc(doc(asStudent2(), 'users/student2'), { passValid: true }));
@@ -157,6 +165,6 @@ describe('office', () => {
 });
 
 test('collections without rules stay closed, even to the office', async () => {
-  await assertFails(getDoc(doc(student(), 'routes/r1')));
-  await assertFails(setDoc(doc(office(), 'routes/r1'), { name: 'x' }));
+  await assertFails(getDoc(doc(student(), 'trips/t1')));
+  await assertFails(setDoc(doc(office(), 'trips/t1'), { busId: 'x' }));
 });

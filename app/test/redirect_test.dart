@@ -12,12 +12,22 @@ AsyncValue<Session> _signedIn({
   bool verified = true,
   UserRole? role,
   String? language = 'en',
+  String? routeId = 'cbe-gandhipuram',
 }) {
   return AsyncData(SignedIn(
     uid: 'u1',
     email: email,
     emailVerified: verified,
-    profile: role == null ? null : AppUser(uid: 'u1', name: 'A', role: role, language: language),
+    profile: role == null
+        ? null
+        : AppUser(
+            uid: 'u1',
+            name: 'A',
+            role: role,
+            language: language,
+            routeId: role == UserRole.student ? routeId : null,
+            stopId: role == UserRole.student && routeId != null ? 'ukkadam' : null,
+          ),
   ));
 }
 
@@ -61,6 +71,18 @@ void main() {
       expect(redirectFor(session, Routes.driverHome), Routes.studentHome);
       expect(redirectFor(session, Routes.driverLanguage), Routes.studentHome);
       expect(redirectFor(session, Routes.welcome), Routes.studentHome);
+    });
+
+    test('picks a route and stop once, before anything else', () {
+      final session = _signedIn(role: UserRole.student, routeId: null);
+      expect(redirectFor(session, Routes.studentHome), Routes.studentChooseRoute);
+      expect(redirectFor(session, Routes.driverHome), Routes.studentChooseRoute);
+      expect(redirectFor(session, Routes.studentChooseRoute), isNull);
+    });
+
+    test('with a route chosen, can come back to change it', () {
+      final session = _signedIn(role: UserRole.student);
+      expect(redirectFor(session, Routes.studentChooseRoute), isNull);
     });
 
     test('without a profile finishes setup, except mid sign-up', () {
