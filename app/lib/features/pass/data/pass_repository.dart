@@ -13,6 +13,9 @@ enum ScanResult {
   passExpired,
   wrongRoute,
 
+  /// A rider from another route without a seat held in the app.
+  noSeatHeld,
+
   /// The phone could not reach the server.
   offline,
 }

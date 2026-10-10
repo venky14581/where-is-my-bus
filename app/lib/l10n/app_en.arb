@@ -463,5 +463,122 @@
       }
     }
   },
-  "scanOffline": "No connection. Check the pass by eye for now."
+  "scanOffline": "No connection. Check the pass by eye for now.",
+  "missedBusButton": "Missed your bus?",
+  "missedBusTitle": "Catch another bus",
+  "missedBusIntro": "College buses the transport office allows you to ride, each with the nearest stop you can reach in time.",
+  "missedBusFromHere": "Distances from where you are now.",
+  "missedBusFromStop": "Distances from your stop, {stop}. Allow location to get a closer match.",
+  "@missedBusFromStop": {
+    "placeholders": {
+      "stop": {
+        "type": "String"
+      }
+    }
+  },
+  "missedBusLocating": "Finding where you are…",
+  "missedBusNone": "No other college bus can take you right now.",
+  "missedBusNoneHint": "Only buses the transport office allows for your route, still on their way to a stop near you, are shown here.",
+  "missedBusNeedsPass": "You need a valid bus pass to ride another college bus.",
+  "missedBusGetOnAt": "Get on at {stop}",
+  "@missedBusGetOnAt": {
+    "placeholders": {
+      "stop": {
+        "type": "String"
+      }
+    }
+  },
+  "missedBusWalk": "{distance} walk, about {minutes} min",
+  "@missedBusWalk": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "missedBusBusIn": "Bus there in {minutes} min, around {time}",
+  "@missedBusBusIn": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "missedBusBusThereNow": "The bus is at that stop now",
+  "missedBusTooFar": "The bus may get there before you.",
+  "missedBusSeats": "{count, plural, =1{1 seat for other routes} other{{count} seats for other routes}}",
+  "@missedBusSeats": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "missedBusFull": "No seats left for other routes",
+  "distanceMetres": "{metres} m",
+  "@distanceMetres": {
+    "placeholders": {
+      "metres": {
+        "type": "int"
+      }
+    }
+  },
+  "distanceKm": "{km} km",
+  "@distanceKm": {
+    "placeholders": {
+      "km": {
+        "type": "String"
+      }
+    }
+  },
+  "holdSeatButton": "Hold a seat",
+  "holdHeld": "Seat held. Be at {stop} and show your pass to the driver.",
+  "@holdHeld": {
+    "placeholders": {
+      "stop": {
+        "type": "String"
+      }
+    }
+  },
+  "holdCancelButton": "Give up seat",
+  "holdBoarded": "You boarded this bus.",
+  "holdMissed": "The bus left {stop}, so your seat was released.",
+  "@holdMissed": {
+    "placeholders": {
+      "stop": {
+        "type": "String"
+      }
+    }
+  },
+  "holdFull": "Sorry, the last seat has just gone.",
+  "holdPassed": "The bus has already passed that stop.",
+  "holdNotAllowed": "This bus does not take riders from your route.",
+  "holdNotRunning": "This bus is no longer running.",
+  "holdOffline": "No connection. Try again.",
+  "waitingRidersTitle": "Riders from other routes",
+  "waitingRider": "{name} at {stop}",
+  "@waitingRider": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "stop": {
+        "type": "String"
+      }
+    }
+  },
+  "scanNoSeatHeld": "{name} has no seat held on this bus. They can hold one in the app.",
+  "@scanNoSeatHeld": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
 }

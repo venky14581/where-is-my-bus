@@ -645,4 +645,128 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get scanOffline => 'No connection. Check the pass by eye for now.';
+
+  @override
+  String get missedBusButton => 'Missed your bus?';
+
+  @override
+  String get missedBusTitle => 'Catch another bus';
+
+  @override
+  String get missedBusIntro =>
+      'College buses the transport office allows you to ride, each with the nearest stop you can reach in time.';
+
+  @override
+  String get missedBusFromHere => 'Distances from where you are now.';
+
+  @override
+  String missedBusFromStop(String stop) {
+    return 'Distances from your stop, $stop. Allow location to get a closer match.';
+  }
+
+  @override
+  String get missedBusLocating => 'Finding where you are…';
+
+  @override
+  String get missedBusNone => 'No other college bus can take you right now.';
+
+  @override
+  String get missedBusNoneHint =>
+      'Only buses the transport office allows for your route, still on their way to a stop near you, are shown here.';
+
+  @override
+  String get missedBusNeedsPass =>
+      'You need a valid bus pass to ride another college bus.';
+
+  @override
+  String missedBusGetOnAt(String stop) {
+    return 'Get on at $stop';
+  }
+
+  @override
+  String missedBusWalk(String distance, int minutes) {
+    return '$distance walk, about $minutes min';
+  }
+
+  @override
+  String missedBusBusIn(int minutes, String time) {
+    return 'Bus there in $minutes min, around $time';
+  }
+
+  @override
+  String get missedBusBusThereNow => 'The bus is at that stop now';
+
+  @override
+  String get missedBusTooFar => 'The bus may get there before you.';
+
+  @override
+  String missedBusSeats(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count seats for other routes',
+      one: '1 seat for other routes',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get missedBusFull => 'No seats left for other routes';
+
+  @override
+  String distanceMetres(int metres) {
+    return '$metres m';
+  }
+
+  @override
+  String distanceKm(String km) {
+    return '$km km';
+  }
+
+  @override
+  String get holdSeatButton => 'Hold a seat';
+
+  @override
+  String holdHeld(String stop) {
+    return 'Seat held. Be at $stop and show your pass to the driver.';
+  }
+
+  @override
+  String get holdCancelButton => 'Give up seat';
+
+  @override
+  String get holdBoarded => 'You boarded this bus.';
+
+  @override
+  String holdMissed(String stop) {
+    return 'The bus left $stop, so your seat was released.';
+  }
+
+  @override
+  String get holdFull => 'Sorry, the last seat has just gone.';
+
+  @override
+  String get holdPassed => 'The bus has already passed that stop.';
+
+  @override
+  String get holdNotAllowed => 'This bus does not take riders from your route.';
+
+  @override
+  String get holdNotRunning => 'This bus is no longer running.';
+
+  @override
+  String get holdOffline => 'No connection. Try again.';
+
+  @override
+  String get waitingRidersTitle => 'Riders from other routes';
+
+  @override
+  String waitingRider(String name, String stop) {
+    return '$name at $stop';
+  }
+
+  @override
+  String scanNoSeatHeld(String name) {
+    return '$name has no seat held on this bus. They can hold one in the app.';
+  }
 }

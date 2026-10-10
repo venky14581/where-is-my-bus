@@ -9,6 +9,7 @@ import '../../core/l10n.dart';
 import '../auth/application/auth_providers.dart';
 import '../auth/domain/session.dart';
 import '../auth/ui/widgets.dart';
+import '../missed_bus/application/missed_bus_providers.dart';
 import '../routes/application/route_providers.dart';
 import '../routes/domain/bus_route.dart';
 import '../../routing/routes.dart';
@@ -156,6 +157,7 @@ class _TripControlsState extends ConsumerState<_TripControls> {
           ),
           const SizedBox(height: 16),
           _RunningStatus(trip: trip),
+          if (trip.tripId case final tripId?) _WaitingRiders(tripId: tripId, route: widget.route),
           const SizedBox(height: 16),
           const _IssueButtons(),
         ],
@@ -405,6 +407,45 @@ class _BusCard extends StatelessWidget {
               ].join(' · ')),
             ],
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Riders from other routes who hold a seat and are still to board, so the
+/// driver knows to stop for them.
+class _WaitingRiders extends ConsumerWidget {
+  const _WaitingRiders({required this.tripId, required this.route});
+
+  final String tripId;
+  final BusRoute route;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final holds = ref.watch(waitingHoldsProvider(tripId)).value ?? const [];
+    if (holds.isEmpty) return const SizedBox.shrink();
+    final l10n = context.l10n;
+    final text = Theme.of(context).textTheme;
+    final order = [for (final s in route.stops) s.id];
+    final sorted = [...holds]..sort((a, b) => order.indexOf(a.stopId).compareTo(order.indexOf(b.stopId)));
+    return Padding(
+      padding: const EdgeInsets.only(top: 16),
+      child: Card.filled(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l10n.waitingRidersTitle, style: text.titleMedium),
+              const SizedBox(height: 8),
+              for (final hold in sorted)
+                Text(
+                  l10n.waitingRider(hold.name, route.stopById(hold.stopId)?.name ?? hold.stopId),
+                  style: text.titleLarge,
+                ),
+            ],
+          ),
         ),
       ),
     );

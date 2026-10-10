@@ -24,6 +24,9 @@ import 'package:where_is_my_bus/features/pass/application/pass_providers.dart';
 import 'package:where_is_my_bus/features/pass/data/pass_repository.dart';
 import 'package:where_is_my_bus/features/live/data/live_repository.dart';
 import 'package:where_is_my_bus/features/live/domain/live_bus.dart';
+import 'package:where_is_my_bus/features/missed_bus/application/missed_bus_providers.dart';
+import 'package:where_is_my_bus/features/missed_bus/data/missed_bus_repository.dart';
+import 'package:where_is_my_bus/features/missed_bus/domain/missed_bus.dart';
 import 'package:where_is_my_bus/features/routes/application/route_providers.dart';
 import 'package:where_is_my_bus/features/routes/data/route_repository.dart';
 import 'package:where_is_my_bus/features/routes/domain/bus_route.dart';
@@ -373,6 +376,61 @@ class FakeLiveRepository implements LiveRepository {
   Stream<Duration> serverTimeOffset() => Stream.value(Duration.zero);
 }
 
+/// Running trips, route access and seat holds, all changed by hand.
+class FakeMissedBusRepository implements MissedBusRepository {
+  final trips = <RunningTrip>[];
+  final access = <String, List<String>>{};
+
+  /// Holds by trip, then student.
+  final holds = <String, Map<String, SeatHold>>{};
+  HoldResult nextResult = HoldResult.held;
+  final requests = <({String tripId, String stopId})>[];
+
+  /// Who [hold] holds the seat for.
+  String holder = '';
+  final _changes = StreamController<void>.broadcast();
+
+  void changed() => _changes.add(null);
+
+  Stream<T> _watch<T>(T Function() read) async* {
+    yield read();
+    await for (final _ in _changes.stream) {
+      yield read();
+    }
+  }
+
+  @override
+  Stream<List<RunningTrip>> watchRunningTrips(String date) => _watch(() => [...trips]);
+
+  @override
+  Stream<Map<String, List<String>>> watchRouteAccess() => _watch(() => {...access});
+
+  @override
+  Stream<SeatHold?> watchHold({required String tripId, required String uid}) => _watch(() => holds[tripId]?[uid]);
+
+  @override
+  Stream<List<SeatHold>> watchWaitingHolds(String tripId) =>
+      _watch(() => [...?holds[tripId]?.values.where((h) => h.status == HoldStatus.held)]);
+
+  @override
+  Future<HoldResult> hold({required String tripId, required String stopId}) async {
+    requests.add((tripId: tripId, stopId: stopId));
+    if (nextResult == HoldResult.held) {
+      (holds[tripId] ??= {})[holder] = SeatHold(uid: holder, name: 'Asha', stopId: stopId, status: HoldStatus.held);
+      changed();
+    }
+    return nextResult;
+  }
+
+  @override
+  Future<void> cancel(String tripId) async {
+    final mine = holds[tripId]?[holder];
+    if (mine == null) return;
+    holds[tripId]![holder] = SeatHold(uid: holder, name: mine.name, stopId: mine.stopId, status: HoldStatus.cancelled);
+    changed();
+  }
+}
+
 Future<void> pumpApp(
   WidgetTester tester,
   FakeAuthRepository auth, {
@@ -386,6 +444,8 @@ Future<void> pumpApp(
   FakePushService? push,
   FakePassRepository? passes,
   FakeScanner? scanner,
+  FakeMissedBusRepository? missedBus,
+  Locate? locate,
 }) async {
   // A phone-sized surface so layouts match what students and drivers see.
   tester.view.physicalSize = const Size(1080, 2340);
@@ -408,6 +468,8 @@ Future<void> pumpApp(
       pushServiceProvider.overrideWithValue(push ?? FakePushService()),
       passRepositoryProvider.overrideWithValue(passes ?? FakePassRepository()),
       scannerBuilderProvider.overrideWithValue((scanner ?? FakeScanner()).builder),
+      missedBusRepositoryProvider.overrideWithValue(missedBus ?? FakeMissedBusRepository()),
+      locateProvider.overrideWithValue(locate ?? () async => null),
     ],
     child: const WhereIsMyBusApp(),
   ));

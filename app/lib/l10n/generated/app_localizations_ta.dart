@@ -652,4 +652,132 @@ class AppLocalizationsTa extends AppLocalizations {
   @override
   String get scanOffline =>
       'இணைப்பு இல்லை. இப்போதைக்கு அனுமதிச்சீட்டைப் பார்த்துச் சரிபார்க்கவும்.';
+
+  @override
+  String get missedBusButton => 'பேருந்தைத் தவறவிட்டீர்களா?';
+
+  @override
+  String get missedBusTitle => 'வேறு பேருந்தில் செல்லுங்கள்';
+
+  @override
+  String get missedBusIntro =>
+      'போக்குவரத்து அலுவலகம் உங்களுக்கு அனுமதித்த கல்லூரிப் பேருந்துகள், நேரத்தில் அடையக்கூடிய அருகிலுள்ள நிறுத்தத்துடன்.';
+
+  @override
+  String get missedBusFromHere =>
+      'நீங்கள் இப்போது இருக்கும் இடத்திலிருந்து தூரம்.';
+
+  @override
+  String missedBusFromStop(String stop) {
+    return 'உங்கள் நிறுத்தமான $stop இலிருந்து தூரம். இன்னும் அருகிலுள்ள நிறுத்தத்திற்கு இருப்பிட அனுமதி தரவும்.';
+  }
+
+  @override
+  String get missedBusLocating => 'நீங்கள் இருக்கும் இடத்தைக் கண்டறிகிறது…';
+
+  @override
+  String get missedBusNone =>
+      'இப்போது வேறு எந்தக் கல்லூரிப் பேருந்தும் உங்களை ஏற்ற முடியாது.';
+
+  @override
+  String get missedBusNoneHint =>
+      'உங்கள் வழித்தடத்திற்கு அலுவலகம் அனுமதித்த, இன்னும் உங்கள் அருகிலுள்ள நிறுத்தத்திற்கு வரவுள்ள பேருந்துகள் மட்டுமே இங்கே காட்டப்படும்.';
+
+  @override
+  String get missedBusNeedsPass =>
+      'வேறு கல்லூரிப் பேருந்தில் செல்ல செல்லுபடியாகும் அனுமதிச்சீட்டு தேவை.';
+
+  @override
+  String missedBusGetOnAt(String stop) {
+    return '$stop இல் ஏறவும்';
+  }
+
+  @override
+  String missedBusWalk(String distance, int minutes) {
+    return '$distance நடை, சுமார் $minutes நிமிடம்';
+  }
+
+  @override
+  String missedBusBusIn(int minutes, String time) {
+    return 'பேருந்து $minutes நிமிடத்தில், சுமார் $time மணிக்கு வரும்';
+  }
+
+  @override
+  String get missedBusBusThereNow =>
+      'பேருந்து இப்போது அந்த நிறுத்தத்தில் உள்ளது';
+
+  @override
+  String get missedBusTooFar => 'உங்களுக்கு முன் பேருந்து அங்கு சென்றுவிடலாம்.';
+
+  @override
+  String missedBusSeats(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'மற்ற வழித்தடங்களுக்கு $count இருக்கைகள்',
+      one: 'மற்ற வழித்தடங்களுக்கு 1 இருக்கை',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get missedBusFull => 'மற்ற வழித்தடங்களுக்கு இருக்கை இல்லை';
+
+  @override
+  String distanceMetres(int metres) {
+    return '$metres மீ';
+  }
+
+  @override
+  String distanceKm(String km) {
+    return '$km கி.மீ';
+  }
+
+  @override
+  String get holdSeatButton => 'இருக்கையை ஒதுக்கு';
+
+  @override
+  String holdHeld(String stop) {
+    return 'இருக்கை ஒதுக்கப்பட்டது. $stop இல் இருந்து ஓட்டுநரிடம் உங்கள் அனுமதிச்சீட்டைக் காட்டுங்கள்.';
+  }
+
+  @override
+  String get holdCancelButton => 'இருக்கையை விடு';
+
+  @override
+  String get holdBoarded => 'நீங்கள் இந்தப் பேருந்தில் ஏறிவிட்டீர்கள்.';
+
+  @override
+  String holdMissed(String stop) {
+    return 'பேருந்து $stop ஐக் கடந்துவிட்டதால் உங்கள் இருக்கை விடுவிக்கப்பட்டது.';
+  }
+
+  @override
+  String get holdFull => 'மன்னிக்கவும், கடைசி இருக்கையும் இப்போது போய்விட்டது.';
+
+  @override
+  String get holdPassed => 'பேருந்து அந்த நிறுத்தத்தைக் கடந்துவிட்டது.';
+
+  @override
+  String get holdNotAllowed =>
+      'இந்தப் பேருந்து உங்கள் வழித்தட மாணவர்களை ஏற்றாது.';
+
+  @override
+  String get holdNotRunning => 'இந்தப் பேருந்து இப்போது இயங்கவில்லை.';
+
+  @override
+  String get holdOffline => 'இணைப்பு இல்லை. மீண்டும் முயலவும்.';
+
+  @override
+  String get waitingRidersTitle => 'மற்ற வழித்தடப் பயணிகள்';
+
+  @override
+  String waitingRider(String name, String stop) {
+    return '$name — $stop';
+  }
+
+  @override
+  String scanNoSeatHeld(String name) {
+    return '$name இந்தப் பேருந்தில் இருக்கை ஒதுக்கவில்லை. செயலியில் ஒதுக்கலாம்.';
+  }
 }

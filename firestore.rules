@@ -5,6 +5,7 @@ rules_version = '2';
 // Module 6: alert settings, devices, driver reports, alerts, announcements.
 // Module 7: validation of office edits, settings (fares and booking window).
 // Module 8: pass secrets and boardings, written only by Cloud Functions.
+// Module 9: seat holds on another bus, written only by Cloud Functions.
 // Server-only paths (pushLog, functionRuns, trips/*/approachingSent) stay
 // closed to clients.
 service cloud.firestore {
@@ -243,6 +244,15 @@ service cloud.firestore {
       // sees them for a head count; the office for reports.
       match /boardings/{uid} {
         allow read: if isOffice() || (signedIn() && get(tripPath(tripId)).data.driverId == request.auth.uid);
+      }
+
+      // Seats held by riders from other routes (missed-bus help), written
+      // by the holdSeat function. The student sees their own; the trip's
+      // driver sees who to expect where.
+      match /holds/{uid} {
+        allow read: if isOffice()
+          || (signedIn() && request.auth.uid == uid)
+          || (signedIn() && get(tripPath(tripId)).data.driverId == request.auth.uid);
       }
 
       // Running late and Breakdown, from the trip's driver while it runs.

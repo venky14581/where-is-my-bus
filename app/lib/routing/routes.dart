@@ -15,6 +15,7 @@ abstract final class Routes {
   static const studentAlerts = '/student/alerts';
   static const studentNotificationSettings = '/student/alerts/settings';
   static const studentPass = '/student/pass';
+  static const studentMissedBus = '/student/missed-bus';
 
   static const driverHome = '/driver';
   static const driverSignIn = '/driver/sign-in';

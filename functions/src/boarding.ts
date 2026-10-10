@@ -50,7 +50,8 @@ export type ScanResult =
   | 'expiredCode'
   | 'noPass'
   | 'passExpired'
-  | 'wrongRoute';
+  | 'wrongRoute'
+  | 'noSeatHeld';
 
 const metres = (a: { lat: number; lng: number }, b: { lat: number; lng: number }) => {
   const rad = Math.PI / 180;
@@ -116,16 +117,23 @@ export const scanPass = onCall(async (request) => {
     stopId = stops.reduce((best, s) => (metres(here, s) < metres(here, best) ? s : best)).id;
   }
 
-  try {
-    await db.doc(`trips/${tripId}/boardings/${pass.uid}`).create({
-      type: studentRoute === tripRoute ? 'pass' : 'alternate',
+  // A rider from another route boards only with a seat held in the app
+  // (missed-bus help), so the seat count stays true. Boarding uses it up.
+  const alternate = studentRoute !== tripRoute;
+  const boardingRef = db.doc(`trips/${tripId}/boardings/${pass.uid}`);
+  const holdRef = db.doc(`trips/${tripId}/holds/${pass.uid}`);
+  const outcome = await db.runTransaction(async (tx): Promise<ScanResult> => {
+    const [boarding, hold] = await Promise.all([tx.get(boardingRef), tx.get(holdRef)]);
+    if (boarding.exists) return 'alreadyBoarded';
+    if (alternate && hold.get('status') !== 'held') return 'noSeatHeld';
+    tx.create(boardingRef, {
+      type: alternate ? 'alternate' : 'pass',
       name,
       stopId,
       at: FieldValue.serverTimestamp(),
     });
-  } catch (e) {
-    if ((e as { code?: number }).code === 6) return result('alreadyBoarded', { name });
-    throw e;
-  }
-  return result('boarded', { name });
+    if (alternate) tx.update(holdRef, { status: 'boarded', endedAt: FieldValue.serverTimestamp() });
+    return 'boarded';
+  });
+  return result(outcome, { name });
 });
