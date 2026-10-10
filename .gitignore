@@ -1,0 +1,14 @@
+node_modules/
+.env.local
+*.local
+
+# Firebase CLI and emulators
+.firebase/
+*-debug.log
+.emulator-data/
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
