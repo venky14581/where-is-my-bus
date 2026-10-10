@@ -314,6 +314,73 @@ class AppLocalizationsTa extends AppLocalizations {
   }
 
   @override
-  String get tripTrackingNotReady =>
-      'பயணக் கண்காணிப்பு இன்னும் இயக்கப்படவில்லை.';
+  String get endTrip => 'பயணத்தை முடி';
+
+  @override
+  String get endTripConfirmTitle => 'இந்தப் பயணத்தை முடிக்கவா?';
+
+  @override
+  String get endTripConfirmBody =>
+      'மாணவர்கள் இனி வரைபடத்தில் பேருந்தைப் பார்க்க முடியாது.';
+
+  @override
+  String get cancelButton => 'ரத்து';
+
+  @override
+  String get directionToCampus => 'காலைப் பயணம்: கல்லூரிக்கு';
+
+  @override
+  String get directionFromCampus => 'மாலைப் பயணம்: கல்லூரியிலிருந்து';
+
+  @override
+  String get sharingLocation => 'பேருந்தின் இருப்பிடம் பகிரப்படுகிறது';
+
+  @override
+  String lastSentSecondsAgo(int seconds) {
+    return '$seconds வினாடிகள் முன் அனுப்பப்பட்டது';
+  }
+
+  @override
+  String get waitingForGps => 'GPS-க்காகக் காத்திருக்கிறது…';
+
+  @override
+  String get noSignal =>
+      'சிக்னல் இல்லை. இணையம் திரும்பியதும் இருப்பிடம் அனுப்பப்படும்.';
+
+  @override
+  String nextStopName(String name) {
+    return 'அடுத்த நிறுத்தம்: $name';
+  }
+
+  @override
+  String stopsReached(int reached, int total) {
+    return '$total நிறுத்தங்களில் $reached கடந்தது';
+  }
+
+  @override
+  String get lastStopReached =>
+      'எல்லா நிறுத்தங்களும் முடிந்தன. பயணத்தை முடி என்பதைத் தட்டவும்.';
+
+  @override
+  String get mockLocationWarning =>
+      'போலி GPS கண்டறியப்பட்டது. போலி இருப்பிடச் செயலியை அணைக்கவும். பேருந்தின் இருப்பிடம் அனுப்பப்படவில்லை.';
+
+  @override
+  String get problemLocationOff =>
+      'இருப்பிடம் அணைக்கப்பட்டுள்ளது. பயணத்தைத் தொடங்க அதை இயக்கவும்.';
+
+  @override
+  String get problemPermissionDenied =>
+      'பேருந்தின் இருப்பிடத்தைப் பகிர இந்தச் செயலிக்கு இருப்பிட அனுமதி தேவை.';
+
+  @override
+  String get problemPermissionDeniedForever =>
+      'இருப்பிட அனுமதி தடுக்கப்பட்டுள்ளது. அமைப்புகளில் அனுமதிக்கவும்.';
+
+  @override
+  String get problemStartFailed =>
+      'பயணத்தைத் தொடங்க முடியவில்லை. இணையத்தைச் சரிபார்த்து மீண்டும் முயலவும்.';
+
+  @override
+  String get openSettings => 'அமைப்புகளைத் திற';
 }

@@ -182,5 +182,47 @@
       }
     }
   },
-  "tripTrackingNotReady": "Trip tracking isn't switched on yet."
+  "endTrip": "End Trip",
+  "endTripConfirmTitle": "End this trip?",
+  "endTripConfirmBody": "Students will stop seeing the bus on the map.",
+  "cancelButton": "Cancel",
+  "directionToCampus": "Morning trip to campus",
+  "directionFromCampus": "Evening trip from campus",
+  "sharingLocation": "Sharing bus location",
+  "lastSentSecondsAgo": "Sent {seconds} s ago",
+  "@lastSentSecondsAgo": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "waitingForGps": "Waiting for GPS…",
+  "noSignal": "No signal. The location will be sent when the network returns.",
+  "nextStopName": "Next stop: {name}",
+  "@nextStopName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "stopsReached": "{reached} of {total} stops reached",
+  "@stopsReached": {
+    "placeholders": {
+      "reached": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "lastStopReached": "All stops reached. Tap End Trip.",
+  "mockLocationWarning": "Fake GPS detected. Turn off any fake location app. The bus location is not being sent.",
+  "problemLocationOff": "Location is off. Turn it on to start the trip.",
+  "problemPermissionDenied": "The app needs location permission to share the bus position.",
+  "problemPermissionDeniedForever": "Location permission is blocked. Allow it in Settings.",
+  "problemStartFailed": "Couldn't start the trip. Check the internet and try again.",
+  "openSettings": "Open settings"
 }

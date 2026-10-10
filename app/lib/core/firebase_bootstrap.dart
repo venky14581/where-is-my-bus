@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 
 import '../firebase_options.dart';
@@ -24,6 +25,7 @@ Future<void> initFirebase() async {
   final host = _emulatorHost();
   await FirebaseAuth.instance.useAuthEmulator(host, 9099);
   FirebaseFirestore.instance.useFirestoreEmulator(host, 8080);
+  FirebaseDatabase.instance.useDatabaseEmulator(host, 9000);
   debugPrint('Using Firebase emulators on $host');
 }
 

@@ -602,11 +602,119 @@ abstract class AppLocalizations {
   /// **'Bus {number}'**
   String busNumber(String number);
 
-  /// No description provided for @tripTrackingNotReady.
+  /// No description provided for @endTrip.
   ///
   /// In en, this message translates to:
-  /// **'Trip tracking isn\'t switched on yet.'**
-  String get tripTrackingNotReady;
+  /// **'End Trip'**
+  String get endTrip;
+
+  /// No description provided for @endTripConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'End this trip?'**
+  String get endTripConfirmTitle;
+
+  /// No description provided for @endTripConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Students will stop seeing the bus on the map.'**
+  String get endTripConfirmBody;
+
+  /// No description provided for @cancelButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancelButton;
+
+  /// No description provided for @directionToCampus.
+  ///
+  /// In en, this message translates to:
+  /// **'Morning trip to campus'**
+  String get directionToCampus;
+
+  /// No description provided for @directionFromCampus.
+  ///
+  /// In en, this message translates to:
+  /// **'Evening trip from campus'**
+  String get directionFromCampus;
+
+  /// No description provided for @sharingLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Sharing bus location'**
+  String get sharingLocation;
+
+  /// No description provided for @lastSentSecondsAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent {seconds} s ago'**
+  String lastSentSecondsAgo(int seconds);
+
+  /// No description provided for @waitingForGps.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for GPS…'**
+  String get waitingForGps;
+
+  /// No description provided for @noSignal.
+  ///
+  /// In en, this message translates to:
+  /// **'No signal. The location will be sent when the network returns.'**
+  String get noSignal;
+
+  /// No description provided for @nextStopName.
+  ///
+  /// In en, this message translates to:
+  /// **'Next stop: {name}'**
+  String nextStopName(String name);
+
+  /// No description provided for @stopsReached.
+  ///
+  /// In en, this message translates to:
+  /// **'{reached} of {total} stops reached'**
+  String stopsReached(int reached, int total);
+
+  /// No description provided for @lastStopReached.
+  ///
+  /// In en, this message translates to:
+  /// **'All stops reached. Tap End Trip.'**
+  String get lastStopReached;
+
+  /// No description provided for @mockLocationWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Fake GPS detected. Turn off any fake location app. The bus location is not being sent.'**
+  String get mockLocationWarning;
+
+  /// No description provided for @problemLocationOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Location is off. Turn it on to start the trip.'**
+  String get problemLocationOff;
+
+  /// No description provided for @problemPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'The app needs location permission to share the bus position.'**
+  String get problemPermissionDenied;
+
+  /// No description provided for @problemPermissionDeniedForever.
+  ///
+  /// In en, this message translates to:
+  /// **'Location permission is blocked. Allow it in Settings.'**
+  String get problemPermissionDeniedForever;
+
+  /// No description provided for @problemStartFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t start the trip. Check the internet and try again.'**
+  String get problemStartFailed;
+
+  /// No description provided for @openSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open settings'**
+  String get openSettings;
 }
 
 class _AppLocalizationsDelegate

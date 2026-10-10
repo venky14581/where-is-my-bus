@@ -15,6 +15,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '000000000000',
     projectId: 'demo-whereismybus',
     authDomain: 'demo-whereismybus.firebaseapp.com',
-    databaseURL: 'http://127.0.0.1:9000/?ns=demo-whereismybus',
+    // The emulator applies database.rules.json only to the default instance,
+    // which is named <projectId>-default-rtdb, as in production.
+    databaseURL: 'http://127.0.0.1:9000/?ns=demo-whereismybus-default-rtdb',
   );
 }

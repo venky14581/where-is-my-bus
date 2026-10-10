@@ -7,7 +7,8 @@ import { FieldValue } from 'firebase-admin/firestore';
 const readJson = async (name) =>
   JSON.parse(await readFile(new URL(`../data/${name}`, import.meta.url), 'utf8'));
 
-export async function importBaseData(db) {
+// rtdb: Admin SDK Realtime Database, for the busDrivers mirror its rules use.
+export async function importBaseData(db, rtdb) {
   const base = await readJson('base-data.json');
   const paths = await readJson('route-paths.json');
   const batch = db.batch();
@@ -37,12 +38,14 @@ export async function importBaseData(db) {
     });
   }
 
+  const busDrivers = {};
   for (const bus of base.buses) {
     let driverId = null;
     if (bus.driver) {
       const found = await db.collection('users').where('driverId', '==', bus.driver).limit(1).get();
       if (found.empty) throw new Error(`Bus ${bus.id}: no driver with ID ${bus.driver}`);
       driverId = found.docs[0].id;
+      busDrivers[bus.id] = driverId;
     }
     batch.set(db.doc(`buses/${bus.id}`), {
       number: bus.number,
@@ -58,5 +61,6 @@ export async function importBaseData(db) {
   }
 
   await batch.commit();
+  await rtdb.ref('busDrivers').set(busDrivers);
   return { routes: base.routes.length, buses: base.buses.length };
 }

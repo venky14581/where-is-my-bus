@@ -5,6 +5,7 @@ import 'package:hive/hive.dart';
 abstract interface class SettingsStore {
   String? read(String key);
   Future<void> write(String key, String value);
+  Future<void> remove(String key);
 }
 
 class HiveSettingsStore implements SettingsStore {
@@ -19,6 +20,9 @@ class HiveSettingsStore implements SettingsStore {
 
   @override
   Future<void> write(String key, String value) => _box.put(key, value);
+
+  @override
+  Future<void> remove(String key) => _box.delete(key);
 }
 
 /// Overridden in `main()` once the Hive box is open.
