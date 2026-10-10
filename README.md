@@ -66,6 +66,17 @@ Nothing here touches a real Firebase project: the app and dashboard use the
    cd app && flutter run -d chrome
    ```
 
+   To try driver mode without a phone, add a simulated drive along the
+   route (debug builds only):
+
+   ```bash
+   cd app && flutter run -d chrome --dart-define=SIMULATE_DRIVE=true
+   ```
+
+   Sign in as driver `DRV001`, tap Start Trip, and watch `live/bus-01` move
+   in the Database tab of the emulator UI. Keep to one browser tab: a second
+   tab of the same debug session stays blank.
+
    Use `flutter run` (a debug build) for web. Do not use a release web build
    (`flutter build web`) with the emulators: when a page reload finds a
    signed-in user, Firebase Auth checks that user against production before
@@ -84,15 +95,23 @@ the emulator UI (http://localhost:4000/auth), then tap **I've verified**.
 
 ### On an Android phone
 
+Driver mode needs a real phone: background tracking with the screen off
+can't be tested on the web. Install Android Studio first (it installs the
+Android SDK), then check `flutter doctor`.
+
 The app finds the emulators at `10.0.2.2` on the Android emulator. For a
-physical phone on the same Wi-Fi, add `"host": "0.0.0.0"` to the `auth` and
-`firestore` entries in `firebase.json`, then run:
+physical phone on the same Wi-Fi, add `"host": "0.0.0.0"` to the `auth`,
+`firestore` and `database` entries in `firebase.json`, then run:
 
 ```bash
 cd app && flutter run --dart-define=EMULATOR_HOST=192.168.1.20
 ```
 
 (replace the address with your computer's LAN IP).
+
+To test background tracking: start a trip, turn the screen off for five
+minutes, and check that `live/{busId}` keeps updating in the emulator UI and
+that the "trip in progress" notification is showing.
 
 ## Tests
 
