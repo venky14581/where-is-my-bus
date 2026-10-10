@@ -3,6 +3,7 @@
 
 export { createDriver, setDriverPin } from './drivers.js';
 export { mirrorBusDriver } from './mirror.js';
+export { issuePassSecret, scanPass } from './boarding.js';
 
 import { FieldValue, type DocumentSnapshot, type Timestamp } from 'firebase-admin/firestore';
 import { getMessaging } from 'firebase-admin/messaging';

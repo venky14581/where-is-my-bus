@@ -572,4 +572,84 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get reportButton => 'தெரிவி';
+
+  @override
+  String get myPassTitle => 'என் பேருந்து அனுமதிச்சீட்டு';
+
+  @override
+  String get passShowDriver => 'ஏறும்போது இதை ஓட்டுநரிடம் காட்டவும்.';
+
+  @override
+  String passValidUntil(String date) {
+    return '$date வரை செல்லும்';
+  }
+
+  @override
+  String get passExpired =>
+      'உங்கள் அனுமதிச்சீட்டு காலாவதியாகிவிட்டது. போக்குவரத்து அலுவலகத்தைத் தொடர்புகொள்ளவும்.';
+
+  @override
+  String get passNone =>
+      'உங்கள் கணக்கில் பேருந்து அனுமதிச்சீட்டு இல்லை. போக்குவரத்து அலுவலகத்தைத் தொடர்புகொள்ளவும்.';
+
+  @override
+  String get passPreparing => 'உங்கள் அனுமதிச்சீட்டு தயாராகிறது…';
+
+  @override
+  String passRefreshesIn(int seconds) {
+    return '$seconds வினாடிகளில் மாறும்; திரைப்பிடிப்புகள் செல்லாது';
+  }
+
+  @override
+  String get scanPassButton => 'அனுமதிச்சீட்டை ஸ்கேன் செய்';
+
+  @override
+  String get scanTitle => 'அனுமதிச்சீட்டுகளை ஸ்கேன் செய்';
+
+  @override
+  String get scanHint => 'மாணவரின் QR குறியீட்டை நோக்கி கேமராவைக் காட்டவும்.';
+
+  @override
+  String boardedCount(int count) {
+    return '$count பேர் ஏறினர்';
+  }
+
+  @override
+  String scanBoarded(String name) {
+    return '$name – ஏறினார்';
+  }
+
+  @override
+  String scanAlreadyBoarded(String name) {
+    return '$name ஏற்கனவே ஏறிவிட்டார்';
+  }
+
+  @override
+  String get scanNotAPass => 'இது பேருந்து அனுமதிச்சீட்டு அல்ல.';
+
+  @override
+  String get scanInvalid => 'இந்த அனுமதிச்சீட்டு உண்மையானது அல்ல.';
+
+  @override
+  String get scanExpiredCode =>
+      'பழைய குறியீடு. அனுமதிச்சீட்டை மீண்டும் திறக்க மாணவரிடம் சொல்லவும்.';
+
+  @override
+  String scanNoPass(String name) {
+    return '$name அவர்களிடம் பேருந்து அனுமதிச்சீட்டு இல்லை.';
+  }
+
+  @override
+  String scanPassExpired(String name) {
+    return '$name அவர்களின் அனுமதிச்சீட்டு காலாவதியானது.';
+  }
+
+  @override
+  String scanWrongRoute(String name) {
+    return '$name இந்தப் பேருந்தில் பயணிக்க அனுமதி இல்லை.';
+  }
+
+  @override
+  String get scanOffline =>
+      'இணைப்பு இல்லை. இப்போதைக்கு அனுமதிச்சீட்டைப் பார்த்துச் சரிபார்க்கவும்.';
 }

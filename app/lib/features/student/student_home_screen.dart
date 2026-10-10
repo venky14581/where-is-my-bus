@@ -30,6 +30,11 @@ class StudentHomeScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text(l10n.appTitle),
         actions: [
+          IconButton(
+            tooltip: l10n.myPassTitle,
+            icon: const Icon(Icons.qr_code_2),
+            onPressed: () => context.push(Routes.studentPass),
+          ),
           if (routeId != null) _AlertsButton(routeId: routeId),
           IconButton(
             tooltip: l10n.allBusesTitle,

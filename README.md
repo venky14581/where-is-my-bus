@@ -99,7 +99,7 @@ Nothing here touches a real Firebase project: the app and dashboard use the
    iOS and real projects are not affected.
 
 4. Office dashboard at http://localhost:5173 (live map, buses, routes and
-   stops, drivers, announcements, fares and booking):
+   stops, drivers, bus passes, announcements, fares and booking):
 
    ```bash
    npm --prefix dashboard run dev

@@ -6,6 +6,7 @@ import { LiveMapPage } from './pages/LiveMapPage';
 import { BusesPage } from './pages/BusesPage';
 import { RoutesPage } from './pages/RoutesPage';
 import { DriversPage } from './pages/DriversPage';
+import { PassesPage } from './pages/PassesPage';
 import { AnnouncementsPage } from './pages/AnnouncementsPage';
 import { SettingsPage } from './pages/SettingsPage';
 
@@ -14,6 +15,7 @@ const pages = [
   { path: 'buses', label: 'Buses', render: () => <BusesPage /> },
   { path: 'routes', label: 'Routes and stops', render: () => <RoutesPage /> },
   { path: 'drivers', label: 'Drivers', render: () => <DriversPage /> },
+  { path: 'passes', label: 'Bus passes', render: () => <PassesPage /> },
   { path: 'announcements', label: 'Announcements', render: () => <AnnouncementsPage /> },
   { path: 'settings', label: 'Fares and booking', render: () => <SettingsPage /> },
 ] as const satisfies readonly { path: string; label: string; render: () => ReactNode }[];

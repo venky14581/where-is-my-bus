@@ -24,6 +24,7 @@ class AppUser {
     this.routeId,
     this.stopId,
     this.passValid = false,
+    this.passValidUntil,
     this.language,
     this.alerts = const AlertPrefs(),
   });
@@ -36,6 +37,9 @@ class AppUser {
   final String? routeId;
   final String? stopId;
   final bool passValid;
+
+  /// Last day the pass is valid, YYYY-MM-DD, set by the office.
+  final String? passValidUntil;
 
   /// `en` or `ta`. Null until a driver picks one at first login.
   final String? language;
@@ -52,6 +56,7 @@ class AppUser {
         routeId: routeId ?? this.routeId,
         stopId: stopId ?? this.stopId,
         passValid: passValid,
+        passValidUntil: passValidUntil,
         language: language ?? this.language,
         alerts: alerts ?? this.alerts,
       );
@@ -70,6 +75,7 @@ class AppUser {
       routeId: data['routeId'] as String?,
       stopId: data['stopId'] as String?,
       passValid: data['passValid'] as bool? ?? false,
+      passValidUntil: data['passValidUntil'] as String?,
       language: data['language'] as String?,
       alerts: AlertPrefs.fromMap(data['alerts']),
     );

@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../core/l10n.dart';
 import '../auth/application/auth_providers.dart';
@@ -10,6 +11,7 @@ import '../auth/domain/session.dart';
 import '../auth/ui/widgets.dart';
 import '../routes/application/route_providers.dart';
 import '../routes/domain/bus_route.dart';
+import '../../routing/routes.dart';
 import '../routes/ui/scheduled_time.dart';
 import '../trip/application/trip_controller.dart';
 import '../trip/data/location_source.dart';
@@ -144,6 +146,15 @@ class _TripControlsState extends ConsumerState<_TripControls> {
         if (trip.problem case final problem?) _ProblemBanner(problem: problem),
         if (trip.mockDetected) ErrorBanner(l10n.mockLocationWarning),
         if (trip.phase == TripPhase.running) ...[
+          SizedBox(
+            height: 64,
+            child: FilledButton.tonalIcon(
+              onPressed: () => context.push(Routes.driverScan),
+              icon: const Icon(Icons.qr_code_scanner, size: 28),
+              label: Text(l10n.scanPassButton, style: const TextStyle(fontSize: 20)),
+            ),
+          ),
+          const SizedBox(height: 16),
           _RunningStatus(trip: trip),
           const SizedBox(height: 16),
           const _IssueButtons(),

@@ -387,5 +387,81 @@
   "driverReportSent": "Riders have been told.",
   "breakdownConfirmTitle": "Report a breakdown?",
   "breakdownConfirmBody": "Every rider on this route will be told the bus has broken down.",
-  "reportButton": "Report"
+  "reportButton": "Report",
+  "myPassTitle": "My bus pass",
+  "passShowDriver": "Show this to the driver when you board.",
+  "passValidUntil": "Valid until {date}",
+  "@passValidUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "passExpired": "Your pass has expired. Contact the transport office.",
+  "passNone": "No bus pass on your account. Contact the transport office.",
+  "passPreparing": "Preparing your pass…",
+  "passRefreshesIn": "Changes in {seconds} s, so screenshots stop working",
+  "@passRefreshesIn": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "scanPassButton": "Scan pass",
+  "scanTitle": "Scan passes",
+  "scanHint": "Point the camera at the student's QR code.",
+  "boardedCount": "{count} boarded",
+  "@boardedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "scanBoarded": "{name} – boarded",
+  "@scanBoarded": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "scanAlreadyBoarded": "{name} already boarded",
+  "@scanAlreadyBoarded": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "scanNotAPass": "That's not a bus pass.",
+  "scanInvalid": "This pass is not genuine.",
+  "scanExpiredCode": "Old code. Ask the student to open their pass again.",
+  "scanNoPass": "{name} has no bus pass.",
+  "@scanNoPass": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "scanPassExpired": "{name}'s pass has expired.",
+  "@scanPassExpired": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "scanWrongRoute": "{name} is not allowed on this bus.",
+  "@scanWrongRoute": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "scanOffline": "No connection. Check the pass by eye for now."
 }

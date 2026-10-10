@@ -2,6 +2,7 @@ import { describe, expect, test } from 'vitest';
 
 import { describeAge, liveState, parseLive } from './live';
 import { decodePolyline } from './polyline';
+import { passState } from './passes';
 import { buildPath, routeDocument, routeProblems, slugify, withStopIds, type RouteDraft } from './routeEdit';
 
 const stop = (name: string, time: string, id = '', lat: number | null = 11, lng: number | null = 76.9) => ({
@@ -96,5 +97,14 @@ describe('live positions', () => {
 
   test('polylines decode with negative steps', () => {
     expect(decodePolyline('_p~iF~ps|U_ulLnnqC_mqNvxq`@')).toEqual([[38.5, -120.2], [40.7, -120.95], [43.252, -126.453]]);
+  });
+});
+
+describe('passes', () => {
+  test('valid through the last day, then expired; none without a date', () => {
+    expect(passState({ passValid: true, passValidUntil: '2026-10-12' }, '2026-10-12')).toBe('valid');
+    expect(passState({ passValid: true, passValidUntil: '2026-10-12' }, '2026-10-13')).toBe('expired');
+    expect(passState({ passValid: true, passValidUntil: null }, '2026-10-12')).toBe('none');
+    expect(passState({ passValid: false, passValidUntil: '2027-01-01' }, '2026-10-12')).toBe('none');
   });
 });

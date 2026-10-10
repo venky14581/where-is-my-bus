@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -13,6 +14,9 @@ const _useEmulatorsOverride = String.fromEnvironment('USE_EMULATORS');
 // same Wi-Fi as the computer running the emulators.
 const _emulatorHostOverride = String.fromEnvironment('EMULATOR_HOST');
 
+/// Same region as functions/src/app.ts.
+const functionsRegion = 'asia-south1';
+
 Future<void> initFirebase() async {
   final options = DefaultFirebaseOptions.currentPlatform;
   await Firebase.initializeApp(options: options);
@@ -26,6 +30,7 @@ Future<void> initFirebase() async {
   await FirebaseAuth.instance.useAuthEmulator(host, 9099);
   FirebaseFirestore.instance.useFirestoreEmulator(host, 8080);
   FirebaseDatabase.instance.useDatabaseEmulator(host, 9000);
+  FirebaseFunctions.instanceFor(region: functionsRegion).useFunctionsEmulator(host, 5001);
   debugPrint('Using Firebase emulators on $host');
 }
 

@@ -566,4 +566,83 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reportButton => 'Report';
+
+  @override
+  String get myPassTitle => 'My bus pass';
+
+  @override
+  String get passShowDriver => 'Show this to the driver when you board.';
+
+  @override
+  String passValidUntil(String date) {
+    return 'Valid until $date';
+  }
+
+  @override
+  String get passExpired =>
+      'Your pass has expired. Contact the transport office.';
+
+  @override
+  String get passNone =>
+      'No bus pass on your account. Contact the transport office.';
+
+  @override
+  String get passPreparing => 'Preparing your pass…';
+
+  @override
+  String passRefreshesIn(int seconds) {
+    return 'Changes in $seconds s, so screenshots stop working';
+  }
+
+  @override
+  String get scanPassButton => 'Scan pass';
+
+  @override
+  String get scanTitle => 'Scan passes';
+
+  @override
+  String get scanHint => 'Point the camera at the student\'s QR code.';
+
+  @override
+  String boardedCount(int count) {
+    return '$count boarded';
+  }
+
+  @override
+  String scanBoarded(String name) {
+    return '$name – boarded';
+  }
+
+  @override
+  String scanAlreadyBoarded(String name) {
+    return '$name already boarded';
+  }
+
+  @override
+  String get scanNotAPass => 'That\'s not a bus pass.';
+
+  @override
+  String get scanInvalid => 'This pass is not genuine.';
+
+  @override
+  String get scanExpiredCode =>
+      'Old code. Ask the student to open their pass again.';
+
+  @override
+  String scanNoPass(String name) {
+    return '$name has no bus pass.';
+  }
+
+  @override
+  String scanPassExpired(String name) {
+    return '$name\'s pass has expired.';
+  }
+
+  @override
+  String scanWrongRoute(String name) {
+    return '$name is not allowed on this bus.';
+  }
+
+  @override
+  String get scanOffline => 'No connection. Check the pass by eye for now.';
 }

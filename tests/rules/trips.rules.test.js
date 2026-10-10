@@ -123,3 +123,25 @@ describe('stop times', () => {
     await assertFails(setDoc(doc(student(), `trips/${TRIP}/stopTimes/ukkadam`), stopTime('ukkadam')));
   });
 });
+
+describe('passes and boardings', () => {
+  beforeEach(() => env.withSecurityRulesDisabled(async (ctx) => {
+    const db = ctx.firestore();
+    await setDoc(doc(db, `trips/${TRIP}`), { ...newTrip(), startedAt: Timestamp.now() });
+    await setDoc(doc(db, 'passSecrets/student1'), { secret: 'c2VjcmV0' });
+    await setDoc(doc(db, `trips/${TRIP}/boardings/student1`), { type: 'pass', name: 'Asha', at: Timestamp.now() });
+  }));
+
+  test('a student reads only their own pass secret, and nobody writes one', async () => {
+    await assertSucceeds(getDoc(doc(student(), 'passSecrets/student1')));
+    await assertFails(getDoc(doc(driver(), 'passSecrets/student1')));
+    await assertFails(setDoc(doc(student(), 'passSecrets/student1'), { secret: 'mine' }));
+  });
+
+  test("the trip's driver sees who boarded; students and other drivers do not", async () => {
+    await assertSucceeds(getDoc(doc(driver(), `trips/${TRIP}/boardings/student1`)));
+    await assertFails(getDoc(doc(driver('driver2'), `trips/${TRIP}/boardings/student1`)));
+    await assertFails(getDoc(doc(student(), `trips/${TRIP}/boardings/student1`)));
+    await assertFails(setDoc(doc(driver(), `trips/${TRIP}/boardings/student2`), { type: 'pass' }));
+  });
+});
