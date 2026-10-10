@@ -165,6 +165,15 @@ npm run test:functions
 npm --prefix dashboard test
 ```
 
+End-to-end, every module's server side (sign-in, rules, Cloud Functions and
+triggers) on the emulators. Starts and stops the emulators itself, or uses
+the ones from `npm run emulators`. It empties and re-seeds them, so run
+`npm run seed` again afterwards if you were using that data:
+
+```bash
+npm run test:e2e
+```
+
 ## Connecting a real Firebase project
 
 Not done yet. When the team has a project: run `flutterfire configure` in
