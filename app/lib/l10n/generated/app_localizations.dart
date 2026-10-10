@@ -1003,6 +1003,126 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Report'**
   String get reportButton;
+
+  /// No description provided for @myPassTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My bus pass'**
+  String get myPassTitle;
+
+  /// No description provided for @passShowDriver.
+  ///
+  /// In en, this message translates to:
+  /// **'Show this to the driver when you board.'**
+  String get passShowDriver;
+
+  /// No description provided for @passValidUntil.
+  ///
+  /// In en, this message translates to:
+  /// **'Valid until {date}'**
+  String passValidUntil(String date);
+
+  /// No description provided for @passExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Your pass has expired. Contact the transport office.'**
+  String get passExpired;
+
+  /// No description provided for @passNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No bus pass on your account. Contact the transport office.'**
+  String get passNone;
+
+  /// No description provided for @passPreparing.
+  ///
+  /// In en, this message translates to:
+  /// **'Preparing your pass…'**
+  String get passPreparing;
+
+  /// No description provided for @passRefreshesIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Changes in {seconds} s, so screenshots stop working'**
+  String passRefreshesIn(int seconds);
+
+  /// No description provided for @scanPassButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan pass'**
+  String get scanPassButton;
+
+  /// No description provided for @scanTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan passes'**
+  String get scanTitle;
+
+  /// No description provided for @scanHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Point the camera at the student\'s QR code.'**
+  String get scanHint;
+
+  /// No description provided for @boardedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} boarded'**
+  String boardedCount(int count);
+
+  /// No description provided for @scanBoarded.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} – boarded'**
+  String scanBoarded(String name);
+
+  /// No description provided for @scanAlreadyBoarded.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} already boarded'**
+  String scanAlreadyBoarded(String name);
+
+  /// No description provided for @scanNotAPass.
+  ///
+  /// In en, this message translates to:
+  /// **'That\'s not a bus pass.'**
+  String get scanNotAPass;
+
+  /// No description provided for @scanInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'This pass is not genuine.'**
+  String get scanInvalid;
+
+  /// No description provided for @scanExpiredCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Old code. Ask the student to open their pass again.'**
+  String get scanExpiredCode;
+
+  /// No description provided for @scanNoPass.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} has no bus pass.'**
+  String scanNoPass(String name);
+
+  /// No description provided for @scanPassExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}\'s pass has expired.'**
+  String scanPassExpired(String name);
+
+  /// No description provided for @scanWrongRoute.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is not allowed on this bus.'**
+  String scanWrongRoute(String name);
+
+  /// No description provided for @scanOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'No connection. Check the pass by eye for now.'**
+  String get scanOffline;
 }
 
 class _AppLocalizationsDelegate

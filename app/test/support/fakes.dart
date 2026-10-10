@@ -20,6 +20,8 @@ import 'package:where_is_my_bus/features/alerts/domain/feed_item.dart';
 import 'package:where_is_my_bus/features/eta/application/eta_providers.dart';
 import 'package:where_is_my_bus/features/eta/data/stop_times_repository.dart';
 import 'package:where_is_my_bus/features/live/application/live_providers.dart';
+import 'package:where_is_my_bus/features/pass/application/pass_providers.dart';
+import 'package:where_is_my_bus/features/pass/data/pass_repository.dart';
 import 'package:where_is_my_bus/features/live/data/live_repository.dart';
 import 'package:where_is_my_bus/features/live/domain/live_bus.dart';
 import 'package:where_is_my_bus/features/routes/application/route_providers.dart';
@@ -66,6 +68,8 @@ class FakeAuthRepository implements AuthRepository {
     bool verified = true,
     String? routeId,
     String? stopId,
+    bool passValid = false,
+    String? passValidUntil,
   }) {
     final uid = 'uid-$email';
     _accounts[email] = _Account(
@@ -79,6 +83,8 @@ class FakeAuthRepository implements AuthRepository {
         language: 'en',
         routeId: routeId,
         stopId: stopId,
+        passValid: passValid,
+        passValidUntil: passValidUntil,
       ),
     );
   }
@@ -299,6 +305,37 @@ class FakePushService implements PushService {
   Future<void> unregister(String uid) async => unregistered.add(uid);
 }
 
+class FakePassRepository implements PassRepository {
+  final secrets = <String, String>{};
+  final scanned = <String>[];
+  ScanOutcome Function(String code) decide = (_) => const ScanOutcome(ScanResult.boarded, name: 'Asha');
+
+  @override
+  Stream<String?> watchSecret(String uid) => Stream.value(secrets[uid]);
+
+  @override
+  Future<ScanOutcome> scan({required String tripId, required String code}) async {
+    scanned.add(code);
+    return decide(code);
+  }
+
+  @override
+  Stream<int> watchBoardedCount(String tripId) =>
+      Stream.value(scanned.where((c) => decide(c).result == ScanResult.boarded).length);
+}
+
+/// Stands in for the camera: tests call [emit] to "scan" a code.
+class FakeScanner {
+  void Function(String code)? _onCode;
+
+  void emit(String code) => _onCode?.call(code);
+
+  ScannerBuilder get builder => (context, onCode) {
+        _onCode = onCode;
+        return const ColoredBox(color: Colors.black);
+      };
+}
+
 class FakeStopTimesRepository implements StopTimesRepository {
   final byTrip = <String, Map<String, DateTime>>{};
 
@@ -347,6 +384,8 @@ Future<void> pumpApp(
   FakeStopTimesRepository? stopTimes,
   FakeAlertsRepository? alerts,
   FakePushService? push,
+  FakePassRepository? passes,
+  FakeScanner? scanner,
 }) async {
   // A phone-sized surface so layouts match what students and drivers see.
   tester.view.physicalSize = const Size(1080, 2340);
@@ -367,6 +406,8 @@ Future<void> pumpApp(
       stopTimesRepositoryProvider.overrideWithValue(stopTimes ?? FakeStopTimesRepository()),
       alertsRepositoryProvider.overrideWithValue(alerts ?? FakeAlertsRepository(auth)),
       pushServiceProvider.overrideWithValue(push ?? FakePushService()),
+      passRepositoryProvider.overrideWithValue(passes ?? FakePassRepository()),
+      scannerBuilderProvider.overrideWithValue((scanner ?? FakeScanner()).builder),
     ],
     child: const WhereIsMyBusApp(),
   ));

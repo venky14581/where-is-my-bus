@@ -14,10 +14,12 @@ abstract final class Routes {
   static const studentFullRoute = '/student/route';
   static const studentAlerts = '/student/alerts';
   static const studentNotificationSettings = '/student/alerts/settings';
+  static const studentPass = '/student/pass';
 
   static const driverHome = '/driver';
   static const driverSignIn = '/driver/sign-in';
   static const driverLanguage = '/driver/language';
+  static const driverScan = '/driver/scan';
 
   /// Reachable while signed out.
   static const public = {

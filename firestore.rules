@@ -4,6 +4,7 @@ rules_version = '2';
 // them. Module 1: users. Module 2: routes, buses, routeAccess. Module 3: trips.
 // Module 6: alert settings, devices, driver reports, alerts, announcements.
 // Module 7: validation of office edits, settings (fares and booking window).
+// Module 8: pass secrets and boardings, written only by Cloud Functions.
 // Server-only paths (pushLog, functionRuns, trips/*/approachingSent) stay
 // closed to clients.
 service cloud.firestore {
@@ -238,6 +239,12 @@ service cloud.firestore {
           && request.resource.data.recordedAt == request.time;
       }
 
+      // Who boarded, written by the scanPass function. The trip's driver
+      // sees them for a head count; the office for reports.
+      match /boardings/{uid} {
+        allow read: if isOffice() || (signedIn() && get(tripPath(tripId)).data.driverId == request.auth.uid);
+      }
+
       // Running late and Breakdown, from the trip's driver while it runs.
       match /reports/{reportId} {
         allow read: if canReadBaseData();
@@ -249,6 +256,12 @@ service cloud.firestore {
           && request.resource.data.type in ['late', 'breakdown']
           && request.resource.data.createdAt == request.time;
       }
+    }
+
+    // The secret behind a student's rotating pass QR. Only that student's
+    // phone and the server may know it; never written by a client.
+    match /passSecrets/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
     }
 
     // The in-app alerts list. Written only by Cloud Functions.

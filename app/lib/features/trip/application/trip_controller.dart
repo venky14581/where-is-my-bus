@@ -25,6 +25,7 @@ enum TripProblem { locationOff, permissionDenied, permissionDeniedForever, start
 class TripState {
   const TripState({
     this.phase = TripPhase.idle,
+    this.tripId,
     this.direction,
     this.lastSentAt,
     this.online = true,
@@ -36,6 +37,9 @@ class TripState {
   });
 
   final TripPhase phase;
+
+  /// Set while a trip runs; the pass scanner needs it.
+  final String? tripId;
   final TripDirection? direction;
 
   /// When the last position reached the server (phone clock).
@@ -59,6 +63,7 @@ class TripState {
   }) =>
       TripState(
         phase: phase,
+        tripId: tripId,
         direction: direction,
         lastSentAt: lastSentAt ?? this.lastSentAt,
         online: online ?? this.online,
@@ -168,6 +173,7 @@ class TripController extends Notifier<TripState> {
     _stops = stops;
     state = TripState(
       phase: TripPhase.running,
+      tripId: active.tripId,
       direction: active.direction,
       nextStop: stops.nextStop,
       reachedCount: stops.reached.length,
@@ -216,6 +222,7 @@ class TripController extends Notifier<TripState> {
       unawaited(_store.save(_active!));
       state = TripState(
         phase: state.phase,
+        tripId: state.tripId,
         direction: state.direction,
         lastSentAt: state.lastSentAt,
         online: state.online,
