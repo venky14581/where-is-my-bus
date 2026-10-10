@@ -8,6 +8,7 @@ are in [CLAUDE.md](CLAUDE.md); progress per module is in [docs/modules](docs/mod
 | --- | --- |
 | `app/` | Flutter app: students and drivers (Android, iOS; web for development) |
 | `dashboard/` | React dashboard for the transport office |
+| `functions/` | Cloud Functions (TypeScript): alerts and announcements |
 | `firestore.rules`, `database.rules.json` | Security rules |
 | `data/` | Routes, buses and route access (`base-data.json`), and road paths from OSRM |
 | `scripts/seed-emulators.mjs` | Loads demo accounts and `data/` into the local emulators |
@@ -32,6 +33,10 @@ npm --prefix dashboard install
 ```
 
 ```bash
+npm --prefix functions install
+```
+
+```bash
 cd app && flutter pub get
 ```
 
@@ -40,7 +45,8 @@ cd app && flutter pub get
 Nothing here touches a real Firebase project: the app and dashboard use the
 `demo-whereismybus` project, which only exists on the emulators.
 
-1. Start the emulators and leave them running (UI at http://localhost:4000):
+1. Build the Cloud Functions and start the emulators, and leave them running
+   (UI at http://localhost:4000):
 
    ```bash
    npm run emulators
@@ -98,6 +104,14 @@ Nothing here touches a real Firebase project: the app and dashboard use the
    npm --prefix dashboard run dev
    ```
 
+Push notifications are not sent anywhere either: on the emulators the alert
+functions write each message to the `pushLog` collection (Firestore tab of
+the emulator UI) instead. To post an announcement:
+
+```bash
+npm run announce -- "Holiday on Monday" "No buses run on Monday."
+```
+
 Verification emails are not sent anywhere. Open the link from the Auth tab of
 the emulator UI (http://localhost:4000/auth), then tap **I've verified**.
 
@@ -131,10 +145,14 @@ cd app && flutter test
 npm run test:rules
 ```
 
+```bash
+npm run test:functions
+```
+
 ## Connecting a real Firebase project
 
 Not done yet. When the team has a project: run `flutterfire configure` in
 `app/` (this overwrites `lib/firebase_options.dart` and the app stops using the
 emulators by itself), fill in `dashboard/.env.local`, and deploy the rules with
-`firebase deploy --only firestore:rules,database`. Cloud Functions (later
-modules) need the pay-as-you-go plan.
+`firebase deploy --only firestore,database,functions`. Cloud Functions need
+the pay-as-you-go plan.

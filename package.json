@@ -4,7 +4,7 @@
   "type": "module",
   "description": "Firebase emulator tooling, seed data and security-rules tests for Where Is My Bus",
   "scripts": {
-    "emulators": "npm --prefix functions run build && firebase emulators:start --project demo-whereismybus",
+    "emulators": "node scripts/emulators.mjs",
     "seed": "node scripts/seed-emulators.mjs",
     "build-paths": "node scripts/build-route-paths.mjs",
     "simulate-bus": "node scripts/simulate-bus.mjs",
