@@ -15,3 +15,8 @@ functions/.env.*
 .idea/
 .DS_Store
 Thumbs.db
+
+# Python environment and trip data for the arrival-time model (ml/)
+ml/.venv/
+ml/data/
+__pycache__/

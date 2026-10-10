@@ -49,6 +49,7 @@ class FirebaseMissedBusRepository implements MissedBusRepository {
                   passHolders: (doc.data()['passHolders'] as num?)?.toInt(),
                   altHeld: (doc.data()['altHeld'] as num?)?.toInt() ?? 0,
                   seatsBooked: (doc.data()['seatsBooked'] as num?)?.toInt() ?? 0,
+                  notRiding: (doc.data()['notRiding'] as num?)?.toInt() ?? 0,
                 ),
           ]);
 

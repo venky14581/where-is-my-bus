@@ -165,6 +165,20 @@ npm run test:functions
 npm --prefix dashboard test
 ```
 
+The arrival-time model (Python 3.12):
+
+```bash
+py -3.12 -m venv ml/.venv
+```
+
+```bash
+ml/.venv/Scripts/python -m pip install -r ml/requirements.txt
+```
+
+```bash
+ml/.venv/Scripts/python -m unittest discover -s ml
+```
+
 End-to-end, every module's server side (sign-in, rules, Cloud Functions and
 triggers) on the emulators. Starts and stops the emulators itself, or uses
 the ones from `npm run emulators`. It empties and re-seeds them, so run
@@ -173,6 +187,21 @@ the ones from `npm run emulators`. It empties and re-seeds them, so run
 ```bash
 npm run test:e2e
 ```
+
+## Learned arrival times
+
+`ml/train.py` learns travel times between stops from past trips and writes
+`ml/out/segment_times.json`, which `npm run seed` loads (or
+`npm run import-ml` on its own). Until real trips are recorded it is trained
+on synthetic ones:
+
+```bash
+cd ml && .venv/Scripts/python synth_trips.py && .venv/Scripts/python train.py
+```
+
+With recorded trips, export them first (`npm run export-trips`, add
+`-- --project <id>` for a real project) and run only `train.py`. See
+`docs/modules/module-11-smart-features.md`.
 
 ## Connecting a real Firebase project
 

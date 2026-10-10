@@ -955,4 +955,79 @@ class AppLocalizationsTa extends AppLocalizations {
   String scanNotPaid(String name) {
     return '$name அவர்களின் பயணச்சீட்டுக்குப் பணம் செலுத்தப்படவில்லை.';
   }
+
+  @override
+  String leaveBy(String time) {
+    return '$time மணிக்குள் வீட்டிலிருந்து புறப்படுங்கள்';
+  }
+
+  @override
+  String get leaveNow => 'பேருந்தைப் பிடிக்க இப்போதே புறப்படுங்கள்';
+
+  @override
+  String usualDelayLate(int minutes, String day) {
+    return '$dayகளில் பொதுவாகச் சுமார் $minutes நிமிடம் தாமதம்';
+  }
+
+  @override
+  String usualDelayOnTime(String day) {
+    return '$dayகளில் பொதுவாகச் சரியான நேரம்';
+  }
+
+  @override
+  String get usualDelayTitle => 'வளாகத்தில் வழக்கமான தாமதம்';
+
+  @override
+  String usualDelayRow(String day, int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'சுமார் $minutes நிமிடம் தாமதம்',
+      zero: 'சரியான நேரம்',
+    );
+    return '$day: $_temp0';
+  }
+
+  @override
+  String get crowdSeats => 'இருக்கைகள் உள்ளன';
+
+  @override
+  String get crowdFew => 'சில இருக்கைகளே உள்ளன';
+
+  @override
+  String get crowdStanding => 'நின்றுதான் பயணம்';
+
+  @override
+  String get notRidingLabel => 'இன்று மாலை பயணிக்கவில்லை';
+
+  @override
+  String notRidingHelp(String time) {
+    return 'உங்கள் இருக்கையை வேறு மாணவர் முன்பதிவு செய்யலாம். $time வரை இதை மாற்றலாம்.';
+  }
+
+  @override
+  String get notRidingLocked =>
+      'முன்பதிவு முடிந்ததால் இதை இப்போது மாற்ற முடியாது.';
+
+  @override
+  String get notRidingSeatTaken =>
+      'உங்கள் இருக்கையை வேறொருவர் முன்பதிவு செய்துவிட்டதால் திரும்பப் பெற முடியாது.';
+
+  @override
+  String get settingLeaveHome => 'வீட்டிலிருந்து புறப்படும் நேரம்';
+
+  @override
+  String get settingLeaveHomeHelp =>
+      'புறப்பட வேண்டிய நேரத்தை அறிய, நிறுத்தத்துக்கு நடக்கும் நேரத்தை அமைக்கவும்.';
+
+  @override
+  String get settingWalkMinutes => 'வீட்டிலிருந்து என் நிறுத்தத்துக்கு நடை';
+
+  @override
+  String walkMinutesValue(int minutes) {
+    return '$minutes நிமிடம்';
+  }
+
+  @override
+  String get walkMinutesNone => 'அமைக்கவில்லை';
 }

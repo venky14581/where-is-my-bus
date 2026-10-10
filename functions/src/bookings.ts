@@ -95,6 +95,7 @@ export async function scheduleEveningTrips(now: Date): Promise<string[]> {
           passHolders: await countPassHolders(routeId, now),
           altHeld: 0,
           seatsBooked: 0,
+          notRiding: 0,
           // Fixed when the trip is made, so a fare change does not alter
           // what a student was quoted.
           guestFare: typeof fare === 'number' ? fare : null,
@@ -188,6 +189,7 @@ export const bookSeat = onCall(async (request) => {
     const free = spareSeats({
       capacity: trip.get('capacity') ?? 0,
       passHolders: trip.get('passHolders') ?? 0,
+      notRiding: trip.get('notRiding') ?? 0,
       altHeld: trip.get('altHeld') ?? 0,
       seatsBooked: trip.get('seatsBooked') ?? 0,
     });

@@ -3,6 +3,7 @@ import 'package:latlong2/latlong.dart';
 import '../../../core/geo.dart';
 import '../../routes/domain/bus_route.dart';
 import '../../trip/domain/trip_plan.dart';
+import 'learned_times.dart';
 import 'route_line.dart';
 
 /// What a student should be told about the bus and their stop.
@@ -41,10 +42,10 @@ TripDirection directionOfTrip(String? tripId) =>
         ? TripDirection.fromCampus
         : TripDirection.toCampus;
 
-/// A route's stops placed along its road path, with the timetable spread
-/// over the distance between them.
+/// A route's stops placed along its road path, with the timetable (or the
+/// learned times between stops) spread over the distance between them.
 class RouteTimeline {
-  RouteTimeline._(this.route, this.line, this._stopAlong, this._minutesAt);
+  RouteTimeline._(this.route, this.line, this._stopAlong, this._schedule);
 
   /// Close enough to call it "at the stop": a bus bay plus GPS error.
   static const atStopM = 150.0;
@@ -60,9 +61,9 @@ class RouteTimeline {
   final RouteLine line;
   final Map<String, double> _stopAlong;
 
-  /// Scheduled minutes after midnight, by stop, in path order. Only kept
-  /// when the times increase along the route.
-  final List<({double along, int minutes})>? _minutesAt;
+  /// Scheduled seconds from the first stop, by stop, in path order. Only
+  /// kept when the times increase along the route.
+  final List<({double along, double seconds})>? _schedule;
 
   static final _cache = <String, RouteTimeline>{};
 
@@ -98,7 +99,11 @@ class RouteTimeline {
         }
       }
     }
-    return RouteTimeline._(route, line, along, (schedule?.length ?? 0) >= 2 ? schedule : null);
+    if (schedule == null || schedule.length < 2) return RouteTimeline._(route, line, along, null);
+    final start = schedule.first.minutes;
+    return RouteTimeline._(route, line, along, [
+      for (final s in schedule) (along: s.along, seconds: (s.minutes - start) * 60.0),
+    ]);
   }
 
   static int? _parseMinutes(String hhmm) {
@@ -112,31 +117,48 @@ class RouteTimeline {
 
   double? alongOf(String stopId) => _stopAlong[stopId];
 
-  /// Scheduled travel time between two points on the path, in either order.
-  Duration travelTime(double fromAlong, double toAlong) {
-    final seconds = (_secondsAt(toAlong) - _secondsAt(fromAlong)).abs();
-    return Duration(seconds: seconds.round());
+  /// Expected travel time between two points on the path, in either order:
+  /// from learned times when [travel] has them, else the timetable, then
+  /// stretched by today's slowness.
+  Duration travelTime(double fromAlong, double toAlong, {TravelModel? travel}) {
+    final profile = _learnedProfile(travel?.segments) ?? _schedule;
+    final seconds = (_secondsAt(toAlong, profile) - _secondsAt(fromAlong, profile)).abs();
+    return Duration(seconds: (seconds * (travel?.factor ?? 1)).round());
   }
 
-  /// Seconds since the first stop's scheduled time, at a point on the path.
-  double _secondsAt(double along) {
-    final schedule = _minutesAt;
-    if (schedule == null) return along / fallbackSpeedMps;
-    final first = schedule.first;
-    final last = schedule.last;
-    if (along <= first.along) return (along - first.along) / fallbackSpeedMps;
-    if (along >= last.along) {
-      return (last.minutes - first.minutes) * 60 + (along - last.along) / fallbackSpeedMps;
+  /// Learned seconds per stretch placed on the path, like the timetable.
+  /// Null if they do not fit the route's stops.
+  List<({double along, double seconds})>? _learnedProfile(List<int>? segments) {
+    if (segments == null || segments.length != route.stops.length - 1) return null;
+    final profile = <({double along, double seconds})>[];
+    var seconds = 0.0;
+    for (final (i, stop) in route.stops.indexed) {
+      final along = _stopAlong[stop.id]!;
+      if (i > 0) {
+        seconds += segments[i - 1];
+        if (along <= profile.last.along) return null;
+      }
+      profile.add((along: along, seconds: seconds));
     }
-    for (var i = 1; i < schedule.length; i++) {
-      final a = schedule[i - 1];
-      final b = schedule[i];
+    return profile;
+  }
+
+  /// Seconds from the first stop at a point on the path.
+  static double _secondsAt(double along, List<({double along, double seconds})>? profile) {
+    if (profile == null) return along / fallbackSpeedMps;
+    final first = profile.first;
+    final last = profile.last;
+    if (along <= first.along) return (along - first.along) / fallbackSpeedMps;
+    if (along >= last.along) return last.seconds + (along - last.along) / fallbackSpeedMps;
+    for (var i = 1; i < profile.length; i++) {
+      final a = profile[i - 1];
+      final b = profile[i];
       if (along <= b.along) {
         final t = (along - a.along) / (b.along - a.along);
-        return ((a.minutes - first.minutes) + t * (b.minutes - a.minutes)) * 60;
+        return a.seconds + t * (b.seconds - a.seconds);
       }
     }
-    return (last.minutes - first.minutes) * 60;
+    return last.seconds;
   }
 
   /// Where the bus stands relative to [stopId] on a trip running [direction].
@@ -148,6 +170,7 @@ class RouteTimeline {
     required double busLng,
     required TripDirection direction,
     DateTime? recordedAt,
+    TravelModel? travel,
   }) {
     final stopAlong = _stopAlong[stopId];
     if (stopAlong == null) return const OffRoute();
@@ -158,6 +181,6 @@ class RouteTimeline {
     final ahead = direction == TripDirection.toCampus ? stopAlong - bus.along : bus.along - stopAlong;
     if (ahead.abs() <= atStopM) return const ArrivingNow();
     if (ahead < 0 || recordedAt != null) return Passed(recordedAt);
-    return Approaching(travelTime(bus.along, stopAlong), ahead);
+    return Approaching(travelTime(bus.along, stopAlong, travel: travel), ahead);
   }
 }

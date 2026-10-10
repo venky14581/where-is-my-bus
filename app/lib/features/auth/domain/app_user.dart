@@ -28,6 +28,7 @@ class AppUser {
     this.language,
     this.alerts = const AlertPrefs(),
     this.dailyRider = true,
+    this.walkMinutes,
   });
 
   final String uid;
@@ -53,6 +54,9 @@ class AppUser {
   /// booked when needed.
   final bool dailyRider;
 
+  /// Minutes from home to the stop, for the leave-home reminder.
+  final int? walkMinutes;
+
   AppUser copyWith({
     String? name,
     String? routeId,
@@ -60,6 +64,7 @@ class AppUser {
     String? language,
     AlertPrefs? alerts,
     bool? dailyRider,
+    int? walkMinutes,
   }) =>
       AppUser(
         uid: uid,
@@ -74,6 +79,7 @@ class AppUser {
         language: language ?? this.language,
         alerts: alerts ?? this.alerts,
         dailyRider: dailyRider ?? this.dailyRider,
+        walkMinutes: walkMinutes ?? this.walkMinutes,
       );
 
   /// Returns null when the document has no recognisable role, so a malformed
@@ -94,6 +100,7 @@ class AppUser {
       language: data['language'] as String?,
       alerts: AlertPrefs.fromMap(data['alerts']),
       dailyRider: data['dailyRider'] as bool? ?? true,
+      walkMinutes: (data['walkMinutes'] as num?)?.toInt(),
     );
   }
 }

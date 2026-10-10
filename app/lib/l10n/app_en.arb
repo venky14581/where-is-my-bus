@@ -701,5 +701,71 @@
         "type": "String"
       }
     }
-  }
+  },
+  "leaveBy": "Leave home by {time}",
+  "@leaveBy": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "leaveNow": "Leave now to catch it",
+  "usualDelayLate": "Usually about {minutes} min late on {day}s",
+  "@usualDelayLate": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "usualDelayOnTime": "Usually on time on {day}s",
+  "@usualDelayOnTime": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "usualDelayTitle": "Usual delay at campus",
+  "usualDelayRow": "{day}: {minutes, plural, =0{on time} other{about {minutes} min late}}",
+  "@usualDelayRow": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "crowdSeats": "Seats available",
+  "crowdFew": "Few seats left",
+  "crowdStanding": "Standing only",
+  "notRidingLabel": "Not riding this evening",
+  "notRidingHelp": "Another student can book your seat. You can change this until {time}.",
+  "@notRidingHelp": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "notRidingLocked": "Booking has closed, so this cannot change now.",
+  "notRidingSeatTaken": "Your seat has been booked by someone else, so it cannot be taken back.",
+  "settingLeaveHome": "Time to leave home",
+  "settingLeaveHomeHelp": "Set your walk to the stop to be told when to leave.",
+  "settingWalkMinutes": "Walk from home to my stop",
+  "walkMinutesValue": "{minutes} min",
+  "@walkMinutesValue": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "walkMinutesNone": "Not set"
 }

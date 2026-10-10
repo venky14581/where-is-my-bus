@@ -16,6 +16,7 @@ import { getAuth } from 'firebase-admin/auth';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
 import { getDatabase } from 'firebase-admin/database';
 import { importBaseData } from './base-data.mjs';
+import { importLearnedTimes } from './learned-times.mjs';
 
 const PROJECT_ID = 'demo-whereismybus';
 const DRIVER_EMAIL_DOMAIN = 'drivers.whereismybus.invalid'; // AppConfig.driverEmailDomain
@@ -103,6 +104,7 @@ async function seed() {
   // A fresh start: no bus is running.
   await rtdb.ref('live').remove();
   const counts = await importBaseData(db, rtdb);
+  const learned = await importLearnedTimes(db);
 
   console.log('Seeded the emulators with:');
   console.log(`  office   ${office.email}`);
@@ -110,6 +112,7 @@ async function seed() {
   console.log(`  driver   ${unassignedDriver.driverId} (no profile)`);
   console.log(`  student  ${student.email}`);
   console.log(`  ${counts.routes} routes and ${counts.buses} buses from data/base-data.json`);
+  if (learned) console.log(`  learned arrival times for ${learned} routes from ml/out/segment_times.json`);
   console.log('Passwords and PINs are in scripts/seed-emulators.mjs.');
 }
 

@@ -1,4 +1,5 @@
 import '../../../core/geo.dart';
+import '../../booking/domain/seats.dart';
 import '../../eta/domain/arrival.dart';
 import '../../live/domain/live_bus.dart';
 import '../../routes/domain/bus_route.dart';
@@ -14,6 +15,7 @@ class RunningTrip {
     this.passHolders,
     this.altHeld = 0,
     this.seatsBooked = 0,
+    this.notRiding = 0,
   });
 
   final String id;
@@ -30,6 +32,9 @@ class RunningTrip {
 
   /// Evening seats booked by guests (Module 10).
   final int seatsBooked;
+
+  /// Pass holders not riding (Module 11).
+  final int notRiding;
 }
 
 enum HoldStatus { held, boarded, cancelled, missed }
@@ -123,9 +128,13 @@ abstract final class MissedBus {
   static int? freeSeats(int capacity, RunningTrip trip) {
     final kept = trip.passHolders;
     if (kept == null) return null;
-    // Same sum as spareSeats in functions/src/booking.ts.
-    final free = capacity - kept - trip.altHeld - trip.seatsBooked;
-    return free < 0 ? 0 : free;
+    return spareSeats(
+      capacity: capacity,
+      passHolders: kept,
+      notRiding: trip.notRiding,
+      altHeld: trip.altHeld,
+      seatsBooked: trip.seatsBooked,
+    );
   }
 
   /// Buses the student may take, each with the best stop to get on at:

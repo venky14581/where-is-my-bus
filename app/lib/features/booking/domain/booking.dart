@@ -1,3 +1,5 @@
+import 'seats.dart' as seats;
+
 /// An evening trip made ahead for booking (`trips/{date}_{busId}_fromCampus`).
 class EveningTrip {
   const EveningTrip({
@@ -13,6 +15,7 @@ class EveningTrip {
     required this.passHolders,
     this.altHeld = 0,
     this.seatsBooked = 0,
+    this.notRiding = 0,
     this.guestFare,
   });
 
@@ -33,16 +36,20 @@ class EveningTrip {
   final int altHeld;
   final int seatsBooked;
 
+  /// Pass holders who said they are not riding.
+  final int notRiding;
+
   /// Rupees for one seat; null when the route offers no guest seats.
   final num? guestFare;
 
-  /// Seats nobody has a claim on: the route's pass holders come first, then
-  /// missed-bus riders and guests. Same sum as spareSeats in
-  /// functions/src/booking.ts.
-  int get spareSeats {
-    final free = capacity - passHolders - altHeld - seatsBooked;
-    return free < 0 ? 0 : free;
-  }
+  /// Seats nobody has a claim on; see [seats.spareSeats].
+  int get spareSeats => seats.spareSeats(
+        capacity: capacity,
+        passHolders: passHolders,
+        notRiding: notRiding,
+        altHeld: altHeld,
+        seatsBooked: seatsBooked,
+      );
 
   BookingWindow windowAt(DateTime now) {
     if (status == 'ended') return BookingWindow.closed;

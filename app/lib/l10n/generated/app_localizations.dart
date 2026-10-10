@@ -1573,6 +1573,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{name}\'s ticket is not paid.'**
   String scanNotPaid(String name);
+
+  /// No description provided for @leaveBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave home by {time}'**
+  String leaveBy(String time);
+
+  /// No description provided for @leaveNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave now to catch it'**
+  String get leaveNow;
+
+  /// No description provided for @usualDelayLate.
+  ///
+  /// In en, this message translates to:
+  /// **'Usually about {minutes} min late on {day}s'**
+  String usualDelayLate(int minutes, String day);
+
+  /// No description provided for @usualDelayOnTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Usually on time on {day}s'**
+  String usualDelayOnTime(String day);
+
+  /// No description provided for @usualDelayTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Usual delay at campus'**
+  String get usualDelayTitle;
+
+  /// No description provided for @usualDelayRow.
+  ///
+  /// In en, this message translates to:
+  /// **'{day}: {minutes, plural, =0{on time} other{about {minutes} min late}}'**
+  String usualDelayRow(String day, int minutes);
+
+  /// No description provided for @crowdSeats.
+  ///
+  /// In en, this message translates to:
+  /// **'Seats available'**
+  String get crowdSeats;
+
+  /// No description provided for @crowdFew.
+  ///
+  /// In en, this message translates to:
+  /// **'Few seats left'**
+  String get crowdFew;
+
+  /// No description provided for @crowdStanding.
+  ///
+  /// In en, this message translates to:
+  /// **'Standing only'**
+  String get crowdStanding;
+
+  /// No description provided for @notRidingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Not riding this evening'**
+  String get notRidingLabel;
+
+  /// No description provided for @notRidingHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Another student can book your seat. You can change this until {time}.'**
+  String notRidingHelp(String time);
+
+  /// No description provided for @notRidingLocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking has closed, so this cannot change now.'**
+  String get notRidingLocked;
+
+  /// No description provided for @notRidingSeatTaken.
+  ///
+  /// In en, this message translates to:
+  /// **'Your seat has been booked by someone else, so it cannot be taken back.'**
+  String get notRidingSeatTaken;
+
+  /// No description provided for @settingLeaveHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Time to leave home'**
+  String get settingLeaveHome;
+
+  /// No description provided for @settingLeaveHomeHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Set your walk to the stop to be told when to leave.'**
+  String get settingLeaveHomeHelp;
+
+  /// No description provided for @settingWalkMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'Walk from home to my stop'**
+  String get settingWalkMinutes;
+
+  /// No description provided for @walkMinutesValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String walkMinutesValue(int minutes);
+
+  /// No description provided for @walkMinutesNone.
+  ///
+  /// In en, this message translates to:
+  /// **'Not set'**
+  String get walkMinutesNone;
 }
 
 class _AppLocalizationsDelegate
