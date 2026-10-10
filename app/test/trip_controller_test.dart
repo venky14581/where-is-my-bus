@@ -68,7 +68,22 @@ void main() {
     expect(h.state.phase, TripPhase.running);
     expect(h.state.nextStop!.id, 'a');
     expect(h.state.totalStops, 3);
+    // Not before a position exists; the rules would refuse it.
+    expect(h.repo.armed, isEmpty);
+  });
+
+  test('arms the offline marker after the first position, once per connection', () async {
+    await h.start();
+    await h.fix(10.999);
+    await h.fix(10.9986);
     expect(h.repo.armed, ['bus-01']);
+
+    h.repo.setOnline(false);
+    await h.pump();
+    h.repo.setOnline(true);
+    await h.pump();
+    await h.fix(10.9983);
+    expect(h.repo.armed, ['bus-01', 'bus-01']);
   });
 
   test('sends a position at most every 3 seconds', () async {
@@ -113,7 +128,7 @@ void main() {
     h.repo.setOnline(true);
     await h.pump();
     expect(h.repo.published.map((f) => f.lat), [10.9982]);
-    expect(h.repo.armed, ['bus-01', 'bus-01']); // re-armed after reconnecting
+    expect(h.repo.armed, ['bus-01']); // armed once the pending point is written
   });
 
   test('ending marks the bus ended, closes the trip and stops the service', () async {

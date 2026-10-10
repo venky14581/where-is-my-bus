@@ -36,6 +36,13 @@ for (const route of base.routes) {
     distanceFromStartM,
   };
   console.log(`${route.id}: ${(best.distance / 1000).toFixed(1)} km, ${route.stops.length} stops`);
+  // The phone records a stop when the bus comes within 80 m of it, so a stop
+  // placed away from the road is never recorded.
+  body.waypoints.forEach((waypoint, i) => {
+    if (waypoint.distance > 50) {
+      console.warn(`  ! ${route.stops[i].id} is ${Math.round(waypoint.distance)} m from the road. Move it to the roadside.`);
+    }
+  });
   await new Promise((r) => setTimeout(r, 1100)); // demo server allows ~1 request/s
 }
 

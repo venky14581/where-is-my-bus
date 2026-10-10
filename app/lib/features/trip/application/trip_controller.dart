@@ -82,6 +82,9 @@ class TripController extends Notifier<TripState> {
   Fix? _pending;
   DateTime? _lastSendAt;
 
+  /// Whether `live/{busId}` will flip to offline if this connection drops.
+  bool _disconnectArmed = false;
+
   TripRepository get _repo => ref.read(tripRepositoryProvider);
   ActiveTripStore get _store => ref.read(activeTripStoreProvider);
   DateTime _now() => ref.read(clockProvider)();
@@ -177,8 +180,10 @@ class TripController extends Notifier<TripState> {
     final active = _active;
     if (active == null) return;
     state = state.copyWith(online: online);
-    if (!online) return;
-    unawaited(_repo.armDisconnect(active.busId).catchError((_) {}));
+    if (!online) {
+      _disconnectArmed = false; // the server already fired or dropped it
+      return;
+    }
     final pending = _pending;
     if (pending != null) _send(pending);
   }
@@ -235,7 +240,14 @@ class TripController extends Notifier<TripState> {
     _pending = null;
     _lastSendAt = _now();
     _repo.publishPosition(busId: active.busId, tripId: active.tripId, fix: fix).then((_) {
-      if (_active?.tripId == active.tripId) state = state.copyWith(lastSentAt: _now());
+      if (_active?.tripId != active.tripId) return;
+      state = state.copyWith(lastSentAt: _now());
+      // Only after a position exists: the rules refuse an offline marker
+      // for a bus with no lat and lng, e.g. on its very first trip.
+      if (!_disconnectArmed) {
+        _disconnectArmed = true;
+        _repo.armDisconnect(active.busId).catchError((_) => _disconnectArmed = false);
+      }
     }, onError: (Object _) => _pending ??= fix);
   }
 
@@ -260,6 +272,7 @@ class TripController extends Notifier<TripState> {
     _active = null;
     _stops = null;
     _pending = null;
+    _disconnectArmed = false;
   }
 }
 
