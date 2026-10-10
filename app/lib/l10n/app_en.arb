@@ -580,5 +580,126 @@
         "type": "String"
       }
     }
+  },
+  "eveningSeatsTitle": "Evening seats",
+  "eveningSeatsButton": "Evening seats",
+  "eveningIntro": "Book a spare seat on a college bus leaving campus this evening or tomorrow. A route's pass holders always keep their seats.",
+  "eveningToday": "Today",
+  "eveningTomorrow": "Tomorrow",
+  "eveningNone": "No evening buses to book yet. Booking opens the evening before.",
+  "eveningLeaves": "Leaves campus at {time}",
+  "@eveningLeaves": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "fareRupees": "₹{fare}",
+  "@fareRupees": {
+    "placeholders": {
+      "fare": {
+        "type": "String"
+      }
+    }
+  },
+  "seatsLeft": "{count, plural, =0{No seats left} =1{1 seat left} other{{count} seats left}}",
+  "@seatsLeft": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "bookingOpensAt": "Booking opens at {time}",
+  "@bookingOpensAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "bookingUntil": "Book until {time}",
+  "@bookingUntil": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "passCoversBus": "Your bus pass covers this bus.",
+  "bookSeatButton": "Book a seat",
+  "bookedLabel": "You have a seat on this bus",
+  "chooseDropTitle": "Where do you get off?",
+  "bookForButton": "Book for ₹{fare}",
+  "@bookForButton": {
+    "placeholders": {
+      "fare": {
+        "type": "String"
+      }
+    }
+  },
+  "bookAlready": "You already have a seat on this bus.",
+  "bookFull": "Sorry, no seats are left.",
+  "bookNotOpen": "Booking is not open yet.",
+  "bookClosed": "Booking has closed",
+  "bookNoGuestSeats": "This route has no seats to book.",
+  "bookBadStop": "Choose another stop.",
+  "bookPaymentsUnavailable": "Payment is not available right now. Try again later.",
+  "bookOffline": "No connection. Try again.",
+  "paymentCancelled": "Payment cancelled, so the seat was released.",
+  "paymentExpired": "Payment took too long, so the seat was released. Book again.",
+  "paymentInvalid": "The payment could not be confirmed. If money was taken, contact the transport office.",
+  "demoPaymentTitle": "Demo payment",
+  "demoPaymentBody": "No money is taken. This stands in for Razorpay while testing.",
+  "payButton": "Pay ₹{amount}",
+  "@payButton": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "ticketsTitle": "Your tickets",
+  "ticketShow": "Show this to the driver. It works for one scan.",
+  "ticketQrLabel": "Bus ticket",
+  "ticketUsed": "Used",
+  "ticketGetOff": "Get off at {stop}",
+  "@ticketGetOff": {
+    "placeholders": {
+      "stop": {
+        "type": "String"
+      }
+    }
+  },
+  "pendingUntil": "Waiting for payment. The seat is kept until {time}.",
+  "@pendingUntil": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "cancelBookingButton": "Cancel booking",
+  "noDailyBusTitle": "I don't take a college bus every day",
+  "noDailyBusSubtitle": "Hostellers and own transport: book an evening seat when you need one.",
+  "noDailyBusHome": "You have no daily college bus. When you need a ride home, book a spare evening seat.",
+  "chooseDailyRouteButton": "I take a college bus every day",
+  "scanTicketUsed": "This ticket has already been used.",
+  "scanWrongTrip": "{name}'s ticket is for another bus.",
+  "@scanWrongTrip": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "scanNotPaid": "{name}'s ticket is not paid.",
+  "@scanNotPaid": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   }
 }

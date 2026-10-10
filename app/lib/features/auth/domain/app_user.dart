@@ -27,6 +27,7 @@ class AppUser {
     this.passValidUntil,
     this.language,
     this.alerts = const AlertPrefs(),
+    this.dailyRider = true,
   });
 
   final String uid;
@@ -47,7 +48,20 @@ class AppUser {
   /// Notification choices; students only.
   final AlertPrefs alerts;
 
-  AppUser copyWith({String? name, String? routeId, String? stopId, String? language, AlertPrefs? alerts}) => AppUser(
+  /// False for a student who takes no college bus every day (a hosteller,
+  /// or one with their own transport): no route to choose, evening seats
+  /// booked when needed.
+  final bool dailyRider;
+
+  AppUser copyWith({
+    String? name,
+    String? routeId,
+    String? stopId,
+    String? language,
+    AlertPrefs? alerts,
+    bool? dailyRider,
+  }) =>
+      AppUser(
         uid: uid,
         name: name ?? this.name,
         role: role,
@@ -59,6 +73,7 @@ class AppUser {
         passValidUntil: passValidUntil,
         language: language ?? this.language,
         alerts: alerts ?? this.alerts,
+        dailyRider: dailyRider ?? this.dailyRider,
       );
 
   /// Returns null when the document has no recognisable role, so a malformed
@@ -78,6 +93,7 @@ class AppUser {
       passValidUntil: data['passValidUntil'] as String?,
       language: data['language'] as String?,
       alerts: AlertPrefs.fromMap(data['alerts']),
+      dailyRider: data['dailyRider'] as bool? ?? true,
     );
   }
 }

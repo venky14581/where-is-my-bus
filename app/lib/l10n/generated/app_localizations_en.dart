@@ -769,4 +769,173 @@ class AppLocalizationsEn extends AppLocalizations {
   String scanNoSeatHeld(String name) {
     return '$name has no seat held on this bus. They can hold one in the app.';
   }
+
+  @override
+  String get eveningSeatsTitle => 'Evening seats';
+
+  @override
+  String get eveningSeatsButton => 'Evening seats';
+
+  @override
+  String get eveningIntro =>
+      'Book a spare seat on a college bus leaving campus this evening or tomorrow. A route\'s pass holders always keep their seats.';
+
+  @override
+  String get eveningToday => 'Today';
+
+  @override
+  String get eveningTomorrow => 'Tomorrow';
+
+  @override
+  String get eveningNone =>
+      'No evening buses to book yet. Booking opens the evening before.';
+
+  @override
+  String eveningLeaves(String time) {
+    return 'Leaves campus at $time';
+  }
+
+  @override
+  String fareRupees(String fare) {
+    return '₹$fare';
+  }
+
+  @override
+  String seatsLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count seats left',
+      one: '1 seat left',
+      zero: 'No seats left',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String bookingOpensAt(String time) {
+    return 'Booking opens at $time';
+  }
+
+  @override
+  String bookingUntil(String time) {
+    return 'Book until $time';
+  }
+
+  @override
+  String get passCoversBus => 'Your bus pass covers this bus.';
+
+  @override
+  String get bookSeatButton => 'Book a seat';
+
+  @override
+  String get bookedLabel => 'You have a seat on this bus';
+
+  @override
+  String get chooseDropTitle => 'Where do you get off?';
+
+  @override
+  String bookForButton(String fare) {
+    return 'Book for ₹$fare';
+  }
+
+  @override
+  String get bookAlready => 'You already have a seat on this bus.';
+
+  @override
+  String get bookFull => 'Sorry, no seats are left.';
+
+  @override
+  String get bookNotOpen => 'Booking is not open yet.';
+
+  @override
+  String get bookClosed => 'Booking has closed';
+
+  @override
+  String get bookNoGuestSeats => 'This route has no seats to book.';
+
+  @override
+  String get bookBadStop => 'Choose another stop.';
+
+  @override
+  String get bookPaymentsUnavailable =>
+      'Payment is not available right now. Try again later.';
+
+  @override
+  String get bookOffline => 'No connection. Try again.';
+
+  @override
+  String get paymentCancelled => 'Payment cancelled, so the seat was released.';
+
+  @override
+  String get paymentExpired =>
+      'Payment took too long, so the seat was released. Book again.';
+
+  @override
+  String get paymentInvalid =>
+      'The payment could not be confirmed. If money was taken, contact the transport office.';
+
+  @override
+  String get demoPaymentTitle => 'Demo payment';
+
+  @override
+  String get demoPaymentBody =>
+      'No money is taken. This stands in for Razorpay while testing.';
+
+  @override
+  String payButton(String amount) {
+    return 'Pay ₹$amount';
+  }
+
+  @override
+  String get ticketsTitle => 'Your tickets';
+
+  @override
+  String get ticketShow => 'Show this to the driver. It works for one scan.';
+
+  @override
+  String get ticketQrLabel => 'Bus ticket';
+
+  @override
+  String get ticketUsed => 'Used';
+
+  @override
+  String ticketGetOff(String stop) {
+    return 'Get off at $stop';
+  }
+
+  @override
+  String pendingUntil(String time) {
+    return 'Waiting for payment. The seat is kept until $time.';
+  }
+
+  @override
+  String get cancelBookingButton => 'Cancel booking';
+
+  @override
+  String get noDailyBusTitle => 'I don\'t take a college bus every day';
+
+  @override
+  String get noDailyBusSubtitle =>
+      'Hostellers and own transport: book an evening seat when you need one.';
+
+  @override
+  String get noDailyBusHome =>
+      'You have no daily college bus. When you need a ride home, book a spare evening seat.';
+
+  @override
+  String get chooseDailyRouteButton => 'I take a college bus every day';
+
+  @override
+  String get scanTicketUsed => 'This ticket has already been used.';
+
+  @override
+  String scanWrongTrip(String name) {
+    return '$name\'s ticket is for another bus.';
+  }
+
+  @override
+  String scanNotPaid(String name) {
+    return '$name\'s ticket is not paid.';
+  }
 }

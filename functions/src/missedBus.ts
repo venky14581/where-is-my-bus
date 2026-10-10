@@ -29,14 +29,6 @@ export function mayRideAlternate(tripRouteId: string, studentRouteId: string | n
 }
 
 /**
- * Seats a bus can give riders from other routes. Its own pass holders keep
- * priority, so every one of them keeps a seat whether they ride or not.
- */
-export function freeAlternateSeats(capacity: number, passHolders: number, altHeld: number): number {
-  return Math.max(0, capacity - passHolders - altHeld);
-}
-
-/**
  * Whether the bus has already gone past [stopId]: a stop time is recorded
  * there or at any stop after it.
  */

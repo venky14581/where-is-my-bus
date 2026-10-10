@@ -6,6 +6,8 @@ rules_version = '2';
 // Module 7: validation of office edits, settings (fares and booking window).
 // Module 8: pass secrets and boardings, written only by Cloud Functions.
 // Module 9: seat holds on another bus, written only by Cloud Functions.
+// Module 10: evening seat bookings, written only by Cloud Functions; a
+// student may say they take no college bus every day (dailyRider).
 // Server-only paths (pushLog, functionRuns, trips/*/approachingSent) stay
 // closed to clients.
 service cloud.firestore {
@@ -140,7 +142,8 @@ service cloud.firestore {
         && validLanguage(request.resource.data)
         && (
           (resource.data.role == 'student'
-            && onlyChanged(['name', 'language', 'routeId', 'stopId', 'alerts'])
+            && onlyChanged(['name', 'language', 'routeId', 'stopId', 'alerts', 'dailyRider'])
+            && (!('dailyRider' in request.resource.data) || request.resource.data.dailyRider is bool)
             && validName(request.resource.data)
             && validHomeStop(request.resource.data)
             && validAlertPrefs(request.resource.data))
@@ -272,6 +275,12 @@ service cloud.firestore {
     // phone and the server may know it; never written by a client.
     match /passSecrets/{uid} {
       allow read: if signedIn() && request.auth.uid == uid;
+    }
+
+    // Evening seat bookings, one per student per trip. Made, paid and used
+    // only through Cloud Functions; the ticket token is the student's own.
+    match /bookings/{bookingId} {
+      allow read: if isOffice() || (signedIn() && resource.data.uid == request.auth.uid);
     }
 
     // The in-app alerts list. Written only by Cloud Functions.

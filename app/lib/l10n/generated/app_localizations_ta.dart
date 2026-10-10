@@ -780,4 +780,179 @@ class AppLocalizationsTa extends AppLocalizations {
   String scanNoSeatHeld(String name) {
     return '$name இந்தப் பேருந்தில் இருக்கை ஒதுக்கவில்லை. செயலியில் ஒதுக்கலாம்.';
   }
+
+  @override
+  String get eveningSeatsTitle => 'மாலை இருக்கைகள்';
+
+  @override
+  String get eveningSeatsButton => 'மாலை இருக்கைகள்';
+
+  @override
+  String get eveningIntro =>
+      'இன்று மாலை அல்லது நாளை வளாகத்திலிருந்து புறப்படும் கல்லூரிப் பேருந்தில் காலியான இருக்கையை முன்பதிவு செய்யுங்கள். வழித்தட அனுமதிச்சீட்டு வைத்திருப்பவர்களின் இருக்கைகள் எப்போதும் அவர்களுக்கே.';
+
+  @override
+  String get eveningToday => 'இன்று';
+
+  @override
+  String get eveningTomorrow => 'நாளை';
+
+  @override
+  String get eveningNone =>
+      'முன்பதிவு செய்ய இன்னும் மாலைப் பேருந்துகள் இல்லை. முன்பதிவு முந்தைய நாள் மாலை திறக்கும்.';
+
+  @override
+  String eveningLeaves(String time) {
+    return 'வளாகத்திலிருந்து $time மணிக்குப் புறப்படும்';
+  }
+
+  @override
+  String fareRupees(String fare) {
+    return '₹$fare';
+  }
+
+  @override
+  String seatsLeft(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count இருக்கைகள் உள்ளன',
+      one: '1 இருக்கை உள்ளது',
+      zero: 'இருக்கை இல்லை',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String bookingOpensAt(String time) {
+    return 'முன்பதிவு $time மணிக்குத் திறக்கும்';
+  }
+
+  @override
+  String bookingUntil(String time) {
+    return '$time மணி வரை முன்பதிவு செய்யலாம்';
+  }
+
+  @override
+  String get passCoversBus =>
+      'உங்கள் அனுமதிச்சீட்டு இந்தப் பேருந்துக்குச் செல்லும்.';
+
+  @override
+  String get bookSeatButton => 'இருக்கையை முன்பதிவு செய்';
+
+  @override
+  String get bookedLabel => 'இந்தப் பேருந்தில் உங்களுக்கு இருக்கை உள்ளது';
+
+  @override
+  String get chooseDropTitle => 'எங்கே இறங்குவீர்கள்?';
+
+  @override
+  String bookForButton(String fare) {
+    return '₹$fareக்கு முன்பதிவு செய்';
+  }
+
+  @override
+  String get bookAlready =>
+      'இந்தப் பேருந்தில் ஏற்கனவே உங்களுக்கு இருக்கை உள்ளது.';
+
+  @override
+  String get bookFull => 'மன்னிக்கவும், இருக்கைகள் இல்லை.';
+
+  @override
+  String get bookNotOpen => 'முன்பதிவு இன்னும் திறக்கவில்லை.';
+
+  @override
+  String get bookClosed => 'முன்பதிவு முடிந்தது';
+
+  @override
+  String get bookNoGuestSeats =>
+      'இந்த வழித்தடத்தில் முன்பதிவுக்கு இருக்கைகள் இல்லை.';
+
+  @override
+  String get bookBadStop => 'வேறு நிறுத்தத்தைத் தேர்ந்தெடுக்கவும்.';
+
+  @override
+  String get bookPaymentsUnavailable =>
+      'இப்போது பணம் செலுத்த முடியாது. பின்னர் முயலவும்.';
+
+  @override
+  String get bookOffline => 'இணைப்பு இல்லை. மீண்டும் முயலவும்.';
+
+  @override
+  String get paymentCancelled =>
+      'பணம் செலுத்துவது ரத்தானதால் இருக்கை விடுவிக்கப்பட்டது.';
+
+  @override
+  String get paymentExpired =>
+      'பணம் செலுத்த நேரம் கடந்ததால் இருக்கை விடுவிக்கப்பட்டது. மீண்டும் முன்பதிவு செய்யவும்.';
+
+  @override
+  String get paymentInvalid =>
+      'பணம் செலுத்தியதை உறுதிசெய்ய முடியவில்லை. பணம் எடுக்கப்பட்டிருந்தால் போக்குவரத்து அலுவலகத்தைத் தொடர்புகொள்ளவும்.';
+
+  @override
+  String get demoPaymentTitle => 'சோதனைப் பணம்';
+
+  @override
+  String get demoPaymentBody =>
+      'பணம் எதுவும் எடுக்கப்படாது. சோதனையின்போது இது Razorpay-க்குப் பதிலாகச் செயல்படுகிறது.';
+
+  @override
+  String payButton(String amount) {
+    return '₹$amount செலுத்து';
+  }
+
+  @override
+  String get ticketsTitle => 'உங்கள் பயணச்சீட்டுகள்';
+
+  @override
+  String get ticketShow =>
+      'இதை ஓட்டுநரிடம் காட்டுங்கள். ஒருமுறை மட்டுமே செல்லும்.';
+
+  @override
+  String get ticketQrLabel => 'பேருந்துப் பயணச்சீட்டு';
+
+  @override
+  String get ticketUsed => 'பயன்படுத்தப்பட்டது';
+
+  @override
+  String ticketGetOff(String stop) {
+    return '$stop இல் இறங்கவும்';
+  }
+
+  @override
+  String pendingUntil(String time) {
+    return 'பணம் செலுத்தக் காத்திருக்கிறது. இருக்கை $time வரை வைக்கப்படும்.';
+  }
+
+  @override
+  String get cancelBookingButton => 'முன்பதிவை ரத்து செய்';
+
+  @override
+  String get noDailyBusTitle => 'நான் தினமும் கல்லூரிப் பேருந்தில் செல்வதில்லை';
+
+  @override
+  String get noDailyBusSubtitle =>
+      'விடுதி மாணவர்கள், சொந்த வாகனம் உள்ளவர்கள்: தேவைப்படும்போது மாலை இருக்கையை முன்பதிவு செய்யுங்கள்.';
+
+  @override
+  String get noDailyBusHome =>
+      'உங்களுக்குத் தினசரி கல்லூரிப் பேருந்து இல்லை. வீட்டுக்குச் செல்ல வேண்டும்போது மாலைப் பேருந்தில் காலியான இருக்கையை முன்பதிவு செய்யுங்கள்.';
+
+  @override
+  String get chooseDailyRouteButton =>
+      'நான் தினமும் கல்லூரிப் பேருந்தில் செல்கிறேன்';
+
+  @override
+  String get scanTicketUsed => 'இந்தப் பயணச்சீட்டு ஏற்கனவே பயன்படுத்தப்பட்டது.';
+
+  @override
+  String scanWrongTrip(String name) {
+    return '$name அவர்களின் பயணச்சீட்டு வேறு பேருந்துக்கானது.';
+  }
+
+  @override
+  String scanNotPaid(String name) {
+    return '$name அவர்களின் பயணச்சீட்டுக்குப் பணம் செலுத்தப்படவில்லை.';
+  }
 }

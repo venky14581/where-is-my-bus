@@ -8,10 +8,10 @@ import { HttpsError, onCall } from 'firebase-functions/v2/https';
 
 import { db } from './app.js';
 import { passIsCurrent } from './boarding.js';
+import { spareSeats } from './booking.js';
 import {
   campusDate,
   countsAsSeat,
-  freeAlternateSeats,
   hasPassed,
   holdsLeftBehind,
   mayRideAlternate,
@@ -24,7 +24,7 @@ export type HoldResult = 'held' | 'full' | 'passed' | 'notAllowed' | 'noPass' | 
 const directionOf = (value: unknown): Direction => (value === 'fromCampus' ? 'fromCampus' : 'toCampus');
 
 /** Students on [routeId] whose pass is valid now. Each keeps a seat. */
-async function countPassHolders(routeId: string, now: Date): Promise<number> {
+export async function countPassHolders(routeId: string, now: Date): Promise<number> {
   const snap = await db.collection('users').where('role', '==', 'student').where('routeId', '==', routeId).get();
   return snap.docs.filter((d) =>
     passIsCurrent({
@@ -117,7 +117,8 @@ export const holdSeat = onCall(async (request) => {
       return 'held';
     }
     const held = typeof trip.get('altHeld') === 'number' ? (trip.get('altHeld') as number) : 0;
-    if (freeAlternateSeats(capacity, passHolders, held) <= 0) return 'full';
+    const booked = typeof trip.get('seatsBooked') === 'number' ? (trip.get('seatsBooked') as number) : 0;
+    if (spareSeats({ capacity, passHolders, altHeld: held, seatsBooked: booked }) <= 0) return 'full';
 
     for (const other of otherHolds) {
       if (other.exists && other.get('status') === 'held') {
