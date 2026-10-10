@@ -1,7 +1,7 @@
 rules_version = '2';
 
-// Module 1: accounts only. Every other collection stays closed until the
-// module that needs it opens it.
+// Paths not listed here stay closed until the module that needs them opens
+// them. Module 1: users. Module 2: routes, buses, routeAccess.
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -34,12 +34,32 @@ service cloud.firestore {
       return hasRole('office');
     }
 
-    // What later modules use to let students read routes and live buses:
-    // a student profile, a college email and a verified inbox.
+    function isDriver() {
+      return hasRole('driver');
+    }
+
+    // A student profile, a college email and a verified inbox.
     function isVerifiedStudent() {
       return hasRole('student')
         && hasCollegeEmail()
         && request.auth.token.email_verified == true;
+    }
+
+    // Routes and buses are for the college only, not the public.
+    function canReadBaseData() {
+      return isVerifiedStudent() || isDriver() || isOffice();
+    }
+
+    function routePath(routeId) {
+      return /databases/$(database)/documents/routes/$(routeId);
+    }
+
+    // No home stop yet, or a stop that is really on that route.
+    function validHomeStop(data) {
+      return (data.routeId == null && data.stopId == null)
+        || (data.routeId is string
+            && exists(routePath(data.routeId))
+            && data.stopId in get(routePath(data.routeId)).data.stopIds);
     }
 
     function validName(data) {
@@ -81,15 +101,32 @@ service cloud.firestore {
         && request.auth.uid == uid
         && validLanguage(request.resource.data)
         && (
-          // Module 2 checks routeId and stopId against real routes.
           (resource.data.role == 'student'
             && onlyChanged(['name', 'language', 'routeId', 'stopId'])
-            && validName(request.resource.data))
+            && validName(request.resource.data)
+            && validHomeStop(request.resource.data))
           || (resource.data.role == 'driver' && onlyChanged(['language']))
         )
       );
 
       allow delete: if isOffice();
+    }
+
+    // Only the office edits base data. The import script and the dashboard
+    // keep stopIds in step with stops.
+    match /routes/{routeId} {
+      allow read: if canReadBaseData();
+      allow write: if isOffice();
+    }
+
+    match /buses/{busId} {
+      allow read: if canReadBaseData();
+      allow write: if isOffice();
+    }
+
+    match /routeAccess/{routeId} {
+      allow read: if canReadBaseData();
+      allow write: if isOffice();
     }
 
     match /{document=**} {

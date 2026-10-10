@@ -6,6 +6,7 @@
   "scripts": {
     "emulators": "firebase emulators:start --project demo-whereismybus",
     "seed": "node scripts/seed-emulators.mjs",
+    "build-paths": "node scripts/build-route-paths.mjs",
     "test:rules": "firebase emulators:exec --project demo-whereismybus --only firestore,database \"vitest run tests/rules\""
   },
   "devDependencies": {

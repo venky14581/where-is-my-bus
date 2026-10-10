@@ -11,6 +11,9 @@ import 'package:where_is_my_bus/features/auth/domain/app_user.dart';
 import 'package:where_is_my_bus/features/auth/domain/auth_failure.dart';
 import 'package:where_is_my_bus/features/auth/domain/credentials.dart';
 import 'package:where_is_my_bus/features/auth/domain/session.dart';
+import 'package:where_is_my_bus/features/routes/application/route_providers.dart';
+import 'package:where_is_my_bus/features/routes/data/route_repository.dart';
+import 'package:where_is_my_bus/features/routes/domain/bus_route.dart';
 
 class InMemorySettingsStore implements SettingsStore {
   final values = <String, String>{};
@@ -39,13 +42,35 @@ class FakeAuthRepository implements AuthRepository {
   String? _currentEmail;
   int signInCalls = 0;
 
-  void addStudent(String email, String password, {String name = 'Asha', bool verified = true}) {
+  void addStudent(
+    String email,
+    String password, {
+    String name = 'Asha',
+    bool verified = true,
+    String? routeId,
+    String? stopId,
+  }) {
     final uid = 'uid-$email';
     _accounts[email] = _Account(
       secret: password,
       verified: verified,
-      profile: AppUser(uid: uid, name: name, role: UserRole.student, email: email, language: 'en'),
+      profile: AppUser(
+        uid: uid,
+        name: name,
+        role: UserRole.student,
+        email: email,
+        language: 'en',
+        routeId: routeId,
+        stopId: stopId,
+      ),
     );
+  }
+
+  /// What a successful `users/{uid}` update does to the session.
+  void setHomeStop(String routeId, String stopId) {
+    final account = _accounts[_currentEmail]!;
+    account.profile = account.profile!.copyWith(routeId: routeId, stopId: stopId);
+    _emit();
   }
 
   void addDriver(String driverId, String pin, {String name = 'Murugan', String? language}) {
@@ -163,14 +188,7 @@ class FakeAuthRepository implements AuthRepository {
     final account = _accounts[_currentEmail];
     final profile = account?.profile;
     if (profile == null) return;
-    account!.profile = AppUser(
-      uid: profile.uid,
-      name: profile.name,
-      role: profile.role,
-      email: profile.email,
-      driverId: profile.driverId,
-      language: languageCode,
-    );
+    account!.profile = profile.copyWith(language: languageCode);
     _emit();
   }
 
@@ -181,7 +199,56 @@ class FakeAuthRepository implements AuthRepository {
   }
 }
 
-Future<void> pumpApp(WidgetTester tester, FakeAuthRepository auth, {InMemorySettingsStore? settings}) async {
+const testCampus = RouteStop(id: 'campus', name: 'Amrita Campus', lat: 10.9027, lng: 76.9006, scheduledTime: '08:00');
+
+final testRoutes = [
+  const BusRoute(id: 'cbe-gandhipuram', name: 'Gandhipuram – Campus', city: 'Coimbatore', stops: [
+    RouteStop(id: 'gandhipuram', name: 'Gandhipuram Bus Stand', lat: 11.0183, lng: 76.9672, scheduledTime: '07:00'),
+    RouteStop(id: 'ukkadam', name: 'Ukkadam', lat: 10.9886, lng: 76.962, scheduledTime: '07:15'),
+    testCampus,
+  ]),
+  const BusRoute(id: 'pkd-town', name: 'Palakkad – Campus', city: 'Palakkad', stops: [
+    RouteStop(id: 'palakkad-stadium', name: 'Palakkad Stadium Bus Stand', lat: 10.776, lng: 76.655, scheduledTime: '06:50'),
+    testCampus,
+  ]),
+];
+
+/// In-memory routes and buses. Saving a stop updates [auth]'s session, like
+/// the profile listener does against Firestore.
+class FakeRouteRepository implements RouteRepository {
+  FakeRouteRepository(this.auth, {List<BusRoute>? routes, this.buses = const []})
+      : routes = routes ?? testRoutes;
+
+  final FakeAuthRepository auth;
+  final List<BusRoute> routes;
+  final List<Bus> buses;
+
+  @override
+  Stream<List<BusRoute>> watchRoutes() => Stream.value(routes);
+
+  @override
+  Stream<BusRoute?> watchRoute(String routeId) =>
+      Stream.value(routes.where((r) => r.id == routeId).firstOrNull);
+
+  @override
+  Stream<Bus?> watchBusForRoute(String routeId) =>
+      Stream.value(buses.where((b) => b.routeId == routeId).firstOrNull);
+
+  @override
+  Stream<Bus?> watchBusForDriver(String driverUid) =>
+      Stream.value(buses.where((b) => b.driverId == driverUid).firstOrNull);
+
+  @override
+  Future<void> saveHomeStop({required String uid, required String routeId, required String stopId}) async =>
+      auth.setHomeStop(routeId, stopId);
+}
+
+Future<void> pumpApp(
+  WidgetTester tester,
+  FakeAuthRepository auth, {
+  InMemorySettingsStore? settings,
+  FakeRouteRepository? routes,
+}) async {
   // A phone-sized surface so layouts match what students and drivers see.
   tester.view.physicalSize = const Size(1080, 2340);
   tester.view.devicePixelRatio = 3;
@@ -191,6 +258,7 @@ Future<void> pumpApp(WidgetTester tester, FakeAuthRepository auth, {InMemorySett
     overrides: [
       authRepositoryProvider.overrideWithValue(auth),
       settingsStoreProvider.overrideWithValue(settings ?? InMemorySettingsStore()),
+      routeRepositoryProvider.overrideWithValue(routes ?? FakeRouteRepository(auth)),
     ],
     child: const WhereIsMyBusApp(),
   ));

@@ -13,6 +13,7 @@ process.env.FIRESTORE_EMULATOR_HOST ??= '127.0.0.1:8080';
 import { initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
+import { importBaseData } from './base-data.mjs';
 
 const PROJECT_ID = 'demo-whereismybus';
 const DRIVER_EMAIL_DOMAIN = 'drivers.whereismybus.invalid'; // AppConfig.driverEmailDomain
@@ -95,11 +96,14 @@ async function seed() {
     createdAt: FieldValue.serverTimestamp(),
   });
 
+  const counts = await importBaseData(db);
+
   console.log('Seeded the emulators with:');
   console.log(`  office   ${office.email}`);
   for (const d of drivers) console.log(`  driver   ${d.driverId}`);
   console.log(`  driver   ${unassignedDriver.driverId} (no profile)`);
   console.log(`  student  ${student.email}`);
+  console.log(`  ${counts.routes} routes and ${counts.buses} buses from data/base-data.json`);
   console.log('Passwords and PINs are in scripts/seed-emulators.mjs.');
 }
 

@@ -392,18 +392,6 @@ abstract class AppLocalizations {
   /// **'Driver ID: {id}'**
   String driverIdValue(String id);
 
-  /// No description provided for @routeNotChosenTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'No route chosen yet'**
-  String get routeNotChosenTitle;
-
-  /// No description provided for @routeNotChosenBody.
-  ///
-  /// In en, this message translates to:
-  /// **'You\'ll pick your city, route and stop here. After that the app opens on your bus every time.'**
-  String get routeNotChosenBody;
-
   /// No description provided for @accountProblemTitle.
   ///
   /// In en, this message translates to:
@@ -523,6 +511,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Something went wrong. Try again.'**
   String get errorUnknown;
+
+  /// No description provided for @chooseCityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Where do you travel from?'**
+  String get chooseCityTitle;
+
+  /// No description provided for @chooseRouteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your route'**
+  String get chooseRouteTitle;
+
+  /// No description provided for @chooseStopTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your stop'**
+  String get chooseStopTitle;
+
+  /// No description provided for @chooseStopBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The app opens on this bus every time. You can change it later.'**
+  String get chooseStopBody;
+
+  /// No description provided for @stopCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} stops'**
+  String stopCount(int count);
+
+  /// No description provided for @routeCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 route} other{{count} routes}}'**
+  String routeCount(int count);
+
+  /// No description provided for @firstPickupAt.
+  ///
+  /// In en, this message translates to:
+  /// **'First pickup {time}'**
+  String firstPickupAt(String time);
+
+  /// No description provided for @saveButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get saveButton;
+
+  /// No description provided for @noRoutesYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No routes have been added yet. Check back later.'**
+  String get noRoutesYet;
+
+  /// No description provided for @yourStopTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your stop'**
+  String get yourStopTitle;
+
+  /// No description provided for @busDueAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Bus due at {time}'**
+  String busDueAt(String time);
+
+  /// No description provided for @changeButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get changeButton;
+
+  /// No description provided for @routeMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Your route or stop is no longer running. Choose another.'**
+  String get routeMissing;
+
+  /// No description provided for @chooseRouteButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose route'**
+  String get chooseRouteButton;
+
+  /// No description provided for @busNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Bus {number}'**
+  String busNumber(String number);
+
+  /// No description provided for @tripTrackingNotReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip tracking isn\'t switched on yet.'**
+  String get tripTrackingNotReady;
 }
 
 class _AppLocalizationsDelegate

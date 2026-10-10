@@ -1,0 +1,53 @@
+{
+  "_note": "Demo routes. Stop names are real places but coordinates and times are approximate placeholders until the transport office supplies the real list. After editing stops, run `npm run build-paths`, then `npm run seed`.",
+  "routes": [
+    {
+      "id": "cbe-gandhipuram",
+      "name": "Gandhipuram – Campus",
+      "city": "Coimbatore",
+      "stops": [
+        { "id": "gandhipuram", "name": "Gandhipuram Bus Stand", "lat": 11.0183, "lng": 76.9672, "scheduledTime": "07:00" },
+        { "id": "town-hall", "name": "Town Hall", "lat": 10.9946, "lng": 76.9618, "scheduledTime": "07:10" },
+        { "id": "ukkadam", "name": "Ukkadam", "lat": 10.9886, "lng": 76.962, "scheduledTime": "07:15" },
+        { "id": "kuniyamuthur", "name": "Kuniyamuthur", "lat": 10.9636, "lng": 76.9545, "scheduledTime": "07:25" },
+        { "id": "madukkarai", "name": "Madukkarai", "lat": 10.905, "lng": 76.96, "scheduledTime": "07:40" },
+        { "id": "ettimadai-pirivu", "name": "Ettimadai Pirivu", "lat": 10.897, "lng": 76.923, "scheduledTime": "07:50" },
+        { "id": "campus", "name": "Amrita Campus", "lat": 10.9027, "lng": 76.9006, "scheduledTime": "08:00" }
+      ]
+    },
+    {
+      "id": "cbe-rs-puram",
+      "name": "R.S. Puram – Campus",
+      "city": "Coimbatore",
+      "stops": [
+        { "id": "rs-puram", "name": "R.S. Puram", "lat": 11.009, "lng": 76.95, "scheduledTime": "07:05" },
+        { "id": "selvapuram", "name": "Selvapuram", "lat": 10.99, "lng": 76.94, "scheduledTime": "07:15" },
+        { "id": "kovaipudur-pirivu", "name": "Kovaipudur Pirivu", "lat": 10.944, "lng": 76.933, "scheduledTime": "07:30" },
+        { "id": "ettimadai-pirivu", "name": "Ettimadai Pirivu", "lat": 10.897, "lng": 76.923, "scheduledTime": "07:48" },
+        { "id": "campus", "name": "Amrita Campus", "lat": 10.9027, "lng": 76.9006, "scheduledTime": "08:00" }
+      ]
+    },
+    {
+      "id": "pkd-town",
+      "name": "Palakkad – Campus",
+      "city": "Palakkad",
+      "stops": [
+        { "id": "palakkad-stadium", "name": "Palakkad Stadium Bus Stand", "lat": 10.776, "lng": 76.655, "scheduledTime": "06:50" },
+        { "id": "chandranagar", "name": "Chandranagar", "lat": 10.79, "lng": 76.69, "scheduledTime": "07:00" },
+        { "id": "kanjikode", "name": "Kanjikode", "lat": 10.8, "lng": 76.75, "scheduledTime": "07:12" },
+        { "id": "walayar", "name": "Walayar", "lat": 10.84, "lng": 76.84, "scheduledTime": "07:35" },
+        { "id": "campus", "name": "Amrita Campus", "lat": 10.9027, "lng": 76.9006, "scheduledTime": "08:00" }
+      ]
+    }
+  ],
+  "buses": [
+    { "id": "bus-01", "number": "TN 37 AB 1201", "capacity": 50, "routeId": "cbe-gandhipuram", "driver": "DRV001" },
+    { "id": "bus-02", "number": "TN 37 AB 1202", "capacity": 50, "routeId": "cbe-rs-puram", "driver": null },
+    { "id": "bus-03", "number": "TN 37 AB 1203", "capacity": 45, "routeId": "pkd-town", "driver": "DRV002" }
+  ],
+  "routeAccess": [
+    { "routeId": "cbe-gandhipuram", "acceptsFrom": ["cbe-rs-puram"] },
+    { "routeId": "cbe-rs-puram", "acceptsFrom": ["cbe-gandhipuram"] },
+    { "routeId": "pkd-town", "acceptsFrom": [] }
+  ]
+}
