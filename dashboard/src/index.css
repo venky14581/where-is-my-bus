@@ -169,6 +169,7 @@ h2, h3 { margin: 0; }
 .share-page { min-height: 100vh; display: grid; grid-template-rows: auto auto 1fr; background: var(--bg); }
 .share-header { display: flex; align-items: center; gap: .75rem; padding: 12px 16px; background: var(--surface); border-bottom: 1px solid var(--border); }
 .share-note { margin: 0; padding: 10px 16px; }
+.below-target { color: var(--danger-text); font-weight: 600; }
 /* A fixed height: Leaflet measures the map once, before a grid row would settle. */
 .share-map .map { height: calc(100vh - 120px); min-height: 320px; }
 

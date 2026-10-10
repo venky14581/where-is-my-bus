@@ -214,10 +214,24 @@ With recorded trips, export them first (`npm run export-trips`, add
 `-- --project <id>` for a real project) and run only `train.py`. See
 `docs/modules/module-11-smart-features.md`.
 
-## Connecting a real Firebase project
+## Connecting a real Firebase project (the pilot)
 
-Not done yet. When the team has a project: run `flutterfire configure` in
-`app/` (this overwrites `lib/firebase_options.dart` and the app stops using the
-emulators by itself), fill in `dashboard/.env.local`, and deploy the rules with
-`firebase deploy --only firestore,database,functions`. Cloud Functions need
-the pay-as-you-go plan.
+Step by step in [docs/pilot/pilot-plan.md](docs/pilot/pilot-plan.md): create
+the project (pay-as-you-go, for Cloud Functions), run `flutterfire configure`
+in `app/`, fill in `dashboard/.env.local`, deploy with
+`firebase deploy --only firestore,database,functions,hosting`, load the
+office's routes, and check:
+
+```bash
+npm run import-routes -- --stops stops.csv --buses buses.csv
+```
+
+```bash
+npm run pilot-check
+```
+
+Tests for these scripts:
+
+```bash
+npm run test:tools
+```

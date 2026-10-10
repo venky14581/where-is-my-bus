@@ -30,6 +30,10 @@ const POLL_MS = 5000;
  */
 export function SharePage({ token }: { token: string }) {
   const [view, setView] = useState<View>({ state: 'loading' });
+  // A parent is not the transport office.
+  useEffect(() => {
+    document.title = 'Where Is My Bus · Shared trip';
+  }, []);
 
   useEffect(() => {
     let stopped = false;

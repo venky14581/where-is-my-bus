@@ -11,10 +11,13 @@ import {
   ridershipByDay,
   ridershipByStop,
   routeSuggestions,
+  TRACKING_TARGET,
+  trackingHealth,
   type ReportRoute,
 } from '../lib/reports';
 
 const TABS = [
+  { id: 'tracking', label: 'Tracking' },
   { id: 'punctuality', label: 'Punctuality' },
   { id: 'ridership', label: 'Ridership' },
   { id: 'guests', label: 'Guest bookings' },
@@ -29,7 +32,7 @@ const shortDate = (d: string) => new Date(`${d}T12:00:00Z`).toLocaleDateString('
 /** Punctuality, ridership, guest bookings and route suggestions over recent days. */
 export function ReportsPage() {
   const [days, setDays] = useState(14);
-  const [tab, setTab] = useState<Tab>('punctuality');
+  const [tab, setTab] = useState<Tab>('tracking');
   const today = campusToday();
   const { from, to } = dateRange(today, days);
   const data = useReportData(from, to);
@@ -66,6 +69,7 @@ export function ReportsPage() {
         <p className="muted">No trips recorded in this period.</p>
       ) : (
         <>
+          {tab === 'tracking' && <Tracking data={data} routes={routes} routeName={routeName} busNumber={(id) => buses.find((b) => b.id === id)?.number ?? id} />}
           {tab === 'punctuality' && <Punctuality data={data} routes={routes} />}
           {tab === 'ridership' && <Ridership data={data} routes={routes} routeName={routeName} />}
           {tab === 'guests' && <Guests data={data} routes={routes} routeName={routeName} today={today} />}
@@ -79,6 +83,68 @@ export function ReportsPage() {
 }
 
 type Data = ReturnType<typeof useReportData>;
+
+function Tracking({ data, routes, routeName, busNumber }: {
+  data: Data;
+  routes: ReportRoute[];
+  routeName: (id: string) => string;
+  busNumber: (id: string) => string;
+}) {
+  const health = useMemo(() => trackingHealth(data.trips, routes), [data.trips, routes]);
+  const labels = useMemo(() => health.days.map((d) => shortDate(d.date)), [health.days]);
+  const series = useMemo(() => [{
+    label: 'Stops recorded (%)', values: health.days.map((d) => Math.round(d.recordedShare * 100)), colour: SERIES_COLOURS[1],
+  }], [health.days]);
+  const incomplete = health.rows.filter((r) => r.recorded < r.expected);
+  return (
+    <>
+      <p className="muted">
+        Every stop a trip passes should get a time from the driver's phone; the target is {Math.round(TRACKING_TARGET * 100)}%.
+        A stop missed on most trips is probably placed off the road; scattered gaps point at a phone that stopped sending.
+      </p>
+      <BarChart labels={labels} series={series} yTitle="Stops recorded (%)" label="Share of stops recorded per day" />
+      <table className="table">
+        <thead><tr><th>Date</th><th>Trips</th><th>Every stop recorded</th><th>Stops recorded</th></tr></thead>
+        <tbody>
+          {health.days.map((d) => (
+            <tr key={d.date}>
+              <td>{shortDate(d.date)}</td><td>{d.trips}</td><td>{d.complete}</td>
+              <td className={d.recordedShare < TRACKING_TARGET ? 'below-target' : undefined}>{percent(d.recordedShare)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <h3>Stops missed most often</h3>
+      {health.stops.length === 0 ? <p className="muted">None: every stop was recorded on every trip.</p> : (
+        <table className="table">
+          <thead><tr><th>Route</th><th>Stop</th><th>Missed</th></tr></thead>
+          <tbody>
+            {health.stops.map((s) => (
+              <tr key={`${s.routeId}|${s.stopName}`}><td>{routeName(s.routeId)}</td><td>{s.stopName}</td><td>{s.missed} of {s.of} trips</td></tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+      {incomplete.length > 0 && (
+        <>
+          <h3>Trips with stops missing</h3>
+          <table className="table">
+            <thead><tr><th>Date</th><th>Bus</th><th>Trip</th><th>Recorded</th><th>Missing</th></tr></thead>
+            <tbody>
+              {incomplete.map((r) => (
+                <tr key={r.tripId}>
+                  <td>{shortDate(r.date)}</td><td>{busNumber(r.busId)}</td>
+                  <td>{routeName(r.routeId)}, {r.direction === 'toCampus' ? 'morning' : 'evening'}</td>
+                  <td>{r.recorded} of {r.expected}</td><td>{r.missing.join(', ')}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      )}
+    </>
+  );
+}
 
 function Punctuality({ data, routes }: { data: Data; routes: ReportRoute[] }) {
   const rows = useMemo(() => punctuality(data.trips, routes), [data.trips, routes]);

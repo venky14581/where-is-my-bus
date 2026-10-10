@@ -1,0 +1,4 @@
+bus_id,number,capacity,route_id,driver_id
+bus-01,TN 37 AB 1201,50,cbe-gandhipuram,DRV001
+bus-02,TN 37 AB 1202,50,cbe-rs-puram,
+bus-03,TN 37 AB 1203,45,pkd-town,DRV002

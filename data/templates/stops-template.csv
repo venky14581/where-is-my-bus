@@ -1,0 +1,18 @@
+route_id,route_name,city,stop_order,stop_id,stop_name,lat,lng,scheduled_time
+cbe-gandhipuram,Gandhipuram – Campus,Coimbatore,1,gandhipuram,Gandhipuram Bus Stand,11.0183,76.9672,07:00
+cbe-gandhipuram,Gandhipuram – Campus,Coimbatore,2,town-hall,Town Hall,10.9946,76.9618,07:10
+cbe-gandhipuram,Gandhipuram – Campus,Coimbatore,3,ukkadam,Ukkadam,10.9886,76.962,07:15
+cbe-gandhipuram,Gandhipuram – Campus,Coimbatore,4,kuniyamuthur,Kuniyamuthur,10.9636,76.9545,07:25
+cbe-gandhipuram,Gandhipuram – Campus,Coimbatore,5,madukkarai,Madukkarai,10.905,76.96,07:40
+cbe-gandhipuram,Gandhipuram – Campus,Coimbatore,6,ettimadai-pirivu,Ettimadai Pirivu,10.897,76.923,07:50
+cbe-gandhipuram,Gandhipuram – Campus,Coimbatore,7,campus,Amrita Campus,10.9027,76.9006,08:00
+cbe-rs-puram,R.S. Puram – Campus,Coimbatore,1,rs-puram,R.S. Puram,11.009,76.95,07:05
+cbe-rs-puram,R.S. Puram – Campus,Coimbatore,2,selvapuram,Selvapuram,10.99,76.94,07:15
+cbe-rs-puram,R.S. Puram – Campus,Coimbatore,3,kovaipudur-pirivu,Kovaipudur Pirivu,10.944,76.933,07:30
+cbe-rs-puram,R.S. Puram – Campus,Coimbatore,4,ettimadai-pirivu,Ettimadai Pirivu,10.897,76.923,07:48
+cbe-rs-puram,R.S. Puram – Campus,Coimbatore,5,campus,Amrita Campus,10.9027,76.9006,08:00
+pkd-town,Palakkad – Campus,Palakkad,1,palakkad-stadium,Palakkad Stadium Bus Stand,10.776,76.655,06:50
+pkd-town,Palakkad – Campus,Palakkad,2,chandranagar,Chandranagar,10.79,76.69,07:00
+pkd-town,Palakkad – Campus,Palakkad,3,kanjikode,Kanjikode,10.8,76.75,07:12
+pkd-town,Palakkad – Campus,Palakkad,4,walayar,Walayar,10.84,76.84,07:35
+pkd-town,Palakkad – Campus,Palakkad,5,campus,Amrita Campus,10.9027,76.9006,08:00

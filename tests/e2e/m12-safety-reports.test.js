@@ -128,7 +128,11 @@ test('past trips for the reports, without alerting anyone about them', async () 
   const week = await getDocs(query(collection(office.db, 'trips'), where('date', '<', today), where('date', '>=', campusDate(new Date(Date.now() - 8 * 86_400_000)))));
   expect(week.size).toBeGreaterThanOrEqual(30); // 6 bus days x 3 buses x 2, Sundays off
   const one = week.docs.find((d) => d.get('direction') === 'toCampus');
-  expect((await getDocs(collection(office.db, `trips/${one.id}/stopTimes`))).size).toBe(7 - (one.get('routeId') === 'cbe-gandhipuram' ? 0 : 2));
+  // A few stops are left unrecorded on purpose, like a phone briefly without signal.
+  const stops = one.get('routeId') === 'cbe-gandhipuram' ? 7 : 5;
+  const recorded = (await getDocs(collection(office.db, `trips/${one.id}/stopTimes`))).size;
+  expect(recorded).toBeGreaterThanOrEqual(stops - 2);
+  expect(recorded).toBeLessThanOrEqual(stops);
   expect((await getDocs(collection(office.db, `trips/${one.id}/boardings`))).size).toBeGreaterThan(10);
   // Stop times of trips that already ended send no alerts.
   await new Promise((r) => setTimeout(r, 3000));

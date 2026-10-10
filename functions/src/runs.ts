@@ -1,6 +1,9 @@
-import { FieldValue } from 'firebase-admin/firestore';
+import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 
 import { db } from './app.js';
+
+/** Long past any retry; a TTL policy on expireAt deletes the marker then. */
+const KEEP_MS = 7 * 24 * 3600_000;
 
 /**
  * Triggers are delivered at least once, so the same trip start or report can
@@ -10,7 +13,10 @@ import { db } from './app.js';
  */
 export async function claim(key: string): Promise<boolean> {
   try {
-    await db.doc(`functionRuns/${key}`).create({ at: FieldValue.serverTimestamp() });
+    await db.doc(`functionRuns/${key}`).create({
+      at: FieldValue.serverTimestamp(),
+      expireAt: Timestamp.fromMillis(Date.now() + KEEP_MS),
+    });
     return true;
   } catch (e) {
     if ((e as { code?: number }).code === 6) return false; // ALREADY_EXISTS
