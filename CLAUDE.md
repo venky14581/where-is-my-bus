@@ -21,7 +21,8 @@ Users: driver (driver mode in the app), day scholar (student app), hosteller or 
 - Module 9 (Missed-bus help): built and tested on the emulators and the web app, 11 Oct 2026. See `docs/modules/module-09-missed-bus-help.md`. Checking it on a real route needs real stop data (the placeholder stops are off the road in places).
 - Module 10 (Evening seat booking): built and tested on the emulators, 11 Oct 2026. See `docs/modules/module-10-evening-seat-booking.md`. Razorpay checkout still needs a real project with test keys and a phone.
 - `npm run test:e2e` checks the server side of Modules 1 to 10 on the emulators (`tests/e2e/`, one file per module). Add a file for each new module.
-- Next step: Module 11 (Smart features). Still open on a real Android phone: Module 3 screen-off tracking, Module 6 push, Module 8 camera scan, Module 10 Razorpay checkout.
+- Module 11 (Smart features): built and tested on the emulators and the web app with synthetic trip history, 11 Oct 2026. See `docs/modules/module-11-smart-features.md`. Includes Not riding today. Retrain on recorded trips once there are two weeks of them.
+- Next step: Module 12 (Safety and reports). Still open on a real Android phone: Module 3 screen-off tracking, Module 6 push, Module 8 camera scan, Module 10 Razorpay checkout.
 
 ## Decisions made in the planning chat, in order
 
@@ -123,7 +124,7 @@ Use exactly these. Where `SPEC.md` says "Flutter Web or React", the dashboard is
 
 ## Data model
 
-- `users/{uid}`: name, role, routeId, stopId, passValid, passValidUntil (YYYY-MM-DD), language, alerts
+- `users/{uid}`: name, role, routeId, stopId, passValid, passValidUntil (YYYY-MM-DD), language, alerts (including leaveHome), dailyRider, walkMinutes (1 to 60, for the leave-home reminder)
 - `passSecrets/{uid}`: secret behind the student's rotating pass QR (server-written)
 - `routes/{routeId}`: name, city, ordered stops (name, lat, lng, scheduledTime), path
 - `buses/{busId}`: number, capacity, routeId, driverId
@@ -131,10 +132,12 @@ Use exactly these. Where `SPEC.md` says "Flutter Web or React", the dashboard is
 - `trips/{tripId}`: busId, routeId, date, direction, start and end time, capacity, passHolders, notRiding, seatsBooked, booking open and close time. Built so far: passHolders (the route's valid passes, counted when the trip starts) and altHeld (seats held or used by riders from other routes), both server-written.
 - `trips/{tripId}/stopTimes`: actual time at each stop
 - `trips/{tripId}/boardings/{uid}`: time, stop, type (pass, alternate, guest). (Planned as `boardings/{tripId}/{uid}`, which is not a valid Firestore path.)
+- `trips/{tripId}/notRiding/{uid}`: a pass holder not taking this evening trip (setNotRiding). The trip's `notRiding` counts them.
 - `trips/{tripId}/holds/{uid}`: pickup stop, time, status (held, boarded, cancelled, missed). (Planned as `holds/{tripId}/{uid}`, not a valid Firestore path.)
 - `bookings/{bookingId}`: tripId, uid, stop, fare, status, ticket code
 - `routeAccess/{routeId}`: routes it accepts riders from
-- `announcements/{id}`, `timetable/{id}`, `settings/booking`, `segmentTimes/{routeId}`
+- `segmentTimes/{routeId}`: learned seconds per stretch by weekday and half-hour slot, and the usual delay by weekday, from `ml/train.py`. `conditions/{date}`: how today's stretches compare with the expected (ratioSum, count), server-written.
+- `announcements/{id}`, `timetable/{id}`, `settings/booking`
 
 ## Rules to follow while building
 
@@ -179,8 +182,9 @@ How to run and test everything is in `README.md`. Things that are easy to get wr
 - `--dart-define=SIMULATE_DRIVE=true` (debug builds only) drives the bus along its route without a phone. Simulated stop times use a 5× faster clock; never point a simulated build at a real project.
 - On the web, avoid bitwise tricks on negative numbers (`~x`): web ints give unsigned 32-bit results. Run pure-logic tests with `flutter test --platform chrome` when in doubt.
 - `npm run simulate-bus [busId]` moves a bus in the emulators without a driver, for working on student screens. Add `--trip` to also create the Firestore trip and record stop times (needed for missed-bus help). Stop it with Ctrl+C: killing only the npm wrapper leaves node running, and two simulators on one bus fight over its position.
-- Missed-bus seats: a bus gives other routes `capacity − passHolders − altHeld` seats. `altHeld` changes only inside transactions in `functions/src/holds.ts` (`holdSeat`, `cancelHold`, `releasePassedHolds`); `scanPass` marks a hold boarded and the seat stays counted. A rider from another route boards only with a held seat. The rules for who may ride (`functions/src/missedBus.ts`) and the app's ride options (`app/lib/features/missed_bus/domain/missed_bus.dart`) must agree.
-- `app/lib/l10n/generated/` gets deleted by **the first `flutter test` after a `flutter pub get`/`pub add`**, and the next `flutter run` then fails with "Error when reading 'lib/l10n/generated/app_localizations.dart'". Cause, confirmed from build-cache timestamps: `pub get` runs the localization step under its own build configuration, which records the generated files as its outputs; `flutter test` uses another configuration that records none, and on switching Flutter deletes the previous configuration's outputs (`trackSharedBuildDirectory` in flutter_tools). After adding packages, run `flutter gen-l10n` once more after the first test run. The files are committed, so `flutter gen-l10n` always restores them.
+- Spare seats on a trip: `capacity − (passHolders − notRiding) − altHeld − seatsBooked`, in `spareSeats` (`functions/src/booking.ts`) and `app/lib/features/booking/domain/seats.dart`; keep them the same. `altHeld` changes only inside transactions in `functions/src/holds.ts` (`holdSeat`, `cancelHold`, `releasePassedHolds`); `scanPass` marks a hold boarded and the seat stays counted. A rider from another route boards only with a held seat. The rules for who may ride (`functions/src/missedBus.ts`) and the app's ride options (`app/lib/features/missed_bus/domain/missed_bus.dart`) must agree.
+- `app/lib/l10n/generated/` gets deleted by **the first `flutter test` after a `flutter pub get`/`pub add`**, and also seen on 11 Oct 2026 by a `flutter run` straight after a full `flutter test` with no `pub get`. The `flutter run` then fails with "Error when reading 'lib/l10n/generated/app_localizations.dart'". Cause, confirmed from build-cache timestamps: `pub get` runs the localization step under its own build configuration, which records the generated files as its outputs; `flutter test` uses another configuration that records none, and on switching Flutter deletes the previous configuration's outputs (`trackSharedBuildDirectory` in flutter_tools). After adding packages, run `flutter gen-l10n` once more after the first test run. The files are committed, so `flutter gen-l10n` always restores them.
+- The arrival-time model: `ml/` (Python 3.12 venv at `ml/.venv`, `pip install -r ml/requirements.txt`). `ml/synth_trips.py` or `npm run export-trips` → `ml/data/`; `ml/train.py` → `ml/out/segment_times.json` (committed; the seed loads it). `functions/src/learned.ts` and `app/lib/features/eta/domain/learned_times.dart` read it the same way and test the same example, like the pass codes. Python tests: `ml/.venv/Scripts/python -m unittest discover -s ml`.
 - Cloud Functions live in `functions/` (TypeScript). `npm run emulators` builds them first and allows 60 s for a cold load. They trigger on trips, stop times, reports and announcements only. Every trigger must be safe to run twice (delivery is at least once): claim a `functionRuns/{key}` marker or use a transaction. On the emulators, notifications go to `pushLog` instead of FCM.
 - Scheduled functions (`createEveningTrips`, `expireBookings`) do not run on the emulators: there is no Pub/Sub emulator. Keep their work in plain exported functions (`scheduleEveningTrips`, `expireUnpaidBookings` in `functions/src/bookings.ts`) so tests and scripts can call them. Demo payments are accepted only when `FUNCTIONS_EMULATOR` is true; Razorpay keys go in `functions/.env`, which is git-ignored.
 - Driver logins are created and their PINs reset only through the office-only callable functions `createDriver` and `setDriverPin`.

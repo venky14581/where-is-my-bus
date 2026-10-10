@@ -11,6 +11,9 @@ abstract interface class AlertsRepository {
   Stream<List<FeedItem>> watchFeed(String routeId);
 
   Future<void> savePrefs(String uid, AlertPrefs prefs);
+
+  /// Minutes from home to the stop, or null to clear it.
+  Future<void> saveWalkMinutes(String uid, int? minutes);
 }
 
 class FirestoreAlertsRepository implements AlertsRepository {
@@ -57,6 +60,9 @@ class FirestoreAlertsRepository implements AlertsRepository {
 
   @override
   Future<void> savePrefs(String uid, AlertPrefs prefs) => _db.doc('users/$uid').update({'alerts': prefs.toMap()});
+
+  @override
+  Future<void> saveWalkMinutes(String uid, int? minutes) => _db.doc('users/$uid').update({'walkMinutes': minutes});
 }
 
 /// Emits the latest list from every stream once each has emitted.

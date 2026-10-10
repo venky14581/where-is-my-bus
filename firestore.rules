@@ -8,6 +8,8 @@ rules_version = '2';
 // Module 9: seat holds on another bus, written only by Cloud Functions.
 // Module 10: evening seat bookings, written only by Cloud Functions; a
 // student may say they take no college bus every day (dailyRider).
+// Module 11: learned arrival times and today's conditions (server-written),
+// Not riding today (through a function), a student's walk to their stop.
 // Server-only paths (pushLog, functionRuns, trips/*/approachingSent) stay
 // closed to clients.
 service cloud.firestore {
@@ -99,8 +101,9 @@ service cloud.firestore {
       return !('alerts' in data) || (
         data.alerts is map
         && data.alerts.keys().hasOnly(
-             ['approaching', 'tripStarted', 'delays', 'announcements', 'leadStops', 'quietDays'])
+             ['approaching', 'leaveHome', 'tripStarted', 'delays', 'announcements', 'leadStops', 'quietDays'])
         && data.alerts.get('approaching', true) is bool
+        && data.alerts.get('leaveHome', true) is bool
         && data.alerts.get('tripStarted', true) is bool
         && data.alerts.get('delays', true) is bool
         && data.alerts.get('announcements', true) is bool
@@ -142,8 +145,11 @@ service cloud.firestore {
         && validLanguage(request.resource.data)
         && (
           (resource.data.role == 'student'
-            && onlyChanged(['name', 'language', 'routeId', 'stopId', 'alerts', 'dailyRider'])
+            && onlyChanged(['name', 'language', 'routeId', 'stopId', 'alerts', 'dailyRider', 'walkMinutes'])
             && (!('dailyRider' in request.resource.data) || request.resource.data.dailyRider is bool)
+            && (!('walkMinutes' in request.resource.data) || request.resource.data.walkMinutes == null
+                || (request.resource.data.walkMinutes is int
+                    && request.resource.data.walkMinutes >= 1 && request.resource.data.walkMinutes <= 60))
             && validName(request.resource.data)
             && validHomeStop(request.resource.data)
             && validAlertPrefs(request.resource.data))
@@ -252,6 +258,11 @@ service cloud.firestore {
       // Seats held by riders from other routes (missed-bus help), written
       // by the holdSeat function. The student sees their own; the trip's
       // driver sees who to expect where.
+      // Pass holders not taking this evening bus, set by setNotRiding.
+      match /notRiding/{uid} {
+        allow read: if isOffice() || (signedIn() && request.auth.uid == uid);
+      }
+
       match /holds/{uid} {
         allow read: if isOffice()
           || (signedIn() && request.auth.uid == uid)
@@ -281,6 +292,16 @@ service cloud.firestore {
     // only through Cloud Functions; the ticket token is the student's own.
     match /bookings/{bookingId} {
       allow read: if isOffice() || (signedIn() && resource.data.uid == request.auth.uid);
+    }
+
+    // Learned travel times between stops and the usual delay, from
+    // ml/train.py; and how today's buses compare with them. Server-written.
+    match /segmentTimes/{routeId} {
+      allow read: if canReadBaseData();
+    }
+
+    match /conditions/{date} {
+      allow read: if canReadBaseData();
     }
 
     // The in-app alerts list. Written only by Cloud Functions.

@@ -3,11 +3,13 @@
 
 export const TIME_ZONE = 'Asia/Kolkata';
 
-export type AlertKind = 'tripStarted' | 'approaching' | 'delay' | 'late' | 'breakdown' | 'announcement';
+export type AlertKind = 'tripStarted' | 'approaching' | 'leaveHome' | 'delay' | 'late' | 'breakdown' | 'announcement';
 
 /** A student's choices, stored at users/{uid}.alerts. */
 export interface AlertPrefs {
   approaching: boolean;
+  /** Time to leave home, for students who gave their walk to the stop. */
+  leaveHome: boolean;
   tripStarted: boolean;
   /** Delays, running late and breakdowns. */
   delays: boolean;
@@ -20,6 +22,7 @@ export interface AlertPrefs {
 
 export const DEFAULT_PREFS: AlertPrefs = {
   approaching: true,
+  leaveHome: true,
   tripStarted: true,
   delays: true,
   announcements: true,
@@ -37,6 +40,7 @@ export function prefsOf(raw: unknown): AlertPrefs {
     : DEFAULT_PREFS.quietDays;
   return {
     approaching: bool('approaching'),
+    leaveHome: bool('leaveHome'),
     tripStarted: bool('tripStarted'),
     delays: bool('delays'),
     announcements: bool('announcements'),
@@ -49,6 +53,8 @@ export function wants(prefs: AlertPrefs, kind: AlertKind): boolean {
   switch (kind) {
     case 'approaching':
       return prefs.approaching;
+    case 'leaveHome':
+      return prefs.leaveHome;
     case 'tripStarted':
       return prefs.tripStarted;
     case 'delay':

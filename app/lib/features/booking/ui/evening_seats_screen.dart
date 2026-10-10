@@ -12,6 +12,8 @@ import '../../live/ui/live_status.dart';
 import '../../pass/ui/pass_screen.dart';
 import '../../routes/application/route_providers.dart';
 import '../../routes/domain/bus_route.dart';
+import '../../smart/application/smart_providers.dart';
+import '../../smart/data/smart_repository.dart';
 import '../../trip/domain/trip_plan.dart';
 import '../application/booking_providers.dart';
 import '../domain/booking.dart';
@@ -100,6 +102,7 @@ class _Body extends ConsumerWidget {
                     b.status == BookingStatus.confirmed ||
                     b.status == BookingStatus.used)),
             email: user.email,
+            uid: user.uid,
           ),
         ],
       ],
@@ -147,6 +150,7 @@ class _TripCard extends ConsumerStatefulWidget {
     required this.passCovers,
     required this.booked,
     required this.email,
+    required this.uid,
   });
 
   final EveningTrip trip;
@@ -156,6 +160,7 @@ class _TripCard extends ConsumerStatefulWidget {
   final bool passCovers;
   final bool booked;
   final String? email;
+  final String uid;
 
   @override
   ConsumerState<_TripCard> createState() => _TripCardState();
@@ -164,6 +169,27 @@ class _TripCard extends ConsumerStatefulWidget {
 class _TripCardState extends ConsumerState<_TripCard> {
   bool _busy = false;
   String? _message;
+
+  /// A pass holder gives up, or takes back, their seat on this bus.
+  Future<void> _setNotRiding(bool notRiding) async {
+    final l10n = context.l10n;
+    setState(() {
+      _busy = true;
+      _message = null;
+    });
+    final result = await ref.read(smartRepositoryProvider).setNotRiding(tripId: widget.trip.id, notRiding: notRiding);
+    if (!mounted) return;
+    setState(() {
+      _busy = false;
+      _message = switch (result) {
+        NotRidingResult.notRiding || NotRidingResult.riding => null,
+        NotRidingResult.locked => l10n.notRidingLocked,
+        NotRidingResult.seatTaken => l10n.notRidingSeatTaken,
+        NotRidingResult.notYourBus || NotRidingResult.noPass => l10n.bookClosed,
+        NotRidingResult.offline => l10n.bookOffline,
+      };
+    });
+  }
 
   Future<void> _book() async {
     final l10n = context.l10n;
@@ -233,8 +259,16 @@ class _TripCardState extends ConsumerState<_TripCard> {
             Text(l10n.eveningLeaves(formatClock(context, trip.departsAt)), style: text.titleMedium),
             Text('${l10n.fareRupees(trip.guestFare.toString())} · ${l10n.seatsLeft(seats)}'),
             const SizedBox(height: 8),
-            if (widget.passCovers)
-              Text(l10n.passCoversBus, style: TextStyle(color: Colors.green.shade800))
+            if (widget.passCovers) ...[
+              Text(l10n.passCoversBus, style: TextStyle(color: Colors.green.shade800)),
+              _NotRidingSwitch(
+                notRiding: ref.watch(notRidingProvider((tripId: trip.id, uid: widget.uid))).value ?? false,
+                open: window != BookingWindow.closed,
+                closesAt: formatClock(context, trip.bookingClosesAt),
+                busy: _busy,
+                onChanged: _setNotRiding,
+              ),
+            ]
             else if (widget.booked)
               Text(l10n.bookedLabel, style: text.titleMedium?.copyWith(color: Colors.green.shade800))
             else
@@ -262,6 +296,36 @@ class _TripCardState extends ConsumerState<_TripCard> {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Not riding this evening: frees the pass holder's seat for a guest.
+/// Fixed once booking closes.
+class _NotRidingSwitch extends StatelessWidget {
+  const _NotRidingSwitch({
+    required this.notRiding,
+    required this.open,
+    required this.closesAt,
+    required this.busy,
+    required this.onChanged,
+  });
+
+  final bool notRiding;
+  final bool open;
+  final String closesAt;
+  final bool busy;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return SwitchListTile(
+      contentPadding: EdgeInsets.zero,
+      title: Text(l10n.notRidingLabel),
+      subtitle: Text(open ? l10n.notRidingHelp(closesAt) : l10n.notRidingLocked),
+      value: notRiding,
+      onChanged: open && !busy ? onChanged : null,
     );
   }
 }

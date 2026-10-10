@@ -9,6 +9,8 @@
     "build-paths": "node scripts/build-route-paths.mjs",
     "simulate-bus": "node scripts/simulate-bus.mjs",
     "announce": "node scripts/announce.mjs",
+    "export-trips": "node scripts/export-trips.mjs",
+    "import-ml": "node scripts/learned-times.mjs",
     "test:functions": "npm --prefix functions test",
     "test:e2e": "node scripts/e2e.mjs",
     "test:rules": "firebase emulators:exec --project demo-whereismybus --only firestore,database \"vitest run tests/rules\""

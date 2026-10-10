@@ -6,6 +6,7 @@ export { mirrorBusDriver } from './mirror.js';
 export { issuePassSecret, scanPass } from './boarding.js';
 export { cancelHold, countTripSeats, holdSeat, releasePassedHolds } from './holds.js';
 export { bookSeat, cancelBooking, createEveningTrips, expireBookings, payBooking } from './bookings.js';
+export { noteTraffic, setNotRiding } from './smart.js';
 
 import { FieldValue, type DocumentSnapshot, type Timestamp } from 'firebase-admin/firestore';
 import { getMessaging } from 'firebase-admin/messaging';
@@ -27,9 +28,11 @@ import {
 } from './audience.js';
 import type { Language, MessageParams } from './messages.js';
 import { deliver, type Recipient } from './push.js';
+import { claim } from './runs.js';
+import { remindToLeave, type Walker } from './smart.js';
 
 
-interface Student extends Rider {
+interface Student extends Rider, Walker {
   language: Language;
 }
 
@@ -50,6 +53,7 @@ function studentFrom(doc: DocumentSnapshot): Student {
     stopId: typeof data.stopId === 'string' ? data.stopId : null,
     prefs: prefsOf(data.alerts),
     language: data.language === 'ta' ? 'ta' : 'en',
+    walkMinutes: typeof data.walkMinutes === 'number' ? data.walkMinutes : null,
   };
 }
 
@@ -57,22 +61,6 @@ function recipients(students: Student[], kind: AlertKind, now: Date): Recipient[
   return students
     .filter((s) => shouldPush(s.prefs, kind, now))
     .map((s) => ({ uid: s.uid, language: s.language }));
-}
-
-/**
- * Triggers are delivered at least once, so the same trip start or report can
- * arrive twice. Claims [key] for this run; false means another run already
- * handled it. Keyed by what happened, not by event ID, so it holds however
- * the duplicate arrives.
- */
-async function claim(key: string): Promise<boolean> {
-  try {
-    await db.doc(`functionRuns/${key}`).create({ at: FieldValue.serverTimestamp() });
-    return true;
-  } catch (e) {
-    if ((e as { code?: number }).code === 6) return false; // ALREADY_EXISTS
-    throw e;
-  }
 }
 
 /** Adds to the in-app alerts list that every rider of the route can read. */
@@ -122,14 +110,17 @@ export const onTripStarted = onDocumentWritten('trips/{tripId}', async (event) =
   if (!(await claim(`tripStarted_${tripId}`))) return;
   const params = { busNumber: ctx.busNumber, routeName: ctx.routeName };
   await postToFeed(ctx.routeId, 'tripStarted', params, tripId);
+  const students = await studentsOn(ctx.routeId);
   await deliver({
     db,
     messaging: getMessaging,
-    recipients: recipients(await studentsOn(ctx.routeId), 'tripStarted', new Date()),
+    recipients: recipients(students, 'tripStarted', new Date()),
     kind: 'tripStarted',
     params,
     data: { tripId, routeId: ctx.routeId },
   });
+  // The bus sets off from its first stop: riders further on may need to leave now.
+  await remindToLeave({ ...ctx, tripId, reachedIndex: 0, riders: students, now: new Date() });
 });
 
 /**
@@ -163,6 +154,14 @@ export const onStopReached = onDocumentCreated('trips/{tripId}/stopTimes/{stopId
       data: { tripId, routeId: ctx.routeId },
     });
   }
+
+  await remindToLeave({
+    ...ctx,
+    tripId,
+    reachedIndex: ctx.stops.findIndex((s) => s.id === stopId),
+    riders: students,
+    now,
+  });
 
   // Delay: morning only, since the timetable holds morning times.
   if (ctx.direction !== 'toCampus') return;

@@ -7,6 +7,8 @@ export interface MessageParams {
   routeName?: string;
   stopName?: string;
   stopsAway?: number;
+  /** A clock time, HH:MM on the campus clock. */
+  time?: string;
   minutes?: number;
   title?: string;
   body?: string;
@@ -26,6 +28,11 @@ export function render(kind: AlertKind, language: Language, p: MessageParams): {
         return {
           title: 'உங்கள் பேருந்து வருகிறது',
           body: `${bus} ${p.stopName ?? ''} நிறுத்தத்திலிருந்து ${p.stopsAway} நிறுத்தங்கள் தொலைவில் உள்ளது.`,
+        };
+      case 'leaveHome':
+        return {
+          title: 'புறப்படும் நேரம்',
+          body: `${p.stopName ?? ''} நிறுத்தத்துக்கு இப்போது புறப்படுங்கள்: ${bus} சுமார் ${p.time} மணிக்கு வரும்.`,
         };
       case 'delay':
         return { title: 'பேருந்து தாமதம்', body: `${bus} சுமார் ${p.minutes} நிமிடங்கள் தாமதமாக ஓடுகிறது.` };
@@ -48,6 +55,8 @@ export function render(kind: AlertKind, language: Language, p: MessageParams): {
         title: 'Your bus is coming',
         body: `${bus} is ${p.stopsAway} ${p.stopsAway === 1 ? 'stop' : 'stops'} from ${p.stopName ?? 'your stop'}.`,
       };
+    case 'leaveHome':
+      return { title: 'Time to leave', body: `Leave now for ${p.stopName ?? 'your stop'}: ${bus} should be there around ${p.time}.` };
     case 'delay':
       return { title: 'Bus running late', body: `${bus} is running about ${p.minutes} min behind schedule.` };
     case 'late':

@@ -64,10 +64,18 @@ export function bookingWindow(now: Date, opensAt: Date, closesAt: Date): WindowS
 
 /**
  * Seats nobody else has a claim on. The route's pass holders come first,
- * then riders from other routes who missed their bus and guests who booked.
+ * except those who said they are not riding, then riders from other routes
+ * who missed their bus and guests who booked.
  */
-export function spareSeats(trip: { capacity: number; passHolders: number; altHeld?: number; seatsBooked?: number }): number {
-  return Math.max(0, trip.capacity - trip.passHolders - (trip.altHeld ?? 0) - (trip.seatsBooked ?? 0));
+export function spareSeats(trip: {
+  capacity: number;
+  passHolders: number;
+  notRiding?: number;
+  altHeld?: number;
+  seatsBooked?: number;
+}): number {
+  const keep = Math.max(0, trip.passHolders - (trip.notRiding ?? 0));
+  return Math.max(0, trip.capacity - keep - (trip.altHeld ?? 0) - (trip.seatsBooked ?? 0));
 }
 
 /** An unpaid booking keeps its seat this long. */

@@ -56,6 +56,7 @@ class FirebaseBookingRepository implements BookingRepository {
       passHolders: (d['passHolders'] as num?)?.toInt() ?? 0,
       altHeld: (d['altHeld'] as num?)?.toInt() ?? 0,
       seatsBooked: (d['seatsBooked'] as num?)?.toInt() ?? 0,
+      notRiding: (d['notRiding'] as num?)?.toInt() ?? 0,
       guestFare: d['guestFare'] as num?,
     );
   }

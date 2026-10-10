@@ -23,6 +23,7 @@ import 'package:where_is_my_bus/features/booking/data/payment_gateway.dart';
 import 'package:where_is_my_bus/features/booking/domain/booking.dart';
 import 'package:where_is_my_bus/features/eta/application/eta_providers.dart';
 import 'package:where_is_my_bus/features/eta/data/stop_times_repository.dart';
+import 'package:where_is_my_bus/features/eta/domain/learned_times.dart';
 import 'package:where_is_my_bus/features/live/application/live_providers.dart';
 import 'package:where_is_my_bus/features/pass/application/pass_providers.dart';
 import 'package:where_is_my_bus/features/pass/data/pass_repository.dart';
@@ -34,6 +35,8 @@ import 'package:where_is_my_bus/features/missed_bus/domain/missed_bus.dart';
 import 'package:where_is_my_bus/features/routes/application/route_providers.dart';
 import 'package:where_is_my_bus/features/routes/data/route_repository.dart';
 import 'package:where_is_my_bus/features/routes/domain/bus_route.dart';
+import 'package:where_is_my_bus/features/smart/application/smart_providers.dart';
+import 'package:where_is_my_bus/features/smart/data/smart_repository.dart';
 import 'package:where_is_my_bus/features/trip/application/trip_controller.dart';
 
 import 'trip_fakes.dart';
@@ -77,6 +80,7 @@ class FakeAuthRepository implements AuthRepository {
     String? stopId,
     bool passValid = false,
     String? passValidUntil,
+    int? walkMinutes,
   }) {
     final uid = 'uid-$email';
     _accounts[email] = _Account(
@@ -92,6 +96,7 @@ class FakeAuthRepository implements AuthRepository {
         stopId: stopId,
         passValid: passValid,
         passValidUntil: passValidUntil,
+        walkMinutes: walkMinutes,
       ),
     );
   }
@@ -99,6 +104,26 @@ class FakeAuthRepository implements AuthRepository {
   void setAlertPrefs(AlertPrefs prefs) {
     final account = _accounts[_currentEmail]!;
     account.profile = account.profile!.copyWith(alerts: prefs);
+    _emit();
+  }
+
+  void setWalkMinutes(int? minutes) {
+    final account = _accounts[_currentEmail]!;
+    final p = account.profile!;
+    account.profile = AppUser(
+      uid: p.uid,
+      name: p.name,
+      role: p.role,
+      email: p.email,
+      routeId: p.routeId,
+      stopId: p.stopId,
+      passValid: p.passValid,
+      passValidUntil: p.passValidUntil,
+      language: p.language,
+      alerts: p.alerts,
+      dailyRider: p.dailyRider,
+      walkMinutes: minutes,
+    );
     _emit();
   }
 
@@ -317,6 +342,9 @@ class FakeAlertsRepository implements AlertsRepository {
     saved.add(prefs);
     auth.setAlertPrefs(prefs);
   }
+
+  @override
+  Future<void> saveWalkMinutes(String uid, int? minutes) async => auth.setWalkMinutes(minutes);
 }
 
 class FakePushService implements PushService {
@@ -530,6 +558,51 @@ class FakeBookingRepository implements BookingRepository {
   }
 }
 
+/// Learned times, today's conditions, trip seat counts and Not riding marks
+/// in memory. setNotRiding answers [nextNotRiding] and, when that is a
+/// change, records it.
+class FakeSmartRepository implements SmartRepository {
+  final learned = <String, LearnedTimes>{};
+  final conditions = <String, Conditions>{};
+  final seats = <String, TripSeats>{};
+  final notRiding = <String>{};
+  final requests = <({String tripId, bool notRiding})>[];
+  NotRidingResult? nextNotRiding;
+  final _changes = StreamController<void>.broadcast();
+
+  Stream<T> _watch<T>(T Function() read) async* {
+    yield read();
+    await for (final _ in _changes.stream) {
+      yield read();
+    }
+  }
+
+  /// Sends the current values again, after a test changes them.
+  void emit() => _changes.add(null);
+
+  @override
+  Stream<LearnedTimes?> watchLearned(String routeId) => _watch(() => learned[routeId]);
+
+  @override
+  Stream<Conditions?> watchConditions(String date) => _watch(() => conditions[date]);
+
+  @override
+  Stream<TripSeats?> watchTripSeats(String tripId) => _watch(() => seats[tripId]);
+
+  @override
+  Stream<bool> watchNotRiding({required String tripId, required String uid}) => _watch(() => notRiding.contains(tripId));
+
+  @override
+  Future<NotRidingResult> setNotRiding({required String tripId, required bool notRiding}) async {
+    requests.add((tripId: tripId, notRiding: notRiding));
+    final answer = nextNotRiding ?? (notRiding ? NotRidingResult.notRiding : NotRidingResult.riding);
+    if (answer == NotRidingResult.notRiding) this.notRiding.add(tripId);
+    if (answer == NotRidingResult.riding) this.notRiding.remove(tripId);
+    _changes.add(null);
+    return answer;
+  }
+}
+
 /// Pays at once, or backs out when [backOut] is set.
 class FakePaymentGateway implements PaymentGateway {
   bool backOut = false;
@@ -566,6 +639,7 @@ Future<void> pumpApp(
   Locate? locate,
   FakeBookingRepository? bookings,
   FakePaymentGateway? payments,
+  FakeSmartRepository? smart,
 }) async {
   // A phone-sized surface so layouts match what students and drivers see.
   tester.view.physicalSize = const Size(1080, 2340);
@@ -592,6 +666,7 @@ Future<void> pumpApp(
       locateProvider.overrideWithValue(locate ?? () async => null),
       bookingRepositoryProvider.overrideWithValue(bookings ?? FakeBookingRepository()),
       paymentGatewayProvider.overrideWithValue(payments ?? FakePaymentGateway()),
+      smartRepositoryProvider.overrideWithValue(smart ?? FakeSmartRepository()),
     ],
     child: const WhereIsMyBusApp(),
   ));

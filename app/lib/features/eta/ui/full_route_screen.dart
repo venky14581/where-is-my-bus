@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 import '../../../core/l10n.dart';
 import '../../auth/application/auth_providers.dart';
@@ -10,13 +11,15 @@ import '../../live/ui/live_status.dart';
 import '../../routes/application/route_providers.dart';
 import '../../routes/domain/bus_route.dart';
 import '../../routes/ui/scheduled_time.dart';
+import '../../smart/application/smart_providers.dart';
 import '../../trip/domain/trip_plan.dart';
 import '../application/eta_providers.dart';
 import '../domain/arrival.dart';
+import '../domain/learned_times.dart';
 import 'arrival_panel.dart';
 
 /// Every stop in travel order: when it was passed, or when the bus is
-/// expected there.
+/// expected there; then how late the bus usually is on each weekday.
 class FullRouteScreen extends ConsumerWidget {
   const FullRouteScreen({super.key});
 
@@ -31,6 +34,7 @@ class FullRouteScreen extends ConsumerWidget {
     final live = bus == null ? null : ref.watch(liveBusProvider(bus.id)).value;
     final tripId = live?.tripId;
     final stopTimes = tripId == null ? const <String, DateTime>{} : ref.watch(stopTimesProvider(tripId)).value ?? const {};
+    final learned = routeId == null ? null : ref.watch(learnedTimesProvider(routeId)).value;
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.fullRouteTitle)),
@@ -43,6 +47,8 @@ class FullRouteScreen extends ConsumerWidget {
                 live: live,
                 stopTimes: stopTimes,
                 now: now,
+                learned: learned,
+                conditions: ref.watch(conditionsProvider(tripDate(now))).value,
               ),
             ),
     );
@@ -56,6 +62,8 @@ class _StopList extends StatelessWidget {
     required this.live,
     required this.stopTimes,
     required this.now,
+    required this.learned,
+    required this.conditions,
   });
 
   final BusRoute route;
@@ -63,6 +71,8 @@ class _StopList extends StatelessWidget {
   final LiveBus? live;
   final Map<String, DateTime> stopTimes;
   final DateTime now;
+  final LearnedTimes? learned;
+  final Conditions? conditions;
 
   @override
   Widget build(BuildContext context) {
@@ -82,8 +92,22 @@ class _StopList extends StatelessWidget {
         ),
     ];
     var busShown = !running;
+    final travel = TravelModel.of(
+      learned: learned,
+      conditions: conditions,
+      direction: direction,
+      at: now,
+      stopCount: route.stops.length,
+    );
     for (final stop in stops) {
-      final arrival = arrivalFor(route: route, stopId: stop.id, live: live, serverNow: now, stopTimes: stopTimes);
+      final arrival = arrivalFor(
+        route: route,
+        stopId: stop.id,
+        live: live,
+        serverNow: now,
+        stopTimes: stopTimes,
+        travel: travel,
+      );
       if (!busShown && arrival is! Passed) {
         rows.add(_BusHereRow(label: l10n.busIsHere));
         busShown = true;
@@ -94,6 +118,27 @@ class _StopList extends StatelessWidget {
         status: _statusFor(context, stop, arrival, showSchedule),
         passed: arrival is Passed,
       ));
+    }
+    final delays = learned?.delayByWeekday ?? const {};
+    if (delays.isNotEmpty) {
+      final locale = Localizations.localeOf(context).toLanguageTag();
+      rows
+        ..add(const Divider(height: 32))
+        ..add(Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Text(l10n.usualDelayTitle, style: Theme.of(context).textTheme.titleMedium),
+        ));
+      for (final day in delays.keys.toList()..sort()) {
+        rows.add(ListTile(
+          dense: true,
+          // 5 Oct 2026 was a Monday; day d of that week has ISO weekday d.
+          title: Text(l10n.usualDelayRow(
+            DateFormat.EEEE(locale).format(DateTime(2026, 10, 4 + day)),
+            delays[day]!.minutes < 2 ? 0 : delays[day]!.minutes,
+          )),
+          selected: day == campusClock(now).weekday,
+        ));
+      }
     }
     return ListView(padding: const EdgeInsets.only(bottom: 24), children: rows);
   }

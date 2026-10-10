@@ -118,7 +118,8 @@ export const holdSeat = onCall(async (request) => {
     }
     const held = typeof trip.get('altHeld') === 'number' ? (trip.get('altHeld') as number) : 0;
     const booked = typeof trip.get('seatsBooked') === 'number' ? (trip.get('seatsBooked') as number) : 0;
-    if (spareSeats({ capacity, passHolders, altHeld: held, seatsBooked: booked }) <= 0) return 'full';
+    const notRiding = typeof trip.get('notRiding') === 'number' ? (trip.get('notRiding') as number) : 0;
+    if (spareSeats({ capacity, passHolders, notRiding, altHeld: held, seatsBooked: booked }) <= 0) return 'full';
 
     for (const other of otherHolds) {
       if (other.exists && other.get('status') === 'held') {

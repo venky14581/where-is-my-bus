@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
 import '../../core/l10n.dart';
 import '../../routing/routes.dart';
@@ -8,13 +9,17 @@ import '../alerts/application/alerts_providers.dart';
 import '../auth/application/auth_providers.dart';
 import '../auth/domain/session.dart';
 import '../auth/ui/widgets.dart';
+import '../booking/domain/seats.dart';
+import '../eta/domain/learned_times.dart';
 import '../eta/ui/arrival_panel.dart';
 import '../live/application/live_providers.dart';
+import '../live/domain/live_bus.dart';
 import '../live/ui/bus_map.dart';
 import '../live/ui/live_status.dart';
 import '../routes/application/route_providers.dart';
 import '../routes/domain/bus_route.dart';
 import '../routes/ui/scheduled_time.dart';
+import '../smart/application/smart_providers.dart';
 
 /// Opens on the student's own bus: where it is, and how fresh that is.
 class StudentHomeScreen extends ConsumerWidget {
@@ -46,7 +51,7 @@ class StudentHomeScreen extends ConsumerWidget {
       ),
       body: routeId == null
           ? (profile?.dailyRider == false ? _NoDailyBus(name: profile?.name ?? '') : const SizedBox.shrink())
-          : _MyBus(routeId: routeId, stopId: profile?.stopId, name: profile?.name ?? ''),
+          : _MyBus(routeId: routeId, stopId: profile?.stopId, name: profile?.name ?? '', walkMinutes: profile?.walkMinutes),
     );
   }
 }
@@ -75,17 +80,19 @@ class _AlertsButton extends ConsumerWidget {
 }
 
 class _MyBus extends ConsumerWidget {
-  const _MyBus({required this.routeId, required this.stopId, required this.name});
+  const _MyBus({required this.routeId, required this.stopId, required this.name, required this.walkMinutes});
 
   final String routeId;
   final String? stopId;
   final String name;
+  final int? walkMinutes;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final route = ref.watch(routeProvider(routeId));
     final bus = ref.watch(routeBusProvider(routeId)).value;
     final live = bus == null ? null : ref.watch(liveBusProvider(bus.id)).value;
+    final learned = ref.watch(learnedTimesProvider(routeId)).value;
 
     return route.when(
       loading: () => const Center(child: CircularProgressIndicator()),
@@ -114,7 +121,7 @@ class _MyBus extends ConsumerWidget {
                     padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
                     children: [
                       if (bus != null)
-                        ArrivalPanel(route: route, stopId: stop.id, live: live, serverNow: now),
+                        ArrivalPanel(route: route, stopId: stop.id, live: live, serverNow: now, walkMinutes: walkMinutes),
                       if (bus == null)
                         Text(context.l10n.noBusOnRoute)
                       else
@@ -137,7 +144,18 @@ class _MyBus extends ConsumerWidget {
                         ],
                       ),
                       const SizedBox(height: 12),
-                      _StopCard(route: route, stop: stop, busNumber: bus?.number),
+                      _StopCard(
+                        route: route,
+                        stop: stop,
+                        busNumber: bus?.number,
+                        weekday: campusClock(now).weekday,
+                        usualDelay: learned?.delayByWeekday[campusClock(now).weekday],
+                        crowd: switch ((bus, live?.tripId)) {
+                          (final bus?, final tripId?) when live!.stateAt(now) != BusLiveState.notRunning =>
+                            _crowdOn(ref, tripId, bus.capacity),
+                          _ => null,
+                        },
+                      ),
                     ],
                   ),
                 ),
@@ -150,12 +168,40 @@ class _MyBus extends ConsumerWidget {
   }
 }
 
+/// How full the running trip is, once it has counted its pass holders.
+CrowdLevel? _crowdOn(WidgetRef ref, String tripId, int capacity) {
+  final seats = ref.watch(tripSeatsProvider(tripId)).value;
+  final passHolders = seats?.passHolders;
+  if (seats == null || passHolders == null) return null;
+  return crowdLevel(
+    capacity: capacity,
+    passHolders: passHolders,
+    notRiding: seats.notRiding,
+    altHeld: seats.altHeld,
+    seatsBooked: seats.seatsBooked,
+  );
+}
+
 class _StopCard extends StatelessWidget {
-  const _StopCard({required this.route, required this.stop, required this.busNumber});
+  const _StopCard({
+    required this.route,
+    required this.stop,
+    required this.busNumber,
+    required this.weekday,
+    required this.usualDelay,
+    required this.crowd,
+  });
 
   final BusRoute route;
   final RouteStop stop;
   final String? busNumber;
+
+  /// Today, as an ISO weekday on the campus clock.
+  final int weekday;
+
+  /// How late the bus usually is on [weekday], from past trips.
+  final DelayPattern? usualDelay;
+  final CrowdLevel? crowd;
 
   @override
   Widget build(BuildContext context) {
@@ -184,6 +230,28 @@ class _StopCard extends StatelessWidget {
             if (busNumber != null) Text(l10n.busNumber(busNumber!)),
             const SizedBox(height: 8),
             Text(l10n.busDueAt(formatScheduledTime(context, stop.scheduledTime)), style: text.titleMedium),
+            if (usualDelay case final usual?)
+              Text(() {
+                final locale = Localizations.localeOf(context).toLanguageTag();
+                // 5 Oct 2026 was a Monday; day d of that week has ISO weekday d.
+                final today = DateFormat.EEEE(locale).format(DateTime(2026, 10, 4 + weekday));
+                return usual.minutes < 2 ? l10n.usualDelayOnTime(today) : l10n.usualDelayLate(usual.minutes, today);
+              }()),
+            if (crowd case final crowd?)
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Row(
+                  children: [
+                    Icon(crowd == CrowdLevel.standingOnly ? Icons.people : Icons.event_seat_outlined, size: 18),
+                    const SizedBox(width: 6),
+                    Text(switch (crowd) {
+                      CrowdLevel.seatsAvailable => l10n.crowdSeats,
+                      CrowdLevel.fewSeats => l10n.crowdFew,
+                      CrowdLevel.standingOnly => l10n.crowdStanding,
+                    }),
+                  ],
+                ),
+              ),
             Align(
               alignment: Alignment.centerLeft,
               child: TextButton.icon(

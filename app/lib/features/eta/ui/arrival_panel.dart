@@ -4,8 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/l10n.dart';
 import '../../live/domain/live_bus.dart';
 import '../../routes/domain/bus_route.dart';
+import '../../smart/application/smart_providers.dart';
+import '../../trip/domain/trip_plan.dart';
 import '../application/eta_providers.dart';
 import '../domain/arrival.dart';
+import '../domain/learned_times.dart';
 
 /// Where the bus stands relative to [stopId], or null when there is nothing
 /// to estimate (no trip running).
@@ -15,6 +18,7 @@ Arrival? arrivalFor({
   required LiveBus? live,
   required DateTime serverNow,
   required Map<String, DateTime> stopTimes,
+  TravelModel? travel,
 }) {
   if (live == null) return null;
   final state = live.stateAt(serverNow);
@@ -29,6 +33,7 @@ Arrival? arrivalFor({
     busLng: live.lng,
     direction: directionOfTrip(live.tripId),
     recordedAt: recorded,
+    travel: travel,
   );
 }
 
@@ -43,7 +48,7 @@ String formatClock(BuildContext context, DateTime time) =>
     MaterialLocalizations.of(context).formatTimeOfDay(TimeOfDay.fromDateTime(time));
 
 /// The headline on the student home: minutes to their stop, at the stop, or
-/// passed.
+/// passed; and, for a student who gave their walk, when to leave home.
 class ArrivalPanel extends ConsumerWidget {
   const ArrivalPanel({
     super.key,
@@ -51,12 +56,14 @@ class ArrivalPanel extends ConsumerWidget {
     required this.stopId,
     required this.live,
     required this.serverNow,
+    this.walkMinutes,
   });
 
   final BusRoute route;
   final String stopId;
   final LiveBus? live;
   final DateTime serverNow;
+  final int? walkMinutes;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -66,8 +73,21 @@ class ArrivalPanel extends ConsumerWidget {
     final live = this.live;
     final tripId = live?.tripId;
     final stopTimes = tripId == null ? const <String, DateTime>{} : ref.watch(stopTimesProvider(tripId)).value ?? const {};
-    final arrival = arrivalFor(route: route, stopId: stopId, live: live, serverNow: serverNow, stopTimes: stopTimes);
+    final direction = directionOfTrip(tripId);
+    final arrival = arrivalFor(
+      route: route,
+      stopId: stopId,
+      live: live,
+      serverNow: serverNow,
+      stopTimes: stopTimes,
+      travel: travelModel(ref, route, direction, serverNow),
+    );
     if (arrival == null || live == null) return const SizedBox.shrink();
+    final walk = walkMinutes;
+    // Evening riders board at campus; there is no home to leave from.
+    final leave = arrival is Approaching && walk != null && direction == TripDirection.toCampus
+        ? leaveAt(expectedAt(arrival, live, serverNow), walk)
+        : null;
 
     final stale = live.stateAt(serverNow) == BusLiveState.stale;
     final (headline, detail, colour) = switch (arrival) {
@@ -97,6 +117,22 @@ class ArrivalPanel extends ConsumerWidget {
               style: (arrival is OffRoute ? text.bodyLarge : text.headlineSmall)?.copyWith(color: colour),
             ),
             if (detail != null) Text(detail, style: text.titleMedium),
+            if (leave != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Row(
+                  children: [
+                    Icon(Icons.directions_walk, size: 20, color: scheme.tertiary),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        leave.isAfter(serverNow) ? l10n.leaveBy(formatClock(context, leave)) : l10n.leaveNow,
+                        style: text.titleMedium?.copyWith(color: scheme.tertiary),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             if (stale && arrival is Approaching)
               Text(l10n.etaFromLastPosition, style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
           ],

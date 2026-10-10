@@ -48,6 +48,9 @@ describe('seats', () => {
     expect(spareSeats({ capacity: 50, passHolders: 40 })).toBe(10);
     expect(spareSeats({ capacity: 50, passHolders: 40, altHeld: 2, seatsBooked: 7 })).toBe(1);
     expect(spareSeats({ capacity: 50, passHolders: 55, seatsBooked: 0 })).toBe(0);
+    // Pass holders not riding free their seats, never more than they hold.
+    expect(spareSeats({ capacity: 50, passHolders: 48, notRiding: 3, seatsBooked: 4 })).toBe(1);
+    expect(spareSeats({ capacity: 50, passHolders: 2, notRiding: 5 })).toBe(50);
     expect(['pendingPayment', 'confirmed', 'cancelled', 'expired', 'used'].filter(holdsSeat)).toEqual(['pendingPayment', 'confirmed']);
   });
 });

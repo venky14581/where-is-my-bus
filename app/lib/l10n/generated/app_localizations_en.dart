@@ -938,4 +938,79 @@ class AppLocalizationsEn extends AppLocalizations {
   String scanNotPaid(String name) {
     return '$name\'s ticket is not paid.';
   }
+
+  @override
+  String leaveBy(String time) {
+    return 'Leave home by $time';
+  }
+
+  @override
+  String get leaveNow => 'Leave now to catch it';
+
+  @override
+  String usualDelayLate(int minutes, String day) {
+    return 'Usually about $minutes min late on ${day}s';
+  }
+
+  @override
+  String usualDelayOnTime(String day) {
+    return 'Usually on time on ${day}s';
+  }
+
+  @override
+  String get usualDelayTitle => 'Usual delay at campus';
+
+  @override
+  String usualDelayRow(String day, int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'about $minutes min late',
+      zero: 'on time',
+    );
+    return '$day: $_temp0';
+  }
+
+  @override
+  String get crowdSeats => 'Seats available';
+
+  @override
+  String get crowdFew => 'Few seats left';
+
+  @override
+  String get crowdStanding => 'Standing only';
+
+  @override
+  String get notRidingLabel => 'Not riding this evening';
+
+  @override
+  String notRidingHelp(String time) {
+    return 'Another student can book your seat. You can change this until $time.';
+  }
+
+  @override
+  String get notRidingLocked =>
+      'Booking has closed, so this cannot change now.';
+
+  @override
+  String get notRidingSeatTaken =>
+      'Your seat has been booked by someone else, so it cannot be taken back.';
+
+  @override
+  String get settingLeaveHome => 'Time to leave home';
+
+  @override
+  String get settingLeaveHomeHelp =>
+      'Set your walk to the stop to be told when to leave.';
+
+  @override
+  String get settingWalkMinutes => 'Walk from home to my stop';
+
+  @override
+  String walkMinutesValue(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get walkMinutesNone => 'Not set';
 }

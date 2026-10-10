@@ -21,6 +21,22 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
   /// The latest choice, shown while it saves.
   AlertPrefs? _pending;
 
+  /// The walk to the stop being saved; a record so "none" can be pending too.
+  ({int? minutes})? _pendingWalk;
+
+  static const _walkChoices = [2, 3, 5, 8, 10, 12, 15, 20, 25, 30, 40, 50, 60];
+
+  Future<void> _saveWalk(String uid, int? minutes) async {
+    setState(() => _pendingWalk = (minutes: minutes));
+    try {
+      await ref.read(alertsRepositoryProvider).saveWalkMinutes(uid, minutes);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _pendingWalk = null);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.l10n.settingsSaveFailed)));
+    }
+  }
+
   Future<void> _save(String uid, AlertPrefs prefs) async {
     setState(() => _pending = prefs);
     try {
@@ -39,6 +55,7 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
     final profile = session is SignedIn ? session.profile : null;
     if (profile == null) return const Scaffold();
     final prefs = _pending ?? profile.alerts;
+    final walk = _pendingWalk == null ? profile.walkMinutes : _pendingWalk!.minutes;
     void update(AlertPrefs next) => _save(profile.uid, next);
 
     // 5 Oct 2026 was a Monday; day d of that week has ISO weekday d.
@@ -72,6 +89,24 @@ class _NotificationSettingsScreenState extends ConsumerState<NotificationSetting
                 ],
               ),
             ),
+          SwitchListTile(
+            title: Text(l10n.settingLeaveHome),
+            subtitle: walk == null ? Text(l10n.settingLeaveHomeHelp) : null,
+            value: prefs.leaveHome,
+            onChanged: (v) => update(prefs.copyWith(leaveHome: v)),
+          ),
+          ListTile(
+            title: Text(l10n.settingWalkMinutes),
+            trailing: DropdownButton<int?>(
+              value: walk,
+              onChanged: (v) => _saveWalk(profile.uid, v),
+              items: [
+                DropdownMenuItem(value: null, child: Text(l10n.walkMinutesNone)),
+                for (final m in {..._walkChoices, ?walk}.toList()..sort())
+                  DropdownMenuItem(value: m, child: Text(l10n.walkMinutesValue(m))),
+              ],
+            ),
+          ),
           SwitchListTile(
             title: Text(l10n.settingTripStarted),
             value: prefs.tripStarted,

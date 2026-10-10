@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 class AlertPrefs {
   const AlertPrefs({
     this.approaching = true,
+    this.leaveHome = true,
     this.tripStarted = true,
     this.delays = true,
     this.announcements = true,
@@ -14,6 +15,9 @@ class AlertPrefs {
   });
 
   final bool approaching;
+
+  /// Time to leave home; needs the walk to the stop on the profile.
+  final bool leaveHome;
   final bool tripStarted;
 
   /// Delays, running late and breakdowns.
@@ -32,6 +36,7 @@ class AlertPrefs {
     final lead = raw['leadStops'];
     return AlertPrefs(
       approaching: flag('approaching'),
+      leaveHome: flag('leaveHome'),
       tripStarted: flag('tripStarted'),
       delays: flag('delays'),
       announcements: flag('announcements'),
@@ -45,6 +50,7 @@ class AlertPrefs {
 
   Map<String, Object> toMap() => {
         'approaching': approaching,
+        'leaveHome': leaveHome,
         'tripStarted': tripStarted,
         'delays': delays,
         'announcements': announcements,
@@ -54,6 +60,7 @@ class AlertPrefs {
 
   AlertPrefs copyWith({
     bool? approaching,
+    bool? leaveHome,
     bool? tripStarted,
     bool? delays,
     bool? announcements,
@@ -62,6 +69,7 @@ class AlertPrefs {
   }) =>
       AlertPrefs(
         approaching: approaching ?? this.approaching,
+        leaveHome: leaveHome ?? this.leaveHome,
         tripStarted: tripStarted ?? this.tripStarted,
         delays: delays ?? this.delays,
         announcements: announcements ?? this.announcements,
