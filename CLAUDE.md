@@ -12,7 +12,8 @@ Users: driver (driver mode in the app), day scholar (student app), hosteller or 
 
 - Module 1 (Setup and login): done 10 Oct 2026. See `docs/modules/module-01-setup-and-login.md`.
 - Module 2 (Route and bus data): done 10 Oct 2026. See `docs/modules/module-02-route-and-bus-data.md`. The route data in `data/base-data.json` is a placeholder until the transport office supplies the real stops and timings.
-- Next step: Module 3 (Driver trip and GPS). Needs an Android phone and Android Studio.
+- Module 3 (Driver trip and GPS): built and tested on web with a simulated drive, 10 Oct 2026. See `docs/modules/module-03-driver-trip-and-gps.md`. Not done until the screen-off test on a real Android phone passes (needs Android Studio).
+- Next step: that phone test, then Module 4 (Live map). Trip recording works, so stop times start building up for Module 11 as soon as real trips run.
 
 ## Decisions made in the planning chat, in order
 
@@ -165,5 +166,8 @@ How to run and test everything is in `README.md`. Things that are easy to get wr
 - Which screens a role may open is decided only in `app/lib/routing/redirect.dart`; the rules enforce the same split on the server. Add new routes for a role under `/student/...` or `/driver/...` so they inherit it.
 - `firestore.rules` closes every path not listed. Each module opens only the paths it needs and adds tests in `tests/rules/`.
 - Routes, buses and route access come from `data/base-data.json`. After changing stops run `npm run build-paths` (OSRM) and then `npm run seed`. The last stop of every route is the campus.
+- Live positions: Realtime Database instance `demo-whereismybus-default-rtdb` (the emulator only applies `database.rules.json` to `<projectId>-default-rtdb`). Its rules cannot read Firestore, so `busDrivers/{busId}` mirrors `buses/{busId}.driverId`; anything that changes a bus's driver must update both.
+- `--dart-define=SIMULATE_DRIVE=true` (debug builds only) drives the bus along its route without a phone. Simulated stop times use a 5× faster clock; never point a simulated build at a real project.
+- On the web, avoid bitwise tricks on negative numbers (`~x`): web ints give unsigned 32-bit results. Run pure-logic tests with `flutter test --platform chrome` when in doubt.
 - All user-facing app text goes in `app/lib/l10n/app_en.arb` and `app_ta.arb`, then `flutter gen-l10n`.
 - A module is done when its Done-when table in `docs/modules/` passes. Update the Status section above when it does.
