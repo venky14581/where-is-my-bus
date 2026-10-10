@@ -118,7 +118,7 @@ void main() {
       await _enter(tester, 'College email', _studentEmail);
       await _enter(tester, 'Password', 'bus-pass-123');
       await _tap(tester, find.widgetWithText(FilledButton, 'Sign in'));
-      expect(find.text('Hello, Asha'), findsOneWidget);
+      expect(find.text('Your stop'), findsOneWidget);
       expect(find.text('Ukkadam'), findsOneWidget);
 
       await _tap(tester, find.byIcon(Icons.more_vert));

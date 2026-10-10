@@ -1,3 +1,4 @@
+import 'package:where_is_my_bus/core/clock.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:where_is_my_bus/core/settings_store.dart';

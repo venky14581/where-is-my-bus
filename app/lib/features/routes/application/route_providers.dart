@@ -19,6 +19,10 @@ final routeProvider = StreamProvider.autoDispose.family<BusRoute?, String>(
   (ref, routeId) => ref.watch(routeRepositoryProvider).watchRoute(routeId),
 );
 
+final busesProvider = StreamProvider.autoDispose<List<Bus>>(
+  (ref) => ref.watch(routeRepositoryProvider).watchBuses(),
+);
+
 final routeBusProvider = StreamProvider.autoDispose.family<Bus?, String>(
   (ref, routeId) => ref.watch(routeRepositoryProvider).watchBusForRoute(routeId),
 );

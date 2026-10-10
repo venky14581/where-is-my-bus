@@ -15,6 +15,7 @@ import '../features/auth/ui/student_sign_up_screen.dart';
 import '../features/auth/ui/verify_email_screen.dart';
 import '../features/auth/ui/welcome_screen.dart';
 import '../features/driver/driver_home_screen.dart';
+import '../features/live/ui/all_buses_screen.dart';
 import '../features/routes/ui/choose_route_screen.dart';
 import '../features/student/student_home_screen.dart';
 import 'redirect.dart';
@@ -42,6 +43,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       route(Routes.studentFinishSetup, const FinishSetupScreen()),
       route(Routes.studentHome, const StudentHomeScreen()),
       route(Routes.studentChooseRoute, const ChooseRouteScreen()),
+      route(Routes.studentAllBuses, const AllBusesScreen()),
       route(Routes.driverSignIn, const DriverSignInScreen()),
       route(Routes.driverLanguage, const DriverLanguageScreen()),
       route(Routes.driverHome, const DriverHomeScreen()),

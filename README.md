@@ -11,6 +11,7 @@ are in [CLAUDE.md](CLAUDE.md); progress per module is in [docs/modules](docs/mod
 | `firestore.rules`, `database.rules.json` | Security rules |
 | `data/` | Routes, buses and route access (`base-data.json`), and road paths from OSRM |
 | `scripts/seed-emulators.mjs` | Loads demo accounts and `data/` into the local emulators |
+| `scripts/simulate-bus.mjs` | Moves a bus along its route in the emulators (`npm run simulate-bus`) |
 | `tests/rules/` | Security-rules tests |
 
 ## Requirements
@@ -76,6 +77,13 @@ Nothing here touches a real Firebase project: the app and dashboard use the
    Sign in as driver `DRV001`, tap Start Trip, and watch `live/bus-01` move
    in the Database tab of the emulator UI. Keep to one browser tab: a second
    tab of the same debug session stays blank.
+
+   To see the student map without a driver, move a bus along its route in
+   a third terminal (Ctrl+C leaves it marked offline):
+
+   ```bash
+   npm run simulate-bus
+   ```
 
    Use `flutter run` (a debug build) for web. Do not use a release web build
    (`flutter build web`) with the emulators: when a page reload finds a

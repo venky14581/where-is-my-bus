@@ -9,6 +9,9 @@ abstract interface class RouteRepository {
   /// Null when the route no longer exists.
   Stream<BusRoute?> watchRoute(String routeId);
 
+  /// Every bus, for the all-buses view.
+  Stream<List<Bus>> watchBuses();
+
   /// The bus that runs a route, if one is assigned.
   Stream<Bus?> watchBusForRoute(String routeId);
 
@@ -42,6 +45,12 @@ class FirestoreRouteRepository implements RouteRepository {
       .doc('routes/$routeId')
       .snapshots()
       .map((snap) => snap.exists ? BusRoute.fromMap(snap.id, snap.data()!) : null);
+
+  @override
+  Stream<List<Bus>> watchBuses() => _db
+      .collection('buses')
+      .snapshots()
+      .map((snap) => [for (final d in snap.docs) Bus.fromMap(d.id, d.data())]);
 
   @override
   Stream<Bus?> watchBusForRoute(String routeId) =>

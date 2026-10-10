@@ -224,5 +224,51 @@
   "problemPermissionDenied": "The app needs location permission to share the bus position.",
   "problemPermissionDeniedForever": "Location permission is blocked. Allow it in Settings.",
   "problemStartFailed": "Couldn't start the trip. Check the internet and try again.",
-  "openSettings": "Open settings"
+  "openSettings": "Open settings",
+  "agoSeconds": "{seconds} s ago",
+  "@agoSeconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "agoMinutes": "{minutes} min ago",
+  "@agoMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "busLive": "Live · updated {ago}",
+  "@busLive": {
+    "placeholders": {
+      "ago": {
+        "type": "String"
+      }
+    }
+  },
+  "busStale": "Weak signal · last position {ago}",
+  "@busStale": {
+    "placeholders": {
+      "ago": {
+        "type": "String"
+      }
+    }
+  },
+  "busOffline": "Offline · last seen at {time}",
+  "@busOffline": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "busNotRunning": "The bus isn't running right now.",
+  "noBusOnRoute": "No bus is assigned to this route yet.",
+  "followBus": "Follow the bus",
+  "allBusesTitle": "All buses",
+  "allBusesEmpty": "No buses are running right now.",
+  "mapAttribution": "© OpenStreetMap contributors"
 }

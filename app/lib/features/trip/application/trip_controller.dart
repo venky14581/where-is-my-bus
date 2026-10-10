@@ -5,6 +5,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/clock.dart';
 import '../../../core/settings_store.dart';
 import '../../routes/domain/bus_route.dart';
 import '../data/active_trip_store.dart';
@@ -293,7 +294,5 @@ final tripKeepAliveProvider = Provider<TripKeepAlive>((ref) => ForegroundService
 final activeTripStoreProvider = Provider<ActiveTripStore>(
   (ref) => ActiveTripStore(ref.watch(settingsStoreProvider)),
 );
-
-final clockProvider = Provider<DateTime Function()>((ref) => DateTime.now);
 
 final tripControllerProvider = NotifierProvider<TripController, TripState>(TripController.new);
