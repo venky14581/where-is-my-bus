@@ -3,7 +3,8 @@ rules_version = '2';
 // Paths not listed here stay closed until the module that needs them opens
 // them. Module 1: users. Module 2: routes, buses, routeAccess. Module 3: trips.
 // Module 6: alert settings, devices, driver reports, alerts, announcements.
-// Server-only paths (pushLog, trips/*/approachingSent) stay closed to clients.
+// Server-only paths (pushLog, functionRuns, trips/*/approachingSent) stay
+// closed to clients.
 service cloud.firestore {
   match /databases/{database}/documents {
 

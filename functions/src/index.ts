@@ -57,6 +57,22 @@ function recipients(students: Student[], kind: AlertKind, now: Date): Recipient[
     .map((s) => ({ uid: s.uid, language: s.language }));
 }
 
+/**
+ * Triggers are delivered at least once, so the same trip start or report can
+ * arrive twice. Claims [key] for this run; false means another run already
+ * handled it. Keyed by what happened, not by event ID, so it holds however
+ * the duplicate arrives.
+ */
+async function claim(key: string): Promise<boolean> {
+  try {
+    await db.doc(`functionRuns/${key}`).create({ at: FieldValue.serverTimestamp() });
+    return true;
+  } catch (e) {
+    if ((e as { code?: number }).code === 6) return false; // ALREADY_EXISTS
+    throw e;
+  }
+}
+
 /** Adds to the in-app alerts list that every rider of the route can read. */
 async function postToFeed(routeId: string | null, kind: AlertKind, params: MessageParams, tripId?: string) {
   await db.collection('alerts').add({
@@ -91,6 +107,7 @@ export const onTripStarted = onDocumentCreated('trips/{tripId}', async (event) =
   const tripId = event.params.tripId;
   const ctx = await tripContext(tripId);
   if (!ctx || ctx.trip.status !== 'running') return;
+  if (!(await claim(`tripStarted_${tripId}`))) return;
   const params = { busNumber: ctx.busNumber, routeName: ctx.routeName };
   await postToFeed(ctx.routeId, 'tripStarted', params, tripId);
   await deliver({
@@ -170,6 +187,7 @@ export const onDriverReport = onDocumentCreated('trips/{tripId}/reports/{reportI
   if (type !== 'late' && type !== 'breakdown') return;
   const ctx = await tripContext(tripId);
   if (!ctx) return;
+  if (!(await claim(`report_${tripId}_${event.params.reportId}`))) return;
   const params = { busNumber: ctx.busNumber, routeName: ctx.routeName };
   await postToFeed(ctx.routeId, type, params, tripId);
   await deliver({
@@ -186,6 +204,7 @@ export const onDriverReport = onDocumentCreated('trips/{tripId}/reports/{reportI
 export const onAnnouncement = onDocumentCreated('announcements/{id}', async (event) => {
   const data = event.data?.data();
   if (!data) return;
+  if (!(await claim(`announcement_${event.params.id}`))) return;
   const routeId = typeof data.routeId === 'string' ? data.routeId : null;
   const students = routeId ? await studentsOn(routeId) : await allStudents();
   logger.info(`Announcement ${event.params.id} to ${students.length} students`);

@@ -15,7 +15,8 @@ Users: driver (driver mode in the app), day scholar (student app), hosteller or 
 - Module 3 (Driver trip and GPS): built and tested on web with a simulated drive, 10 Oct 2026. See `docs/modules/module-03-driver-trip-and-gps.md`. Not done until the screen-off test on a real Android phone passes (needs Android Studio).
 - Module 4 (Live map): done 10 Oct 2026. See `docs/modules/module-04-live-map.md`.
 - Module 5 (Arrival time): done 10 Oct 2026. See `docs/modules/module-05-arrival-time.md`.
-- Next step: Module 6 (Alerts). Still open from Module 3: the screen-off test on a real Android phone.
+- Module 6 (Alerts): built and tested on the emulators, 11 Oct 2026. See `docs/modules/module-06-alerts.md`. Real push delivery still needs a real Firebase project (pay-as-you-go plan for Cloud Functions) and a phone.
+- Next step: Module 7 (Office dashboard). Still open: the Module 3 screen-off test and Module 6 push test on a real Android phone.
 
 ## Decisions made in the planning chat, in order
 
@@ -172,6 +173,8 @@ How to run and test everything is in `README.md`. Things that are easy to get wr
 - `--dart-define=SIMULATE_DRIVE=true` (debug builds only) drives the bus along its route without a phone. Simulated stop times use a 5× faster clock; never point a simulated build at a real project.
 - On the web, avoid bitwise tricks on negative numbers (`~x`): web ints give unsigned 32-bit results. Run pure-logic tests with `flutter test --platform chrome` when in doubt.
 - `npm run simulate-bus [busId]` moves a bus in the emulators without a driver, for working on student screens.
-- Run every `flutter` command for `app/` from the same shell (PowerShell here). Mixing bash and PowerShell makes Flutter's build cache delete `app/lib/l10n/generated/` as "stale outputs"; if those files vanish, run `flutter gen-l10n` again from that shell.
+- `app/lib/l10n/generated/` sometimes vanishes, so `flutter run` fails with "Error when reading 'lib/l10n/generated/app_localizations.dart'". Cause: Flutter keeps one build cache per configuration and, when switching configuration, deletes the previous one's outputs that the current build did not record (`trackSharedBuildDirectory` in flutter_tools). It has happened right after adding packages, so the `pub get` that follows probably triggers it; not proven. The files are committed: run `flutter gen-l10n` and try again. (An earlier note blamed mixing shells; that was wrong.)
+- Cloud Functions live in `functions/` (TypeScript). `npm run emulators` builds them first and allows 60 s for a cold load. They trigger on trips, stop times, reports and announcements only. Every trigger must be safe to run twice (delivery is at least once): claim a `functionRuns/{key}` marker or use a transaction. On the emulators, notifications go to `pushLog` instead of FCM.
+- All user-facing app text goes in
 - All user-facing app text goes in `app/lib/l10n/app_en.arb` and `app_ta.arb`, then `flutter gen-l10n`.
 - A module is done when its Done-when table in `docs/modules/` passes. Update the Status section above when it does.
