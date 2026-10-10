@@ -45,5 +45,14 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Drivers share the bus position with students during a trip. Students' own location never leaves the phone.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Keeps sharing the bus position while the screen is off during a trip.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+		<string>fetch</string>
+	</array>
 </dict>
 </plist>

@@ -113,6 +113,5 @@ void main() {
     expect(find.text('TN 37 AB 1201'), findsOneWidget);
     expect(find.text('Gandhipuram – Campus'), findsOneWidget);
     expect(find.text('2 stops · First pickup 7:00 AM'), findsOneWidget);
-    expect(find.text("Trip tracking isn't switched on yet."), findsOneWidget);
   });
 }

@@ -14,6 +14,9 @@ import 'package:where_is_my_bus/features/auth/domain/session.dart';
 import 'package:where_is_my_bus/features/routes/application/route_providers.dart';
 import 'package:where_is_my_bus/features/routes/data/route_repository.dart';
 import 'package:where_is_my_bus/features/routes/domain/bus_route.dart';
+import 'package:where_is_my_bus/features/trip/application/trip_controller.dart';
+
+import 'trip_fakes.dart';
 
 class InMemorySettingsStore implements SettingsStore {
   final values = <String, String>{};
@@ -23,6 +26,9 @@ class InMemorySettingsStore implements SettingsStore {
 
   @override
   Future<void> write(String key, String value) async => values[key] = value;
+
+  @override
+  Future<void> remove(String key) async => values.remove(key);
 }
 
 class _Account {
@@ -248,6 +254,8 @@ Future<void> pumpApp(
   FakeAuthRepository auth, {
   InMemorySettingsStore? settings,
   FakeRouteRepository? routes,
+  FakeTripRepository? trips,
+  FakeLocationSource? location,
 }) async {
   // A phone-sized surface so layouts match what students and drivers see.
   tester.view.physicalSize = const Size(1080, 2340);
@@ -259,6 +267,10 @@ Future<void> pumpApp(
       authRepositoryProvider.overrideWithValue(auth),
       settingsStoreProvider.overrideWithValue(settings ?? InMemorySettingsStore()),
       routeRepositoryProvider.overrideWithValue(routes ?? FakeRouteRepository(auth)),
+      tripRepositoryProvider.overrideWithValue(trips ?? FakeTripRepository()),
+      locationSourceProvider.overrideWithValue(location ?? FakeLocationSource()),
+      tripKeepAliveProvider.overrideWithValue(FakeKeepAlive()),
+      clockProvider.overrideWithValue(() => DateTime(2026, 10, 10, 7)),
     ],
     child: const WhereIsMyBusApp(),
   ));

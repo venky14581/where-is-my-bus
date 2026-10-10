@@ -1,7 +1,7 @@
 rules_version = '2';
 
 // Paths not listed here stay closed until the module that needs them opens
-// them. Module 1: users. Module 2: routes, buses, routeAccess.
+// them. Module 1: users. Module 2: routes, buses, routeAccess. Module 3: trips.
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -60,6 +60,21 @@ service cloud.firestore {
         || (data.routeId is string
             && exists(routePath(data.routeId))
             && data.stopId in get(routePath(data.routeId)).data.stopIds);
+    }
+
+    function busPath(busId) {
+      return /databases/$(database)/documents/buses/$(busId);
+    }
+
+    function tripPath(tripId) {
+      return /databases/$(database)/documents/trips/$(tripId);
+    }
+
+    // A driver runs trips only on the bus the office assigned to them.
+    function drivesBus(busId) {
+      return isDriver()
+        && exists(busPath(busId))
+        && get(busPath(busId)).data.driverId == request.auth.uid;
     }
 
     function validName(data) {
@@ -127,6 +142,45 @@ service cloud.firestore {
     match /routeAccess/{routeId} {
       allow read: if canReadBaseData();
       allow write: if isOffice();
+    }
+
+    // One trip per bus, day and direction: {date}_{busId}_{direction}.
+    match /trips/{tripId} {
+      allow read: if canReadBaseData();
+
+      allow create: if drivesBus(request.resource.data.busId)
+        && request.resource.data.keys().hasOnly(
+             ['busId', 'routeId', 'driverId', 'date', 'direction', 'status', 'startedAt', 'endedAt'])
+        && request.resource.data.driverId == request.auth.uid
+        && request.resource.data.routeId == get(busPath(request.resource.data.busId)).data.routeId
+        && request.resource.data.direction in ['toCampus', 'fromCampus']
+        && request.resource.data.date is string
+        && tripId == request.resource.data.date + '_' + request.resource.data.busId + '_' + request.resource.data.direction
+        && request.resource.data.status == 'running'
+        && request.resource.data.startedAt == request.time
+        && request.resource.data.endedAt == null;
+
+      // End the trip, or resume it after the app restarts.
+      allow update: if resource.data.driverId == request.auth.uid
+        && drivesBus(resource.data.busId)
+        && onlyChanged(['status', 'endedAt'])
+        && ((request.resource.data.status == 'running' && request.resource.data.endedAt == null)
+            || (request.resource.data.status == 'ended' && request.resource.data.endedAt == request.time));
+
+      // Actual time at each stop. Recorded by the phone; history for arrival
+      // times (Module 5), punctuality reports and the learned model (Module 11).
+      match /stopTimes/{stopId} {
+        allow read: if canReadBaseData();
+        allow create, update: if signedIn()
+          && exists(tripPath(tripId))
+          && get(tripPath(tripId)).data.driverId == request.auth.uid
+          && get(tripPath(tripId)).data.status == 'running'
+          && request.resource.data.keys().hasOnly(['stopId', 'arrivedAt', 'recordedAt'])
+          && request.resource.data.stopId == stopId
+          && stopId in get(routePath(get(tripPath(tripId)).data.routeId)).data.stopIds
+          && request.resource.data.arrivedAt is timestamp
+          && request.resource.data.recordedAt == request.time;
+      }
     }
 
     match /{document=**} {

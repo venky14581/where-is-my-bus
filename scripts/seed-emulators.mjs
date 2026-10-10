@@ -9,10 +9,12 @@
 
 process.env.FIREBASE_AUTH_EMULATOR_HOST ??= '127.0.0.1:9099';
 process.env.FIRESTORE_EMULATOR_HOST ??= '127.0.0.1:8080';
+process.env.FIREBASE_DATABASE_EMULATOR_HOST ??= '127.0.0.1:9000';
 
 import { initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
+import { getDatabase } from 'firebase-admin/database';
 import { importBaseData } from './base-data.mjs';
 
 const PROJECT_ID = 'demo-whereismybus';
@@ -22,9 +24,10 @@ if (!PROJECT_ID.startsWith('demo-')) {
   throw new Error('Seeding is only for demo- projects running on the emulators.');
 }
 
-const app = initializeApp({ projectId: PROJECT_ID });
+const app = initializeApp({ projectId: PROJECT_ID, databaseURL: `https://${PROJECT_ID}-default-rtdb.firebaseio.com` });
 const auth = getAuth(app);
 const db = getFirestore(app);
+const rtdb = getDatabase(app);
 
 export const DEMO_ACCOUNTS = {
   office: {
@@ -96,7 +99,10 @@ async function seed() {
     createdAt: FieldValue.serverTimestamp(),
   });
 
-  const counts = await importBaseData(db);
+  await rtdb.ref(`officeUids/${office.uid}`).set(true);
+  // A fresh start: no bus is running.
+  await rtdb.ref('live').remove();
+  const counts = await importBaseData(db, rtdb);
 
   console.log('Seeded the emulators with:');
   console.log(`  office   ${office.email}`);
@@ -107,7 +113,7 @@ async function seed() {
   console.log('Passwords and PINs are in scripts/seed-emulators.mjs.');
 }
 
-seed().catch((error) => {
+seed().then(() => process.exit(0)).catch((error) => {
   if (error.code === 'app/network-error' || /ECONNREFUSED/.test(String(error))) {
     console.error('Could not reach the emulators. Start them first with: npm run emulators');
   } else {

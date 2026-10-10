@@ -20,6 +20,10 @@ dependencies:
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   intl: any
+  geolocator: ^14.1.1
+  flutter_foreground_task: ^10.0.0
+  firebase_database: ^12.6.0
+  latlong2: ^0.10.1
 
 dev_dependencies:
   flutter_test:

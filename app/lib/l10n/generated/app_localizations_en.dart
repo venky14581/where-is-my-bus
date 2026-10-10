@@ -311,5 +311,72 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get tripTrackingNotReady => 'Trip tracking isn\'t switched on yet.';
+  String get endTrip => 'End Trip';
+
+  @override
+  String get endTripConfirmTitle => 'End this trip?';
+
+  @override
+  String get endTripConfirmBody =>
+      'Students will stop seeing the bus on the map.';
+
+  @override
+  String get cancelButton => 'Cancel';
+
+  @override
+  String get directionToCampus => 'Morning trip to campus';
+
+  @override
+  String get directionFromCampus => 'Evening trip from campus';
+
+  @override
+  String get sharingLocation => 'Sharing bus location';
+
+  @override
+  String lastSentSecondsAgo(int seconds) {
+    return 'Sent $seconds s ago';
+  }
+
+  @override
+  String get waitingForGps => 'Waiting for GPS…';
+
+  @override
+  String get noSignal =>
+      'No signal. The location will be sent when the network returns.';
+
+  @override
+  String nextStopName(String name) {
+    return 'Next stop: $name';
+  }
+
+  @override
+  String stopsReached(int reached, int total) {
+    return '$reached of $total stops reached';
+  }
+
+  @override
+  String get lastStopReached => 'All stops reached. Tap End Trip.';
+
+  @override
+  String get mockLocationWarning =>
+      'Fake GPS detected. Turn off any fake location app. The bus location is not being sent.';
+
+  @override
+  String get problemLocationOff =>
+      'Location is off. Turn it on to start the trip.';
+
+  @override
+  String get problemPermissionDenied =>
+      'The app needs location permission to share the bus position.';
+
+  @override
+  String get problemPermissionDeniedForever =>
+      'Location permission is blocked. Allow it in Settings.';
+
+  @override
+  String get problemStartFailed =>
+      'Couldn\'t start the trip. Check the internet and try again.';
+
+  @override
+  String get openSettings => 'Open settings';
 }
