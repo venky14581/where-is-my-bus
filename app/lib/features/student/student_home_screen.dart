@@ -119,6 +119,15 @@ class _MyBus extends ConsumerWidget {
                         Text(context.l10n.noBusOnRoute)
                       else
                         LiveStatusLine(bus: live, serverNow: now),
+                      const SizedBox(height: 8),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: OutlinedButton.icon(
+                          onPressed: () => context.push(Routes.studentMissedBus),
+                          icon: const Icon(Icons.directions_run),
+                          label: Text(context.l10n.missedBusButton),
+                        ),
+                      ),
                       const SizedBox(height: 12),
                       _StopCard(route: route, stop: stop, busNumber: bus?.number),
                     ],

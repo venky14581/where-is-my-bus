@@ -91,6 +91,17 @@ Nothing here touches a real Firebase project: the app and dashboard use the
    npm run simulate-bus
    ```
 
+   For missed-bus help (riders from other routes holding a seat), the bus
+   needs a real trip with stop times. Sign in as the demo student, give them
+   a route and a pass, then drive another route's bus:
+
+   ```bash
+   npm run simulate-bus -- bus-02 --trip
+   ```
+
+   Stop the simulator with Ctrl+C in its own terminal. Stopping only the
+   `npm` wrapper can leave the node process driving the same trip.
+
    Use `flutter run` (a debug build) for web. Do not use a release web build
    (`flutter build web`) with the emulators: when a page reload finds a
    signed-in user, Firebase Auth checks that user against production before

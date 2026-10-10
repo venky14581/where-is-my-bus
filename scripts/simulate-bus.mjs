@@ -3,18 +3,26 @@
 //
 //   npm run simulate-bus             # bus-01, morning direction
 //   npm run simulate-bus -- bus-03   # another bus
+//   npm run simulate-bus -- bus-02 --trip
+//                                    # also a real trip in Firestore with
+//                                    # stop times, for missed-bus help and
+//                                    # seat holds (Module 9)
 //
 // Ctrl+C leaves the bus marked offline, like a phone losing signal. At the
 // end of the route the bus is marked ended.
 
 process.env.FIREBASE_DATABASE_EMULATOR_HOST ??= '127.0.0.1:9000';
+process.env.FIRESTORE_EMULATOR_HOST ??= '127.0.0.1:8080';
 
 import { readFile } from 'node:fs/promises';
 import { initializeApp } from 'firebase-admin/app';
 import { getDatabase, ServerValue } from 'firebase-admin/database';
+import { FieldValue, Timestamp, getFirestore } from 'firebase-admin/firestore';
 
 const PROJECT_ID = 'demo-whereismybus';
-const busId = process.argv[2] ?? 'bus-01';
+const args = process.argv.slice(2);
+const busId = args.find((a) => !a.startsWith('--')) ?? 'bus-01';
+const withTrip = args.includes('--trip');
 const TICK_MS = 3000;
 const SPEED_MPS = 11; // about 40 km/h
 const SPEEDUP = 5; // so a 25 km route takes minutes, not most of an hour
@@ -56,7 +64,12 @@ function metres([lat1, lng1], [lat2, lng2]) {
 }
 
 const path = decodePolyline(paths[bus.routeId].polyline);
-const tripId = `${new Date().toISOString().slice(0, 10)}_${busId}_toCampus_simulated`;
+// Trips are dated on the campus clock, like the app does.
+const date = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+const tripId = withTrip ? `${date}_${busId}_toCampus` : `${date}_${busId}_toCampus_simulated`;
+const firestore = getFirestore(app);
+const route = base.routes.find((r) => r.id === bus.routeId);
+const recorded = new Set();
 let segment = 0, along = 0;
 
 function position() {
@@ -75,11 +88,44 @@ function advance(m) {
   }
 }
 
+if (withTrip) {
+  // Overwrites any earlier run today, so holds and stop times start fresh.
+  await firestore.recursiveDelete(firestore.doc(`trips/${tripId}`));
+  await firestore.doc(`trips/${tripId}`).set({
+    busId, routeId: bus.routeId, driverId: bus.driver ? `driver-${bus.driver}` : null, date,
+    direction: 'toCampus', status: 'running', startedAt: FieldValue.serverTimestamp(), endedAt: null,
+  });
+}
+
+// Where on the path the bus comes closest to each stop. The simulator moves
+// in big steps and some placeholder stops sit off the road, so a phone-like
+// "within 80 m" test would skip them; this records every stop, in order.
+const closestIndex = new Map(route.stops.map((stop) => {
+  let best = 0;
+  path.forEach((p, i) => { if (metres(p, [stop.lat, stop.lng]) < metres(path[best], [stop.lat, stop.lng])) best = i; });
+  return [stop.id, best];
+}));
+
+/** Records a stop time once the bus has reached its closest point to a stop. */
+async function recordStops() {
+  if (!withTrip) return;
+  for (const stop of route.stops) {
+    if (recorded.has(stop.id) || segment < closestIndex.get(stop.id)) continue;
+    recorded.add(stop.id);
+    await firestore.doc(`trips/${tripId}/stopTimes/${stop.id}`).set({
+      stopId: stop.id, arrivedAt: Timestamp.now(), recordedAt: FieldValue.serverTimestamp(),
+    });
+    console.log(`  at ${stop.name}`);
+  }
+}
+
 async function tick() {
   const [lat, lng] = position();
+  await recordStops();
   await live.set({ lat, lng, speed: SPEED_MPS, heading: 0, accuracy: 5, updatedAt: ServerValue.TIMESTAMP, tripId, status: 'running' });
   if (segment >= path.length - 1) {
     await live.update({ status: 'ended', updatedAt: ServerValue.TIMESTAMP });
+    if (withTrip) await firestore.doc(`trips/${tripId}`).update({ status: 'ended', endedAt: FieldValue.serverTimestamp() });
     console.log(`${busId} reached the end of ${bus.routeId}; marked ended.`);
     process.exit(0);
   }

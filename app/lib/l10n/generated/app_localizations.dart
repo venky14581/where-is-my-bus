@@ -1123,6 +1123,192 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No connection. Check the pass by eye for now.'**
   String get scanOffline;
+
+  /// No description provided for @missedBusButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Missed your bus?'**
+  String get missedBusButton;
+
+  /// No description provided for @missedBusTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Catch another bus'**
+  String get missedBusTitle;
+
+  /// No description provided for @missedBusIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'College buses the transport office allows you to ride, each with the nearest stop you can reach in time.'**
+  String get missedBusIntro;
+
+  /// No description provided for @missedBusFromHere.
+  ///
+  /// In en, this message translates to:
+  /// **'Distances from where you are now.'**
+  String get missedBusFromHere;
+
+  /// No description provided for @missedBusFromStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Distances from your stop, {stop}. Allow location to get a closer match.'**
+  String missedBusFromStop(String stop);
+
+  /// No description provided for @missedBusLocating.
+  ///
+  /// In en, this message translates to:
+  /// **'Finding where you are…'**
+  String get missedBusLocating;
+
+  /// No description provided for @missedBusNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No other college bus can take you right now.'**
+  String get missedBusNone;
+
+  /// No description provided for @missedBusNoneHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Only buses the transport office allows for your route, still on their way to a stop near you, are shown here.'**
+  String get missedBusNoneHint;
+
+  /// No description provided for @missedBusNeedsPass.
+  ///
+  /// In en, this message translates to:
+  /// **'You need a valid bus pass to ride another college bus.'**
+  String get missedBusNeedsPass;
+
+  /// No description provided for @missedBusGetOnAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Get on at {stop}'**
+  String missedBusGetOnAt(String stop);
+
+  /// No description provided for @missedBusWalk.
+  ///
+  /// In en, this message translates to:
+  /// **'{distance} walk, about {minutes} min'**
+  String missedBusWalk(String distance, int minutes);
+
+  /// No description provided for @missedBusBusIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Bus there in {minutes} min, around {time}'**
+  String missedBusBusIn(int minutes, String time);
+
+  /// No description provided for @missedBusBusThereNow.
+  ///
+  /// In en, this message translates to:
+  /// **'The bus is at that stop now'**
+  String get missedBusBusThereNow;
+
+  /// No description provided for @missedBusTooFar.
+  ///
+  /// In en, this message translates to:
+  /// **'The bus may get there before you.'**
+  String get missedBusTooFar;
+
+  /// No description provided for @missedBusSeats.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 seat for other routes} other{{count} seats for other routes}}'**
+  String missedBusSeats(int count);
+
+  /// No description provided for @missedBusFull.
+  ///
+  /// In en, this message translates to:
+  /// **'No seats left for other routes'**
+  String get missedBusFull;
+
+  /// No description provided for @distanceMetres.
+  ///
+  /// In en, this message translates to:
+  /// **'{metres} m'**
+  String distanceMetres(int metres);
+
+  /// No description provided for @distanceKm.
+  ///
+  /// In en, this message translates to:
+  /// **'{km} km'**
+  String distanceKm(String km);
+
+  /// No description provided for @holdSeatButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold a seat'**
+  String get holdSeatButton;
+
+  /// No description provided for @holdHeld.
+  ///
+  /// In en, this message translates to:
+  /// **'Seat held. Be at {stop} and show your pass to the driver.'**
+  String holdHeld(String stop);
+
+  /// No description provided for @holdCancelButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Give up seat'**
+  String get holdCancelButton;
+
+  /// No description provided for @holdBoarded.
+  ///
+  /// In en, this message translates to:
+  /// **'You boarded this bus.'**
+  String get holdBoarded;
+
+  /// No description provided for @holdMissed.
+  ///
+  /// In en, this message translates to:
+  /// **'The bus left {stop}, so your seat was released.'**
+  String holdMissed(String stop);
+
+  /// No description provided for @holdFull.
+  ///
+  /// In en, this message translates to:
+  /// **'Sorry, the last seat has just gone.'**
+  String get holdFull;
+
+  /// No description provided for @holdPassed.
+  ///
+  /// In en, this message translates to:
+  /// **'The bus has already passed that stop.'**
+  String get holdPassed;
+
+  /// No description provided for @holdNotAllowed.
+  ///
+  /// In en, this message translates to:
+  /// **'This bus does not take riders from your route.'**
+  String get holdNotAllowed;
+
+  /// No description provided for @holdNotRunning.
+  ///
+  /// In en, this message translates to:
+  /// **'This bus is no longer running.'**
+  String get holdNotRunning;
+
+  /// No description provided for @holdOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'No connection. Try again.'**
+  String get holdOffline;
+
+  /// No description provided for @waitingRidersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Riders from other routes'**
+  String get waitingRidersTitle;
+
+  /// No description provided for @waitingRider.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} at {stop}'**
+  String waitingRider(String name, String stop);
+
+  /// No description provided for @scanNoSeatHeld.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} has no seat held on this bus. They can hold one in the app.'**
+  String scanNoSeatHeld(String name);
 }
 
 class _AppLocalizationsDelegate

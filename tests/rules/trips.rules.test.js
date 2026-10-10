@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { afterAll, beforeAll, beforeEach, describe, test } from 'vitest';
 import { assertFails, assertSucceeds, initializeTestEnvironment } from '@firebase/rules-unit-testing';
-import { Timestamp, doc, getDoc, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
+import { Timestamp, collection, doc, getDoc, getDocs, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
 
 let env;
 
@@ -143,5 +143,32 @@ describe('passes and boardings', () => {
     await assertFails(getDoc(doc(driver('driver2'), `trips/${TRIP}/boardings/student1`)));
     await assertFails(getDoc(doc(student(), `trips/${TRIP}/boardings/student1`)));
     await assertFails(setDoc(doc(driver(), `trips/${TRIP}/boardings/student2`), { type: 'pass' }));
+  });
+});
+
+describe('seat holds on another bus', () => {
+  beforeEach(() => env.withSecurityRulesDisabled(async (ctx) => {
+    const db = ctx.firestore();
+    await setDoc(doc(db, `trips/${TRIP}`), { ...newTrip(), startedAt: Timestamp.now(), passHolders: 40, altHeld: 1 });
+    await setDoc(doc(db, 'users/student2'), { name: 'Bala', role: 'student' });
+    await setDoc(doc(db, `trips/${TRIP}/holds/student1`), { uid: 'student1', name: 'Asha', stopId: 'ukkadam', status: 'held' });
+  }));
+
+  test('a student reads their own hold only, and cannot make one', async () => {
+    await assertSucceeds(getDoc(doc(student(), `trips/${TRIP}/holds/student1`)));
+    const other = env.authenticatedContext('student2', { email: 'cb.en.u4cse21002@cb.students.amrita.edu', email_verified: true }).firestore();
+    await assertFails(getDoc(doc(other, `trips/${TRIP}/holds/student1`)));
+    await assertFails(setDoc(doc(other, `trips/${TRIP}/holds/student2`), { stopId: 'ukkadam', status: 'held' }));
+    await assertFails(updateDoc(doc(student(), `trips/${TRIP}/holds/student1`), { status: 'boarded' }));
+  });
+
+  test("the trip's driver lists who to expect; other drivers cannot", async () => {
+    await assertSucceeds(getDocs(collection(driver(), `trips/${TRIP}/holds`)));
+    await assertFails(getDocs(collection(driver('driver2'), `trips/${TRIP}/holds`)));
+  });
+
+  test('nobody changes seat counts from an app', async () => {
+    await assertFails(updateDoc(doc(driver(), `trips/${TRIP}`), { altHeld: 0 }));
+    await assertFails(updateDoc(doc(student(), `trips/${TRIP}`), { altHeld: 0 }));
   });
 });

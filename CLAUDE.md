@@ -18,7 +18,8 @@ Users: driver (driver mode in the app), day scholar (student app), hosteller or 
 - Module 6 (Alerts): built and tested on the emulators, 11 Oct 2026. See `docs/modules/module-06-alerts.md`. Real push delivery still needs a real Firebase project (pay-as-you-go plan for Cloud Functions) and a phone.
 - Module 7 (Office dashboard): done 11 Oct 2026. See `docs/modules/module-07-office-dashboard.md`.
 - Module 8 (Pass and QR scan): built and tested on the emulators, 11 Oct 2026. See `docs/modules/module-08-pass-and-qr-scan.md`. The camera scan needs a phone.
-- Next step: Module 9 (Missed-bus help). Still open on a real Android phone: Module 3 screen-off tracking, Module 6 push, Module 8 camera scan.
+- Module 9 (Missed-bus help): built and tested on the emulators and the web app, 11 Oct 2026. See `docs/modules/module-09-missed-bus-help.md`. Checking it on a real route needs real stop data (the placeholder stops are off the road in places).
+- Next step: Module 10 (Evening seat booking). Still open on a real Android phone: Module 3 screen-off tracking, Module 6 push, Module 8 camera scan.
 
 ## Decisions made in the planning chat, in order
 
@@ -125,10 +126,10 @@ Use exactly these. Where `SPEC.md` says "Flutter Web or React", the dashboard is
 - `routes/{routeId}`: name, city, ordered stops (name, lat, lng, scheduledTime), path
 - `buses/{busId}`: number, capacity, routeId, driverId
 - `live/{busId}`: lat, lng, speed, updatedAt, tripId, status
-- `trips/{tripId}`: busId, routeId, date, direction, start and end time, capacity, passHolders, notRiding, seatsBooked, booking open and close time
+- `trips/{tripId}`: busId, routeId, date, direction, start and end time, capacity, passHolders, notRiding, seatsBooked, booking open and close time. Built so far: passHolders (the route's valid passes, counted when the trip starts) and altHeld (seats held or used by riders from other routes), both server-written.
 - `trips/{tripId}/stopTimes`: actual time at each stop
 - `trips/{tripId}/boardings/{uid}`: time, stop, type (pass, alternate, guest). (Planned as `boardings/{tripId}/{uid}`, which is not a valid Firestore path.)
-- `holds/{tripId}/{uid}`: pickup stop, time
+- `trips/{tripId}/holds/{uid}`: pickup stop, time, status (held, boarded, cancelled, missed). (Planned as `holds/{tripId}/{uid}`, not a valid Firestore path.)
 - `bookings/{bookingId}`: tripId, uid, stop, fare, status, ticket code
 - `routeAccess/{routeId}`: routes it accepts riders from
 - `announcements/{id}`, `timetable/{id}`, `settings/booking`, `segmentTimes/{routeId}`
@@ -175,7 +176,8 @@ How to run and test everything is in `README.md`. Things that are easy to get wr
 - Live positions: Realtime Database instance `demo-whereismybus-default-rtdb` (the emulator only applies `database.rules.json` to `<projectId>-default-rtdb`; anything that builds a database URL must use that name, including Cloud Functions, where the emulator's FIREBASE_CONFIG points elsewhere). Its rules cannot read Firestore, so `busDrivers/{busId}` mirrors `buses/{busId}.driverId`; the `mirrorBusDriver` function keeps it in step, so just edit the bus.
 - `--dart-define=SIMULATE_DRIVE=true` (debug builds only) drives the bus along its route without a phone. Simulated stop times use a 5× faster clock; never point a simulated build at a real project.
 - On the web, avoid bitwise tricks on negative numbers (`~x`): web ints give unsigned 32-bit results. Run pure-logic tests with `flutter test --platform chrome` when in doubt.
-- `npm run simulate-bus [busId]` moves a bus in the emulators without a driver, for working on student screens.
+- `npm run simulate-bus [busId]` moves a bus in the emulators without a driver, for working on student screens. Add `--trip` to also create the Firestore trip and record stop times (needed for missed-bus help). Stop it with Ctrl+C: killing only the npm wrapper leaves node running, and two simulators on one bus fight over its position.
+- Missed-bus seats: a bus gives other routes `capacity − passHolders − altHeld` seats. `altHeld` changes only inside transactions in `functions/src/holds.ts` (`holdSeat`, `cancelHold`, `releasePassedHolds`); `scanPass` marks a hold boarded and the seat stays counted. A rider from another route boards only with a held seat. The rules for who may ride (`functions/src/missedBus.ts`) and the app's ride options (`app/lib/features/missed_bus/domain/missed_bus.dart`) must agree.
 - `app/lib/l10n/generated/` gets deleted by **the first `flutter test` after a `flutter pub get`/`pub add`**, and the next `flutter run` then fails with "Error when reading 'lib/l10n/generated/app_localizations.dart'". Cause, confirmed from build-cache timestamps: `pub get` runs the localization step under its own build configuration, which records the generated files as its outputs; `flutter test` uses another configuration that records none, and on switching Flutter deletes the previous configuration's outputs (`trackSharedBuildDirectory` in flutter_tools). After adding packages, run `flutter gen-l10n` once more after the first test run. The files are committed, so `flutter gen-l10n` always restores them.
 - Cloud Functions live in `functions/` (TypeScript). `npm run emulators` builds them first and allows 60 s for a cold load. They trigger on trips, stop times, reports and announcements only. Every trigger must be safe to run twice (delivery is at least once): claim a `functionRuns/{key}` marker or use a transaction. On the emulators, notifications go to `pushLog` instead of FCM.
 - Driver logins are created and their PINs reset only through the office-only callable functions `createDriver` and `setDriverPin`.
