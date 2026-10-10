@@ -55,12 +55,25 @@ class _ChooseRouteScreenState extends ConsumerState<ChooseRouteScreen> {
     }
   }
 
+  Future<void> _saveNoDailyBus(String uid) async {
+    setState(() => _saving = true);
+    try {
+      await ref.read(routeRepositoryProvider).saveNoDailyBus(uid);
+      if (mounted) context.go(Routes.studentHome);
+    } catch (_) {
+      if (mounted) setState(() => _error = context.l10n.errorUnknown);
+    } finally {
+      if (mounted) setState(() => _saving = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final session = ref.watch(sessionProvider).value;
     final profile = session is SignedIn ? session.profile : null;
-    final hasRoute = profile?.routeId != null;
+    // Somewhere to go back to: a route, or the choice of none.
+    final hasRoute = profile?.routeId != null || profile?.dailyRider == false;
     final routes = ref.watch(routesProvider);
 
     final atFirstStep = _city == null;
@@ -115,6 +128,7 @@ class _ChooseRouteScreenState extends ConsumerState<ChooseRouteScreen> {
                 return _CityStep(
                   routes: all,
                   onSelect: (city) => setState(() => _city = city),
+                  onNoDailyBus: profile == null || _saving ? null : () => _saveNoDailyBus(profile.uid),
                 );
               },
             ),
@@ -126,10 +140,11 @@ class _ChooseRouteScreenState extends ConsumerState<ChooseRouteScreen> {
 }
 
 class _CityStep extends StatelessWidget {
-  const _CityStep({required this.routes, required this.onSelect});
+  const _CityStep({required this.routes, required this.onSelect, required this.onNoDailyBus});
 
   final List<BusRoute> routes;
   final ValueChanged<String> onSelect;
+  final VoidCallback? onNoDailyBus;
 
   @override
   Widget build(BuildContext context) {
@@ -148,6 +163,13 @@ class _CityStep extends StatelessWidget {
             subtitle: context.l10n.routeCount(counts[city]!),
             onTap: () => onSelect(city),
           ),
+        const Divider(height: 32),
+        _Choice(
+          icon: Icons.night_shelter_outlined,
+          title: context.l10n.noDailyBusTitle,
+          subtitle: context.l10n.noDailyBusSubtitle,
+          onTap: onNoDailyBus,
+        ),
       ],
     );
   }
@@ -263,7 +285,7 @@ class _Choice extends StatelessWidget {
   final IconData icon;
   final String title;
   final String subtitle;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final bool selected;
 
   @override

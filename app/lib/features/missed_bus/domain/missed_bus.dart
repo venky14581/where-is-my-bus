@@ -13,6 +13,7 @@ class RunningTrip {
     required this.direction,
     this.passHolders,
     this.altHeld = 0,
+    this.seatsBooked = 0,
   });
 
   final String id;
@@ -26,6 +27,9 @@ class RunningTrip {
 
   /// Seats held or used by riders from other routes.
   final int altHeld;
+
+  /// Evening seats booked by guests (Module 10).
+  final int seatsBooked;
 }
 
 enum HoldStatus { held, boarded, cancelled, missed }
@@ -119,7 +123,8 @@ abstract final class MissedBus {
   static int? freeSeats(int capacity, RunningTrip trip) {
     final kept = trip.passHolders;
     if (kept == null) return null;
-    final free = capacity - kept - trip.altHeld;
+    // Same sum as spareSeats in functions/src/booking.ts.
+    final free = capacity - kept - trip.altHeld - trip.seatsBooked;
     return free < 0 ? 0 : free;
   }
 

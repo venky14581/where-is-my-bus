@@ -17,6 +17,10 @@ import 'package:where_is_my_bus/features/alerts/data/alerts_repository.dart';
 import 'package:where_is_my_bus/features/alerts/data/push_service.dart';
 import 'package:where_is_my_bus/features/alerts/domain/alert_prefs.dart';
 import 'package:where_is_my_bus/features/alerts/domain/feed_item.dart';
+import 'package:where_is_my_bus/features/booking/application/booking_providers.dart';
+import 'package:where_is_my_bus/features/booking/data/booking_repository.dart';
+import 'package:where_is_my_bus/features/booking/data/payment_gateway.dart';
+import 'package:where_is_my_bus/features/booking/domain/booking.dart';
 import 'package:where_is_my_bus/features/eta/application/eta_providers.dart';
 import 'package:where_is_my_bus/features/eta/data/stop_times_repository.dart';
 import 'package:where_is_my_bus/features/live/application/live_providers.dart';
@@ -101,7 +105,24 @@ class FakeAuthRepository implements AuthRepository {
   /// What a successful `users/{uid}` update does to the session.
   void setHomeStop(String routeId, String stopId) {
     final account = _accounts[_currentEmail]!;
-    account.profile = account.profile!.copyWith(routeId: routeId, stopId: stopId);
+    account.profile = account.profile!.copyWith(routeId: routeId, stopId: stopId, dailyRider: true);
+    _emit();
+  }
+
+  void setNoDailyBus() {
+    final account = _accounts[_currentEmail]!;
+    final p = account.profile!;
+    account.profile = AppUser(
+      uid: p.uid,
+      name: p.name,
+      role: p.role,
+      email: p.email,
+      passValid: p.passValid,
+      passValidUntil: p.passValidUntil,
+      language: p.language,
+      alerts: p.alerts,
+      dailyRider: false,
+    );
     _emit();
   }
 
@@ -276,6 +297,9 @@ class FakeRouteRepository implements RouteRepository {
   @override
   Future<void> saveHomeStop({required String uid, required String routeId, required String stopId}) async =>
       auth.setHomeStop(routeId, stopId);
+
+  @override
+  Future<void> saveNoDailyBus(String uid) async => auth.setNoDailyBus();
 }
 
 class FakeAlertsRepository implements AlertsRepository {
@@ -431,6 +455,100 @@ class FakeMissedBusRepository implements MissedBusRepository {
   }
 }
 
+/// Evening trips and bookings in memory. Booking makes an unpaid booking;
+/// paying confirms it with a ticket token, as the server does.
+class FakeBookingRepository implements BookingRepository {
+  final trips = <EveningTrip>[];
+  final bookings = <String, Booking>{};
+  BookResult nextResult = BookResult.booked;
+  final requests = <({String tripId, String stopId})>[];
+  final cancelled = <String>[];
+  final _changes = StreamController<void>.broadcast();
+
+  Stream<T> _watch<T>(T Function() read) async* {
+    yield read();
+    await for (final _ in _changes.stream) {
+      yield read();
+    }
+  }
+
+  @override
+  Stream<List<EveningTrip>> watchEveningTrips(List<String> dates) =>
+      _watch(() => [for (final t in trips) if (dates.contains(t.date)) t]);
+
+  @override
+  Stream<List<Booking>> watchMyBookings(String uid) => _watch(() => bookings.values.toList());
+
+  @override
+  Future<BookOutcome> book({required String tripId, required String stopId}) async {
+    requests.add((tripId: tripId, stopId: stopId));
+    if (nextResult != BookResult.booked) return BookOutcome(nextResult);
+    final trip = trips.firstWhere((t) => t.id == tripId);
+    final id = '${tripId}_me';
+    bookings[id] = Booking(
+      id: id,
+      tripId: tripId,
+      routeId: trip.routeId,
+      busId: trip.busId,
+      date: trip.date,
+      departsAt: trip.departsAt,
+      stopId: stopId,
+      fare: trip.guestFare ?? 0,
+      status: BookingStatus.pendingPayment,
+    );
+    _changes.add(null);
+    return BookOutcome(BookResult.booked, bookingId: id, payment: const PaymentInfo(mode: PaymentMode.demo));
+  }
+
+  void _set(String id, BookingStatus status, {String? token}) {
+    final b = bookings[id]!;
+    bookings[id] = Booking(
+      id: b.id,
+      tripId: b.tripId,
+      routeId: b.routeId,
+      busId: b.busId,
+      date: b.date,
+      departsAt: b.departsAt,
+      stopId: b.stopId,
+      fare: b.fare,
+      status: status,
+      ticketToken: token ?? b.ticketToken,
+    );
+    _changes.add(null);
+  }
+
+  @override
+  Future<PayResult> pay({required String bookingId, required PaymentProof proof}) async {
+    _set(bookingId, BookingStatus.confirmed, token: 'tok');
+    return PayResult.confirmed;
+  }
+
+  @override
+  Future<void> cancel(String bookingId) async {
+    cancelled.add(bookingId);
+    _set(bookingId, BookingStatus.cancelled);
+  }
+}
+
+/// Pays at once, or backs out when [backOut] is set.
+class FakePaymentGateway implements PaymentGateway {
+  bool backOut = false;
+  final charged = <num>[];
+
+  @override
+  Future<PaymentProof?> pay(
+    BuildContext context, {
+    required PaymentInfo info,
+    required num fare,
+    required String description,
+    String? email,
+  }) async {
+    if (backOut) return null;
+    charged.add(fare);
+    return const DemoPaymentProof();
+  }
+}
+
 Future<void> pumpApp(
   WidgetTester tester,
   FakeAuthRepository auth, {
@@ -446,6 +564,8 @@ Future<void> pumpApp(
   FakeScanner? scanner,
   FakeMissedBusRepository? missedBus,
   Locate? locate,
+  FakeBookingRepository? bookings,
+  FakePaymentGateway? payments,
 }) async {
   // A phone-sized surface so layouts match what students and drivers see.
   tester.view.physicalSize = const Size(1080, 2340);
@@ -470,6 +590,8 @@ Future<void> pumpApp(
       scannerBuilderProvider.overrideWithValue((scanner ?? FakeScanner()).builder),
       missedBusRepositoryProvider.overrideWithValue(missedBus ?? FakeMissedBusRepository()),
       locateProvider.overrideWithValue(locate ?? () async => null),
+      bookingRepositoryProvider.overrideWithValue(bookings ?? FakeBookingRepository()),
+      paymentGatewayProvider.overrideWithValue(payments ?? FakePaymentGateway()),
     ],
     child: const WhereIsMyBusApp(),
   ));

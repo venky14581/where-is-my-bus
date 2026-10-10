@@ -35,8 +35,9 @@ String? redirectFor(AsyncValue<Session> session, String location) {
       switch (profile.role) {
         case UserRole.student:
           if (!emailVerified) return _goTo(Routes.studentVerifyEmail, location);
-          // Route and stop are picked once, before anything else.
-          if (profile.routeId == null) return _goTo(Routes.studentChooseRoute, location);
+          // Route and stop are picked once, before anything else, unless
+          // the student takes no college bus every day.
+          if (profile.routeId == null && profile.dailyRider) return _goTo(Routes.studentChooseRoute, location);
           final inStudentApp = Routes.isUnder(location, Routes.studentHome) &&
               !Routes.studentOnboarding.contains(location);
           return inStudentApp ? null : Routes.studentHome;

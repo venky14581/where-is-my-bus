@@ -25,6 +25,9 @@ abstract interface class RouteRepository {
     required String routeId,
     required String stopId,
   });
+
+  /// The student takes no college bus every day: no route or stop.
+  Future<void> saveNoDailyBus(String uid);
 }
 
 class FirestoreRouteRepository implements RouteRepository {
@@ -70,5 +73,9 @@ class FirestoreRouteRepository implements RouteRepository {
     required String routeId,
     required String stopId,
   }) =>
-      _db.doc('users/$uid').update({'routeId': routeId, 'stopId': stopId});
+      _db.doc('users/$uid').update({'routeId': routeId, 'stopId': stopId, 'dailyRider': true});
+
+  @override
+  Future<void> saveNoDailyBus(String uid) =>
+      _db.doc('users/$uid').update({'routeId': null, 'stopId': null, 'dailyRider': false});
 }

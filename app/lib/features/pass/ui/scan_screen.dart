@@ -106,6 +106,9 @@ class _Verdict extends StatelessWidget {
       ScanResult.passExpired => (Colors.red.shade700, Icons.event_busy, l10n.scanPassExpired(outcome!.name)),
       ScanResult.wrongRoute => (Colors.red.shade700, Icons.do_not_disturb_on, l10n.scanWrongRoute(outcome!.name)),
       ScanResult.noSeatHeld => (Colors.red.shade700, Icons.event_seat, l10n.scanNoSeatHeld(outcome!.name)),
+      ScanResult.ticketUsed => (Colors.red.shade700, Icons.confirmation_number_outlined, l10n.scanTicketUsed),
+      ScanResult.wrongTrip => (Colors.red.shade700, Icons.confirmation_number_outlined, l10n.scanWrongTrip(outcome!.name)),
+      ScanResult.notPaid => (Colors.red.shade700, Icons.money_off, l10n.scanNotPaid(outcome!.name)),
       ScanResult.offline => (Colors.orange.shade800, Icons.cloud_off, l10n.scanOffline),
     };
     final onColour = outcome == null ? Theme.of(context).colorScheme.onSurface : Colors.white;

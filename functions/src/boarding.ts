@@ -10,6 +10,7 @@ import { HttpsError, onCall } from 'firebase-functions/v2/https';
 
 import { app, db } from './app.js';
 import { databaseUrl } from './mirror.js';
+import { parseTicketCode, sameToken } from './booking.js';
 import { checkPass, parsePassCode } from './passCode.js';
 
 export interface PassHolder {
@@ -51,7 +52,10 @@ export type ScanResult =
   | 'noPass'
   | 'passExpired'
   | 'wrongRoute'
-  | 'noSeatHeld';
+  | 'noSeatHeld'
+  | 'ticketUsed'
+  | 'wrongTrip'
+  | 'notPaid';
 
 const metres = (a: { lat: number; lng: number }, b: { lat: number; lng: number }) => {
   const rad = Math.PI / 180;
@@ -59,6 +63,19 @@ const metres = (a: { lat: number; lng: number }, b: { lat: number; lng: number }
     Math.cos(a.lat * rad) * Math.cos(b.lat * rad) * Math.sin(((b.lng - a.lng) * rad) / 2) ** 2;
   return 2 * 6371000 * Math.asin(Math.sqrt(h));
 };
+
+/** The route stop nearest the bus's last position, for the boarding record. */
+async function nearestStopId(routeId: string, busId: string): Promise<string | null> {
+  const [route, live] = await Promise.all([
+    db.doc(`routes/${routeId}`).get(),
+    getDatabaseWithUrl(databaseUrl(), app).ref(`live/${busId}`).get(),
+  ]);
+  const stops = (route.get('stops') as { id: string; lat: number; lng: number }[] | undefined) ?? [];
+  const position = live.val() as { lat?: number; lng?: number } | null;
+  if (position?.lat === undefined || position.lng === undefined || stops.length === 0) return null;
+  const here = { lat: position.lat, lng: position.lng };
+  return stops.reduce((best, s) => (metres(here, s) < metres(here, best) ? s : best)).id;
+}
 
 /**
  * The driver scanned a QR. Only the driver of a running trip can call this.
@@ -75,6 +92,28 @@ export const scanPass = onCall(async (request) => {
   }
 
   const result = async (outcome: ScanResult, extra: Record<string, unknown> = {}) => ({ result: outcome, ...extra });
+
+  // A booked evening seat: a ticket QR that works for one scan only.
+  const ticket = parseTicketCode(request.data?.code);
+  if (ticket) {
+    const bookingRef = db.doc(`bookings/${ticket.bookingId}`);
+    const nearest = await nearestStopId(trip.get('routeId'), trip.get('busId'));
+    const outcome = await db.runTransaction(async (tx): Promise<[ScanResult, string]> => {
+      const booking = await tx.get(bookingRef);
+      const token = booking.get('ticketToken');
+      if (!booking.exists || typeof token !== 'string' || !sameToken(token, ticket.token)) return ['invalidCode', ''];
+      const name = String(booking.get('name') ?? '');
+      if (booking.get('tripId') !== tripId) return ['wrongTrip', name];
+      if (booking.get('status') === 'used') return ['ticketUsed', name];
+      if (booking.get('status') !== 'confirmed') return ['notPaid', name];
+      const boardingRef = db.doc(`trips/${tripId}/boardings/${booking.get('uid')}`);
+      if ((await tx.get(boardingRef)).exists) return ['alreadyBoarded', name];
+      tx.update(bookingRef, { status: 'used', usedAt: FieldValue.serverTimestamp() });
+      tx.create(boardingRef, { type: 'guest', name, stopId: nearest, at: FieldValue.serverTimestamp() });
+      return ['boarded', name];
+    });
+    return result(outcome[0], { name: outcome[1] });
+  }
 
   const pass = parsePassCode(request.data?.code);
   if (!pass) return result('notAPass');
@@ -104,18 +143,7 @@ export const scanPass = onCall(async (request) => {
     if (!studentRoute || !accepts.includes(studentRoute)) return result('wrongRoute', { name });
   }
 
-  // Where the bus is: the route stop nearest its last position.
-  const [route, live] = await Promise.all([
-    db.doc(`routes/${tripRoute}`).get(),
-    getDatabaseWithUrl(databaseUrl(), app).ref(`live/${trip.get('busId')}`).get(),
-  ]);
-  const stops = (route.get('stops') as { id: string; lat: number; lng: number }[] | undefined) ?? [];
-  const position = live.val() as { lat?: number; lng?: number } | null;
-  let stopId: string | null = null;
-  if (position?.lat !== undefined && position.lng !== undefined && stops.length > 0) {
-    const here = { lat: position.lat, lng: position.lng };
-    stopId = stops.reduce((best, s) => (metres(here, s) < metres(here, best) ? s : best)).id;
-  }
+  const stopId = await nearestStopId(tripRoute, trip.get('busId'));
 
   // A rider from another route boards only with a seat held in the app
   // (missed-bus help), so the seat count stays true. Boarding uses it up.

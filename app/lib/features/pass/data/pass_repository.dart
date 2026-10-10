@@ -16,6 +16,11 @@ enum ScanResult {
   /// A rider from another route without a seat held in the app.
   noSeatHeld,
 
+  /// Evening tickets: one scan only, for one bus, once paid.
+  ticketUsed,
+  wrongTrip,
+  notPaid,
+
   /// The phone could not reach the server.
   offline,
 }

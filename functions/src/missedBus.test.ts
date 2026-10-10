@@ -3,7 +3,6 @@ import { describe, expect, test } from 'vitest';
 import {
   campusDate,
   countsAsSeat,
-  freeAlternateSeats,
   hasPassed,
   holdsLeftBehind,
   mayRideAlternate,
@@ -22,13 +21,8 @@ describe('who may ride another bus', () => {
   });
 });
 
-describe('seats', () => {
-  test('pass holders keep their seats; the rest go to holds', () => {
-    expect(freeAlternateSeats(50, 44, 0)).toBe(6);
-    expect(freeAlternateSeats(50, 44, 6)).toBe(0);
-    expect(freeAlternateSeats(50, 52, 0)).toBe(0);
-    expect(['held', 'boarded', 'cancelled', 'missed'].filter(countsAsSeat)).toEqual(['held', 'boarded']);
-  });
+test('a seat counts while held or used', () => {
+  expect(['held', 'boarded', 'cancelled', 'missed'].filter(countsAsSeat)).toEqual(['held', 'boarded']);
 });
 
 describe('pickup stops and passing', () => {

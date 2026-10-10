@@ -5,11 +5,12 @@ export { createDriver, setDriverPin } from './drivers.js';
 export { mirrorBusDriver } from './mirror.js';
 export { issuePassSecret, scanPass } from './boarding.js';
 export { cancelHold, countTripSeats, holdSeat, releasePassedHolds } from './holds.js';
+export { bookSeat, cancelBooking, createEveningTrips, expireBookings, payBooking } from './bookings.js';
 
 import { FieldValue, type DocumentSnapshot, type Timestamp } from 'firebase-admin/firestore';
 import { getMessaging } from 'firebase-admin/messaging';
 import { logger } from 'firebase-functions';
-import { onDocumentCreated } from 'firebase-functions/v2/firestore';
+import { onDocumentCreated, onDocumentWritten } from 'firebase-functions/v2/firestore';
 
 import { db } from './app.js';
 
@@ -103,9 +104,19 @@ async function tripContext(tripId: string) {
   };
 }
 
-/** The driver started a trip: riders know the bus is running today. */
-export const onTripStarted = onDocumentCreated('trips/{tripId}', async (event) => {
+/**
+ * The driver started a trip: riders know the bus is running today. A trip
+ * is either created running or, for evening trips made ahead for booking,
+ * goes from scheduled to running. Resuming an ended trip is not a start.
+ */
+export const onTripStarted = onDocumentWritten('trips/{tripId}', async (event) => {
+  const before = event.data?.before;
+  const after = event.data?.after;
+  if (after?.get('status') !== 'running') return;
+  if (before?.exists && before.get('status') !== 'scheduled') return;
   const tripId = event.params.tripId;
+  // Made ahead without a start time; the start is now.
+  if (after.get('startedAt') == null) await after.ref.update({ startedAt: FieldValue.serverTimestamp() });
   const ctx = await tripContext(tripId);
   if (!ctx || ctx.trip.status !== 'running') return;
   if (!(await claim(`tripStarted_${tripId}`))) return;

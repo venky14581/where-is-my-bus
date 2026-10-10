@@ -45,7 +45,7 @@ class StudentHomeScreen extends ConsumerWidget {
         ],
       ),
       body: routeId == null
-          ? const SizedBox.shrink()
+          ? (profile?.dailyRider == false ? _NoDailyBus(name: profile?.name ?? '') : const SizedBox.shrink())
           : _MyBus(routeId: routeId, stopId: profile?.stopId, name: profile?.name ?? ''),
     );
   }
@@ -120,13 +120,21 @@ class _MyBus extends ConsumerWidget {
                       else
                         LiveStatusLine(bus: live, serverNow: now),
                       const SizedBox(height: 8),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: OutlinedButton.icon(
-                          onPressed: () => context.push(Routes.studentMissedBus),
-                          icon: const Icon(Icons.directions_run),
-                          label: Text(context.l10n.missedBusButton),
-                        ),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          OutlinedButton.icon(
+                            onPressed: () => context.push(Routes.studentMissedBus),
+                            icon: const Icon(Icons.directions_run),
+                            label: Text(context.l10n.missedBusButton),
+                          ),
+                          OutlinedButton.icon(
+                            onPressed: () => context.push(Routes.studentEveningSeats),
+                            icon: const Icon(Icons.nights_stay_outlined),
+                            label: Text(context.l10n.eveningSeatsButton),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 12),
                       _StopCard(route: route, stop: stop, busNumber: bus?.number),
@@ -188,6 +196,38 @@ class _StopCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Hostellers and students with their own transport: no bus to follow,
+/// evening seats to book.
+class _NoDailyBus extends StatelessWidget {
+  const _NoDailyBus({required this.name});
+
+  final String name;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return ListView(
+      padding: const EdgeInsets.all(20),
+      children: [
+        Text(l10n.helloName(name), style: Theme.of(context).textTheme.headlineSmall),
+        const SizedBox(height: 16),
+        Text(l10n.noDailyBusHome, style: Theme.of(context).textTheme.bodyLarge),
+        const SizedBox(height: 20),
+        FilledButton.icon(
+          onPressed: () => context.push(Routes.studentEveningSeats),
+          icon: const Icon(Icons.nights_stay_outlined),
+          label: Text(l10n.eveningSeatsButton),
+        ),
+        const SizedBox(height: 8),
+        OutlinedButton(
+          onPressed: () => context.push(Routes.studentChooseRoute),
+          child: Text(l10n.chooseDailyRouteButton),
+        ),
+      ],
     );
   }
 }

@@ -19,6 +19,7 @@ import '../features/auth/ui/welcome_screen.dart';
 import '../features/driver/driver_home_screen.dart';
 import '../features/eta/ui/full_route_screen.dart';
 import '../features/live/ui/all_buses_screen.dart';
+import '../features/booking/ui/evening_seats_screen.dart';
 import '../features/missed_bus/ui/missed_bus_screen.dart';
 import '../features/pass/ui/pass_screen.dart';
 import '../features/pass/ui/scan_screen.dart';
@@ -55,6 +56,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       route(Routes.studentNotificationSettings, const NotificationSettingsScreen()),
       route(Routes.studentPass, const PassScreen()),
       route(Routes.studentMissedBus, const MissedBusScreen()),
+      route(Routes.studentEveningSeats, const EveningSeatsScreen()),
       route(Routes.driverSignIn, const DriverSignInScreen()),
       route(Routes.driverLanguage, const DriverLanguageScreen()),
       route(Routes.driverHome, const DriverHomeScreen()),

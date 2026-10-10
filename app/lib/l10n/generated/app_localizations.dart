@@ -1309,6 +1309,270 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{name} has no seat held on this bus. They can hold one in the app.'**
   String scanNoSeatHeld(String name);
+
+  /// No description provided for @eveningSeatsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Evening seats'**
+  String get eveningSeatsTitle;
+
+  /// No description provided for @eveningSeatsButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Evening seats'**
+  String get eveningSeatsButton;
+
+  /// No description provided for @eveningIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Book a spare seat on a college bus leaving campus this evening or tomorrow. A route\'s pass holders always keep their seats.'**
+  String get eveningIntro;
+
+  /// No description provided for @eveningToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get eveningToday;
+
+  /// No description provided for @eveningTomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Tomorrow'**
+  String get eveningTomorrow;
+
+  /// No description provided for @eveningNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No evening buses to book yet. Booking opens the evening before.'**
+  String get eveningNone;
+
+  /// No description provided for @eveningLeaves.
+  ///
+  /// In en, this message translates to:
+  /// **'Leaves campus at {time}'**
+  String eveningLeaves(String time);
+
+  /// No description provided for @fareRupees.
+  ///
+  /// In en, this message translates to:
+  /// **'₹{fare}'**
+  String fareRupees(String fare);
+
+  /// No description provided for @seatsLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No seats left} =1{1 seat left} other{{count} seats left}}'**
+  String seatsLeft(int count);
+
+  /// No description provided for @bookingOpensAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking opens at {time}'**
+  String bookingOpensAt(String time);
+
+  /// No description provided for @bookingUntil.
+  ///
+  /// In en, this message translates to:
+  /// **'Book until {time}'**
+  String bookingUntil(String time);
+
+  /// No description provided for @passCoversBus.
+  ///
+  /// In en, this message translates to:
+  /// **'Your bus pass covers this bus.'**
+  String get passCoversBus;
+
+  /// No description provided for @bookSeatButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Book a seat'**
+  String get bookSeatButton;
+
+  /// No description provided for @bookedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'You have a seat on this bus'**
+  String get bookedLabel;
+
+  /// No description provided for @chooseDropTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Where do you get off?'**
+  String get chooseDropTitle;
+
+  /// No description provided for @bookForButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Book for ₹{fare}'**
+  String bookForButton(String fare);
+
+  /// No description provided for @bookAlready.
+  ///
+  /// In en, this message translates to:
+  /// **'You already have a seat on this bus.'**
+  String get bookAlready;
+
+  /// No description provided for @bookFull.
+  ///
+  /// In en, this message translates to:
+  /// **'Sorry, no seats are left.'**
+  String get bookFull;
+
+  /// No description provided for @bookNotOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking is not open yet.'**
+  String get bookNotOpen;
+
+  /// No description provided for @bookClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'Booking has closed'**
+  String get bookClosed;
+
+  /// No description provided for @bookNoGuestSeats.
+  ///
+  /// In en, this message translates to:
+  /// **'This route has no seats to book.'**
+  String get bookNoGuestSeats;
+
+  /// No description provided for @bookBadStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose another stop.'**
+  String get bookBadStop;
+
+  /// No description provided for @bookPaymentsUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment is not available right now. Try again later.'**
+  String get bookPaymentsUnavailable;
+
+  /// No description provided for @bookOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'No connection. Try again.'**
+  String get bookOffline;
+
+  /// No description provided for @paymentCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment cancelled, so the seat was released.'**
+  String get paymentCancelled;
+
+  /// No description provided for @paymentExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment took too long, so the seat was released. Book again.'**
+  String get paymentExpired;
+
+  /// No description provided for @paymentInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'The payment could not be confirmed. If money was taken, contact the transport office.'**
+  String get paymentInvalid;
+
+  /// No description provided for @demoPaymentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo payment'**
+  String get demoPaymentTitle;
+
+  /// No description provided for @demoPaymentBody.
+  ///
+  /// In en, this message translates to:
+  /// **'No money is taken. This stands in for Razorpay while testing.'**
+  String get demoPaymentBody;
+
+  /// No description provided for @payButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay ₹{amount}'**
+  String payButton(String amount);
+
+  /// No description provided for @ticketsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your tickets'**
+  String get ticketsTitle;
+
+  /// No description provided for @ticketShow.
+  ///
+  /// In en, this message translates to:
+  /// **'Show this to the driver. It works for one scan.'**
+  String get ticketShow;
+
+  /// No description provided for @ticketQrLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Bus ticket'**
+  String get ticketQrLabel;
+
+  /// No description provided for @ticketUsed.
+  ///
+  /// In en, this message translates to:
+  /// **'Used'**
+  String get ticketUsed;
+
+  /// No description provided for @ticketGetOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Get off at {stop}'**
+  String ticketGetOff(String stop);
+
+  /// No description provided for @pendingUntil.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for payment. The seat is kept until {time}.'**
+  String pendingUntil(String time);
+
+  /// No description provided for @cancelBookingButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel booking'**
+  String get cancelBookingButton;
+
+  /// No description provided for @noDailyBusTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'I don\'t take a college bus every day'**
+  String get noDailyBusTitle;
+
+  /// No description provided for @noDailyBusSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Hostellers and own transport: book an evening seat when you need one.'**
+  String get noDailyBusSubtitle;
+
+  /// No description provided for @noDailyBusHome.
+  ///
+  /// In en, this message translates to:
+  /// **'You have no daily college bus. When you need a ride home, book a spare evening seat.'**
+  String get noDailyBusHome;
+
+  /// No description provided for @chooseDailyRouteButton.
+  ///
+  /// In en, this message translates to:
+  /// **'I take a college bus every day'**
+  String get chooseDailyRouteButton;
+
+  /// No description provided for @scanTicketUsed.
+  ///
+  /// In en, this message translates to:
+  /// **'This ticket has already been used.'**
+  String get scanTicketUsed;
+
+  /// No description provided for @scanWrongTrip.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}\'s ticket is for another bus.'**
+  String scanWrongTrip(String name);
+
+  /// No description provided for @scanNotPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'{name}\'s ticket is not paid.'**
+  String scanNotPaid(String name);
 }
 
 class _AppLocalizationsDelegate

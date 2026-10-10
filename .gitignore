@@ -1,5 +1,8 @@
 node_modules/
 .env.local
+# Payment keys for Cloud Functions (RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET)
+functions/.env
+functions/.env.*
 *.local
 
 # Firebase CLI and emulators
