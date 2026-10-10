@@ -1681,6 +1681,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Not set'**
   String get walkMinutesNone;
+
+  /// No description provided for @sosButton.
+  ///
+  /// In en, this message translates to:
+  /// **'SOS'**
+  String get sosButton;
+
+  /// No description provided for @sosConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Send SOS?'**
+  String get sosConfirmTitle;
+
+  /// No description provided for @sosConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The transport office gets this bus\'s number and where it is now. Use it in an emergency.'**
+  String get sosConfirmBody;
+
+  /// No description provided for @sosSendButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Send SOS'**
+  String get sosSendButton;
+
+  /// No description provided for @sosSent.
+  ///
+  /// In en, this message translates to:
+  /// **'SOS sent. The transport office knows where the bus is.'**
+  String get sosSent;
+
+  /// No description provided for @sosNoTrip.
+  ///
+  /// In en, this message translates to:
+  /// **'No trip is running, so there is no bus location to send. Call the transport office.'**
+  String get sosNoTrip;
+
+  /// No description provided for @shareTripButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Share my trip'**
+  String get shareTripButton;
+
+  /// No description provided for @shareTripTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Share my trip'**
+  String get shareTripTitle;
+
+  /// No description provided for @shareTripBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Anyone with this link can follow your bus on a map until the trip ends. It shows the bus, never you.'**
+  String get shareTripBody;
+
+  /// No description provided for @shareNoTrip.
+  ///
+  /// In en, this message translates to:
+  /// **'Your bus is not running, so there is no trip to share.'**
+  String get shareNoTrip;
+
+  /// No description provided for @copyLinkButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy link'**
+  String get copyLinkButton;
+
+  /// No description provided for @linkCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Link copied'**
+  String get linkCopied;
+
+  /// No description provided for @closeButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get closeButton;
 }
 
 class _AppLocalizationsDelegate

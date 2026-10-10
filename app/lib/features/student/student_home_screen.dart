@@ -19,6 +19,7 @@ import '../live/ui/live_status.dart';
 import '../routes/application/route_providers.dart';
 import '../routes/domain/bus_route.dart';
 import '../routes/ui/scheduled_time.dart';
+import '../safety/ui/sos_button.dart';
 import '../smart/application/smart_providers.dart';
 
 /// Opens on the student's own bus: where it is, and how fresh that is.
@@ -101,7 +102,9 @@ class _MyBus extends ConsumerWidget {
         final stop = route?.stopById(stopId);
         if (route == null || stop == null) return _RouteMissing(name: name);
         return ServerClock(
-          builder: (context, now) => LayoutBuilder(
+          builder: (context, now) {
+            final running = live != null && live.stateAt(now) != BusLiveState.notRunning;
+            return LayoutBuilder(
             builder: (context, constraints) => Column(
               children: [
                 SizedBox(
@@ -141,6 +144,7 @@ class _MyBus extends ConsumerWidget {
                             icon: const Icon(Icons.nights_stay_outlined),
                             label: Text(context.l10n.eveningSeatsButton),
                           ),
+                          if (running) const ShareTripButton(),
                         ],
                       ),
                       const SizedBox(height: 12),
@@ -151,17 +155,22 @@ class _MyBus extends ConsumerWidget {
                         weekday: campusClock(now).weekday,
                         usualDelay: learned?.delayByWeekday[campusClock(now).weekday],
                         crowd: switch ((bus, live?.tripId)) {
-                          (final bus?, final tripId?) when live!.stateAt(now) != BusLiveState.notRunning =>
-                            _crowdOn(ref, tripId, bus.capacity),
+                          (final bus?, final tripId?) when running => _crowdOn(ref, tripId, bus.capacity),
                           _ => null,
                         },
                       ),
+                      // Rarely needed, so last: it should not push the arrival time down.
+                      if (running) ...[
+                        const SizedBox(height: 16),
+                        const SosButton(),
+                      ],
                     ],
                   ),
                 ),
               ],
             ),
-          ),
+          );
+          },
         );
       },
     );

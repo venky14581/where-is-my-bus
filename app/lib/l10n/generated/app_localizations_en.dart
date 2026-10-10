@@ -1013,4 +1013,48 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get walkMinutesNone => 'Not set';
+
+  @override
+  String get sosButton => 'SOS';
+
+  @override
+  String get sosConfirmTitle => 'Send SOS?';
+
+  @override
+  String get sosConfirmBody =>
+      'The transport office gets this bus\'s number and where it is now. Use it in an emergency.';
+
+  @override
+  String get sosSendButton => 'Send SOS';
+
+  @override
+  String get sosSent =>
+      'SOS sent. The transport office knows where the bus is.';
+
+  @override
+  String get sosNoTrip =>
+      'No trip is running, so there is no bus location to send. Call the transport office.';
+
+  @override
+  String get shareTripButton => 'Share my trip';
+
+  @override
+  String get shareTripTitle => 'Share my trip';
+
+  @override
+  String get shareTripBody =>
+      'Anyone with this link can follow your bus on a map until the trip ends. It shows the bus, never you.';
+
+  @override
+  String get shareNoTrip =>
+      'Your bus is not running, so there is no trip to share.';
+
+  @override
+  String get copyLinkButton => 'Copy link';
+
+  @override
+  String get linkCopied => 'Link copied';
+
+  @override
+  String get closeButton => 'Close';
 }

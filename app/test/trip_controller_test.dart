@@ -6,6 +6,7 @@ import 'package:where_is_my_bus/features/routes/domain/bus_route.dart';
 import 'package:where_is_my_bus/features/trip/application/trip_controller.dart';
 import 'package:where_is_my_bus/features/trip/data/location_source.dart';
 import 'package:where_is_my_bus/features/trip/domain/fix.dart';
+import 'package:where_is_my_bus/features/trip/domain/safety_monitor.dart';
 import 'package:where_is_my_bus/features/trip/domain/trip_plan.dart';
 
 import 'support/fakes.dart';
@@ -46,9 +47,9 @@ class _Harness {
   }
 
   /// A good reading at [lat], [secondsLater] after the previous one.
-  Future<void> fix(double lat, {int secondsLater = 3, bool mocked = false}) async {
+  Future<void> fix(double lat, {int secondsLater = 3, bool mocked = false, double speedMps = 10, double lng = 76.96}) async {
     clock.advance(Duration(seconds: secondsLater));
-    location.emit(Fix(lat: lat, lng: 76.96, time: clock.now, accuracyM: 5, speedMps: 10, isMocked: mocked));
+    location.emit(Fix(lat: lat, lng: lng, time: clock.now, accuracyM: 5, speedMps: speedMps, isMocked: mocked));
     await pump();
   }
 
@@ -105,6 +106,26 @@ void main() {
     await h.fix(10.999);
     expect(h.repo.published, hasLength(1));
     expect(h.state.mockDetected, isFalse);
+  });
+
+  test("overspeeding past the office's limit is reported once", () async {
+    h.repo.limitKmh = 40;
+    await h.start();
+    for (var i = 0; i < 6; i++) {
+      await h.fix(10.999 - i * 0.0004, speedMps: 15); // 54 km/h
+    }
+    expect(h.repo.safetyEvents.map((e) => (e.type, e.speedKmh, e.limitKmh)), [(SafetyEventType.overspeed, 54, 40)]);
+  });
+
+  test('a minute well off the route is reported once, with the distance', () async {
+    await h.start();
+    // About 490 m east of the road.
+    for (var i = 0; i < 25; i++) {
+      await h.fix(10.999 - i * 0.0002, lng: 76.9645);
+    }
+    expect(h.repo.safetyEvents, hasLength(1));
+    expect(h.repo.safetyEvents.single.type, SafetyEventType.offRoute);
+    expect(h.repo.safetyEvents.single.distanceM, closeTo(490, 20));
   });
 
   test('records each stop the bus reaches and remembers it on the phone', () async {

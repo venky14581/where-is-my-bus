@@ -52,8 +52,12 @@ export const SEEDED = {
 
 export const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-/** Polls [check] until it returns something truthy; for work done by triggers. */
-export async function waitFor(check, { timeout = 20_000, interval = 250, what = 'condition' } = {}) {
+/**
+ * Polls [check] until it returns something truthy; for work done by triggers.
+ * The emulator starts a worker for each function the first time it fires,
+ * which on Windows can take over 20 seconds, hence the long default.
+ */
+export async function waitFor(check, { timeout = 45_000, interval = 250, what = 'condition' } = {}) {
   const end = Date.now() + timeout;
   let last;
   while (Date.now() < end) {
@@ -104,6 +108,12 @@ function person(client, user) {
     /** Calls a callable function and returns its data. */
     call: async (name, data) => (await httpsCallable(client.functions, name)(data)).data,
   };
+}
+
+/** Someone with no account, such as a parent opening a shared trip link. */
+export function anonymous() {
+  const client = clientApp();
+  return { ...client, call: async (name, data) => (await httpsCallable(client.functions, name)(data)).data };
 }
 
 export async function signIn({ email, password }) {

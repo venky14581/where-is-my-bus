@@ -10,6 +10,9 @@ rules_version = '2';
 // student may say they take no college bus every day (dailyRider).
 // Module 11: learned arrival times and today's conditions (server-written),
 // Not riding today (through a function), a student's walk to their stop.
+// Module 12: overspeed and off-route events from the driver's phone, safety
+// alerts for the office (server-written, office-acknowledged). Parents'
+// trip links (shares) are read only through a function.
 // Server-only paths (pushLog, functionRuns, trips/*/approachingSent) stay
 // closed to clients.
 service cloud.firestore {
@@ -255,14 +258,32 @@ service cloud.firestore {
         allow read: if isOffice() || (signedIn() && get(tripPath(tripId)).data.driverId == request.auth.uid);
       }
 
-      // Seats held by riders from other routes (missed-bus help), written
-      // by the holdSeat function. The student sees their own; the trip's
-      // driver sees who to expect where.
       // Pass holders not taking this evening bus, set by setNotRiding.
       match /notRiding/{uid} {
         allow read: if isOffice() || (signedIn() && request.auth.uid == uid);
       }
 
+      // Overspeeding or leaving the route, noticed by the driver's phone, one
+      // per episode. onSafetyEvent turns each into an office alert.
+      match /events/{eventId} {
+        allow read: if isOffice() || (signedIn() && get(tripPath(tripId)).data.driverId == request.auth.uid);
+        allow create: if signedIn()
+          && exists(tripPath(tripId))
+          && get(tripPath(tripId)).data.driverId == request.auth.uid
+          && get(tripPath(tripId)).data.status == 'running'
+          && request.resource.data.keys().hasOnly(['type', 'lat', 'lng', 'speedKmh', 'limitKmh', 'distanceM', 'createdAt'])
+          && request.resource.data.type in ['overspeed', 'offRoute']
+          && request.resource.data.lat is number && request.resource.data.lat >= -90 && request.resource.data.lat <= 90
+          && request.resource.data.lng is number && request.resource.data.lng >= -180 && request.resource.data.lng <= 180
+          && request.resource.data.get('speedKmh', 0) is number && request.resource.data.get('speedKmh', 0) < 250
+          && request.resource.data.get('limitKmh', 0) is number
+          && request.resource.data.get('distanceM', 0) is number
+          && request.resource.data.createdAt == request.time;
+      }
+
+      // Seats held by riders from other routes (missed-bus help), written
+      // by the holdSeat function. The student sees their own; the trip's
+      // driver sees who to expect where.
       match /holds/{uid} {
         allow read: if isOffice()
           || (signedIn() && request.auth.uid == uid)
@@ -302,6 +323,17 @@ service cloud.firestore {
 
     match /conditions/{date} {
       allow read: if canReadBaseData();
+    }
+
+    // SOS, overspeed and off-route alerts for the transport office. Written
+    // by Cloud Functions; the office marks them acknowledged.
+    match /safetyAlerts/{alertId} {
+      allow read: if isOffice();
+      allow update: if isOffice()
+        && onlyChanged(['status', 'acknowledgedBy', 'acknowledgedAt'])
+        && request.resource.data.status == 'acknowledged'
+        && request.resource.data.acknowledgedBy == request.auth.uid
+        && request.resource.data.acknowledgedAt == request.time;
     }
 
     // The in-app alerts list. Written only by Cloud Functions.

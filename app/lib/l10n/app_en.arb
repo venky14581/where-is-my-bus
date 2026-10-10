@@ -767,5 +767,18 @@
       }
     }
   },
-  "walkMinutesNone": "Not set"
+  "walkMinutesNone": "Not set",
+  "sosButton": "SOS",
+  "sosConfirmTitle": "Send SOS?",
+  "sosConfirmBody": "The transport office gets this bus's number and where it is now. Use it in an emergency.",
+  "sosSendButton": "Send SOS",
+  "sosSent": "SOS sent. The transport office knows where the bus is.",
+  "sosNoTrip": "No trip is running, so there is no bus location to send. Call the transport office.",
+  "shareTripButton": "Share my trip",
+  "shareTripTitle": "Share my trip",
+  "shareTripBody": "Anyone with this link can follow your bus on a map until the trip ends. It shows the bus, never you.",
+  "shareNoTrip": "Your bus is not running, so there is no trip to share.",
+  "copyLinkButton": "Copy link",
+  "linkCopied": "Link copied",
+  "closeButton": "Close"
 }

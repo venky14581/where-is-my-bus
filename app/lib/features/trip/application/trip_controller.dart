@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/clock.dart';
 import '../../../core/settings_store.dart';
+import '../../eta/domain/arrival.dart';
 import '../../routes/domain/bus_route.dart';
 import '../data/active_trip_store.dart';
 import '../data/location_source.dart';
@@ -14,6 +15,7 @@ import '../data/trip_keep_alive.dart';
 import '../data/trip_repository.dart';
 import '../domain/fix.dart';
 import '../domain/fix_filter.dart';
+import '../domain/safety_monitor.dart';
 import '../domain/stop_detector.dart';
 import '../domain/trip_plan.dart';
 
@@ -84,6 +86,7 @@ class TripController extends Notifier<TripState> {
   StreamSubscription<bool>? _connection;
   FixFilter _filter = FixFilter();
   StopDetector? _stops;
+  SafetyMonitor? _safety;
   ActiveTrip? _active;
   Fix? _pending;
   DateTime? _lastSendAt;
@@ -171,6 +174,13 @@ class TripController extends Notifier<TripState> {
     _lastSendAt = null;
     final stops = StopDetector(stopsInTravelOrder(route, active.direction), reached: active.reached);
     _stops = stops;
+    final line = RouteTimeline.of(route).line;
+    double offRoute(double lat, double lng) => line.project(lat, lng).offRoute;
+    _safety = SafetyMonitor(limitKmh: defaultSpeedLimitKmh, offRouteMetres: offRoute);
+    // The office's limit, once read; checking starts with the default.
+    unawaited(_repo.speedLimitKmh().then((limit) {
+      if (_active?.tripId == active.tripId) _safety = SafetyMonitor(limitKmh: limit, offRouteMetres: offRoute);
+    }).catchError((_) {}));
     state = TripState(
       phase: TripPhase.running,
       tripId: active.tripId,
@@ -208,6 +218,11 @@ class TripController extends Notifier<TripState> {
         return;
       case FixVerdict.accepted:
         if (state.mockDetected) state = state.copyWith(mockDetected: false);
+    }
+
+    for (final event in _safety?.onFix(fix) ?? const <SafetyEvent>[]) {
+      // Queued by Firestore while offline, like stop times.
+      unawaited(_repo.recordSafetyEvent(tripId: active.tripId, event: event).catchError((_) {}));
     }
 
     final arrived = stops.onFix(fix);
@@ -293,6 +308,7 @@ class TripController extends Notifier<TripState> {
     _connection = null;
     _active = null;
     _stops = null;
+    _safety = null;
     _pending = null;
     _disconnectArmed = false;
   }

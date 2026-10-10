@@ -14,6 +14,7 @@ import '../routes/application/route_providers.dart';
 import '../routes/domain/bus_route.dart';
 import '../../routing/routes.dart';
 import '../routes/ui/scheduled_time.dart';
+import '../safety/ui/sos_button.dart';
 import '../trip/application/trip_controller.dart';
 import '../trip/data/location_source.dart';
 import '../trip/data/trip_repository.dart';
@@ -160,6 +161,8 @@ class _TripControlsState extends ConsumerState<_TripControls> {
           if (trip.tripId case final tripId?) _WaitingRiders(tripId: tripId, route: widget.route),
           const SizedBox(height: 16),
           const _IssueButtons(),
+          const SizedBox(height: 16),
+          const SosButton(height: 64),
         ],
       ],
     );

@@ -35,6 +35,8 @@ import 'package:where_is_my_bus/features/missed_bus/domain/missed_bus.dart';
 import 'package:where_is_my_bus/features/routes/application/route_providers.dart';
 import 'package:where_is_my_bus/features/routes/data/route_repository.dart';
 import 'package:where_is_my_bus/features/routes/domain/bus_route.dart';
+import 'package:where_is_my_bus/features/safety/application/safety_providers.dart';
+import 'package:where_is_my_bus/features/safety/data/safety_repository.dart';
 import 'package:where_is_my_bus/features/smart/application/smart_providers.dart';
 import 'package:where_is_my_bus/features/smart/data/smart_repository.dart';
 import 'package:where_is_my_bus/features/trip/application/trip_controller.dart';
@@ -603,6 +605,26 @@ class FakeSmartRepository implements SmartRepository {
   }
 }
 
+/// Records SOS presses and trip shares; answers with [sos] and [share].
+class FakeSafetyRepository implements SafetyRepository {
+  SosResult sos = SosResult.sent;
+  ShareResult share = ShareResult.shared;
+  var sosCount = 0;
+  var shareCount = 0;
+
+  @override
+  Future<SosResult> sendSos() async {
+    sosCount++;
+    return sos;
+  }
+
+  @override
+  Future<({ShareResult result, String? token})> shareTrip() async {
+    shareCount++;
+    return (result: share, token: share == ShareResult.shared ? 'tok123' : null);
+  }
+}
+
 /// Pays at once, or backs out when [backOut] is set.
 class FakePaymentGateway implements PaymentGateway {
   bool backOut = false;
@@ -640,6 +662,7 @@ Future<void> pumpApp(
   FakeBookingRepository? bookings,
   FakePaymentGateway? payments,
   FakeSmartRepository? smart,
+  FakeSafetyRepository? safety,
 }) async {
   // A phone-sized surface so layouts match what students and drivers see.
   tester.view.physicalSize = const Size(1080, 2340);
@@ -667,6 +690,7 @@ Future<void> pumpApp(
       bookingRepositoryProvider.overrideWithValue(bookings ?? FakeBookingRepository()),
       paymentGatewayProvider.overrideWithValue(payments ?? FakePaymentGateway()),
       smartRepositoryProvider.overrideWithValue(smart ?? FakeSmartRepository()),
+      safetyRepositoryProvider.overrideWithValue(safety ?? FakeSafetyRepository()),
     ],
     child: const WhereIsMyBusApp(),
   ));

@@ -5,6 +5,7 @@ import 'package:where_is_my_bus/features/trip/data/location_source.dart';
 import 'package:where_is_my_bus/features/trip/data/trip_keep_alive.dart';
 import 'package:where_is_my_bus/features/trip/data/trip_repository.dart';
 import 'package:where_is_my_bus/features/trip/domain/fix.dart';
+import 'package:where_is_my_bus/features/trip/domain/safety_monitor.dart';
 import 'package:where_is_my_bus/features/trip/domain/trip_plan.dart';
 
 /// GPS readings the test pushes by hand.
@@ -69,6 +70,15 @@ class FakeTripRepository implements TripRepository {
 
   @override
   Future<void> reportIssue({required String tripId, required TripIssue issue}) async => reports.add(issue);
+
+  int limitKmh = 60;
+  final safetyEvents = <SafetyEvent>[];
+
+  @override
+  Future<int> speedLimitKmh() async => limitKmh;
+
+  @override
+  Future<void> recordSafetyEvent({required String tripId, required SafetyEvent event}) async => safetyEvents.add(event);
 }
 
 class FakeKeepAlive implements TripKeepAlive {
