@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/l10n.dart';
 import '../../../core/locale_controller.dart';
+import '../../alerts/application/alerts_providers.dart';
 import '../application/auth_providers.dart';
 import '../domain/auth_failure.dart';
 import '../domain/session.dart';
@@ -172,6 +173,14 @@ class BusyButton extends StatelessWidget {
   }
 }
 
+/// Stops push alerts to this device, then signs out.
+Future<void> _signOut(WidgetRef ref) async {
+  if (ref.read(sessionProvider).value case SignedIn(:final uid)) {
+    await ref.read(pushServiceProvider).unregister(uid).catchError((_) {});
+  }
+  await ref.read(authRepositoryProvider).signOut();
+}
+
 /// App bar menu for signed-in screens: language and sign out.
 class AccountMenu extends ConsumerWidget {
   const AccountMenu({super.key});
@@ -184,7 +193,7 @@ class AccountMenu extends ConsumerWidget {
       icon: const Icon(Icons.more_vert),
       onSelected: (value) {
         if (value == 'signOut') {
-          ref.read(authRepositoryProvider).signOut();
+          _signOut(ref);
         } else {
           changeLanguage(ref, value);
         }

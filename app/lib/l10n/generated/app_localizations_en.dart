@@ -477,4 +477,93 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get busIsHere => 'Bus is here';
+
+  @override
+  String get alertsTitle => 'Alerts';
+
+  @override
+  String get alertsEmpty =>
+      'No alerts right now. Trip news from the last day and announcements from the last week appear here.';
+
+  @override
+  String alertTripStarted(String bus) {
+    return '$bus has started its trip.';
+  }
+
+  @override
+  String alertDelay(String bus, int minutes) {
+    return '$bus is running about $minutes min behind schedule.';
+  }
+
+  @override
+  String alertLate(String bus) {
+    return 'The driver of $bus reports the bus is running late.';
+  }
+
+  @override
+  String alertBreakdown(String bus) {
+    return '$bus has broken down. Watch for news from the transport office.';
+  }
+
+  @override
+  String get announcementLabel => 'Transport office';
+
+  @override
+  String get notificationSettingsTitle => 'Notifications';
+
+  @override
+  String get settingApproaching => 'Bus approaching my stop';
+
+  @override
+  String get settingLeadStops => 'Tell me when it is';
+
+  @override
+  String leadStopsOption(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count stops away',
+      one: '1 stop away',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settingTripStarted => 'Bus has started';
+
+  @override
+  String get settingDelays => 'Delays and breakdowns';
+
+  @override
+  String get settingAnnouncements => 'Transport office announcements';
+
+  @override
+  String get settingQuietDays => 'Quiet days';
+
+  @override
+  String get settingQuietDaysHelp =>
+      'No notifications on these days, except breakdowns.';
+
+  @override
+  String get settingsSaveFailed =>
+      'Couldn\'t save. Check the internet and try again.';
+
+  @override
+  String get driverReportLate => 'Running late';
+
+  @override
+  String get driverReportBreakdown => 'Breakdown';
+
+  @override
+  String get driverReportSent => 'Riders have been told.';
+
+  @override
+  String get breakdownConfirmTitle => 'Report a breakdown?';
+
+  @override
+  String get breakdownConfirmBody =>
+      'Every rider on this route will be told the bus has broken down.';
+
+  @override
+  String get reportButton => 'Report';
 }

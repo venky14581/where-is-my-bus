@@ -326,5 +326,66 @@
       }
     }
   },
-  "busIsHere": "Bus is here"
+  "busIsHere": "Bus is here",
+  "alertsTitle": "Alerts",
+  "alertsEmpty": "No alerts right now. Trip news from the last day and announcements from the last week appear here.",
+  "alertTripStarted": "{bus} has started its trip.",
+  "@alertTripStarted": {
+    "placeholders": {
+      "bus": {
+        "type": "String"
+      }
+    }
+  },
+  "alertDelay": "{bus} is running about {minutes} min behind schedule.",
+  "@alertDelay": {
+    "placeholders": {
+      "bus": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "alertLate": "The driver of {bus} reports the bus is running late.",
+  "@alertLate": {
+    "placeholders": {
+      "bus": {
+        "type": "String"
+      }
+    }
+  },
+  "alertBreakdown": "{bus} has broken down. Watch for news from the transport office.",
+  "@alertBreakdown": {
+    "placeholders": {
+      "bus": {
+        "type": "String"
+      }
+    }
+  },
+  "announcementLabel": "Transport office",
+  "notificationSettingsTitle": "Notifications",
+  "settingApproaching": "Bus approaching my stop",
+  "settingLeadStops": "Tell me when it is",
+  "leadStopsOption": "{count, plural, =1{1 stop away} other{{count} stops away}}",
+  "@leadStopsOption": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settingTripStarted": "Bus has started",
+  "settingDelays": "Delays and breakdowns",
+  "settingAnnouncements": "Transport office announcements",
+  "settingQuietDays": "Quiet days",
+  "settingQuietDaysHelp": "No notifications on these days, except breakdowns.",
+  "settingsSaveFailed": "Couldn't save. Check the internet and try again.",
+  "driverReportLate": "Running late",
+  "driverReportBreakdown": "Breakdown",
+  "driverReportSent": "Riders have been told.",
+  "breakdownConfirmTitle": "Report a breakdown?",
+  "breakdownConfirmBody": "Every rider on this route will be told the bus has broken down.",
+  "reportButton": "Report"
 }

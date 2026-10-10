@@ -2,6 +2,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/alerts/ui/alerts_screen.dart';
+import '../features/alerts/ui/notification_settings_screen.dart';
 import '../features/auth/application/auth_providers.dart';
 import '../features/auth/domain/session.dart';
 import '../features/auth/ui/account_problem_screen.dart';
@@ -46,6 +48,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       route(Routes.studentChooseRoute, const ChooseRouteScreen()),
       route(Routes.studentAllBuses, const AllBusesScreen()),
       route(Routes.studentFullRoute, const FullRouteScreen()),
+      route(Routes.studentAlerts, const AlertsScreen()),
+      route(Routes.studentNotificationSettings, const NotificationSettingsScreen()),
       route(Routes.driverSignIn, const DriverSignInScreen()),
       route(Routes.driverLanguage, const DriverLanguageScreen()),
       route(Routes.driverHome, const DriverHomeScreen()),

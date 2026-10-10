@@ -13,6 +13,7 @@ import '../routes/domain/bus_route.dart';
 import '../routes/ui/scheduled_time.dart';
 import '../trip/application/trip_controller.dart';
 import '../trip/data/location_source.dart';
+import '../trip/data/trip_repository.dart';
 import '../trip/domain/trip_plan.dart';
 
 class DriverHomeScreen extends ConsumerWidget {
@@ -142,7 +143,91 @@ class _TripControlsState extends ConsumerState<_TripControls> {
         const SizedBox(height: 16),
         if (trip.problem case final problem?) _ProblemBanner(problem: problem),
         if (trip.mockDetected) ErrorBanner(l10n.mockLocationWarning),
-        if (trip.phase == TripPhase.running) _RunningStatus(trip: trip),
+        if (trip.phase == TripPhase.running) ...[
+          _RunningStatus(trip: trip),
+          const SizedBox(height: 16),
+          const _IssueButtons(),
+        ],
+      ],
+    );
+  }
+}
+
+/// Running late and Breakdown: one tap tells every rider on the route.
+class _IssueButtons extends ConsumerStatefulWidget {
+  const _IssueButtons();
+
+  @override
+  ConsumerState<_IssueButtons> createState() => _IssueButtonsState();
+}
+
+class _IssueButtonsState extends ConsumerState<_IssueButtons> {
+  /// Reports already sent this trip; each can be sent once.
+  final _sent = <TripIssue>{};
+  TripIssue? _sending;
+
+  /// Shown under the buttons. Not a snackbar, which would cover them.
+  String? _message;
+
+  Future<void> _report(TripIssue issue) async {
+    final l10n = context.l10n;
+    if (issue == TripIssue.breakdown) {
+      final yes = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(l10n.breakdownConfirmTitle),
+          content: Text(l10n.breakdownConfirmBody),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context, false), child: Text(l10n.cancelButton)),
+            FilledButton(onPressed: () => Navigator.pop(context, true), child: Text(l10n.reportButton)),
+          ],
+        ),
+      );
+      if (yes != true) return;
+    }
+    setState(() {
+      _sending = issue;
+      _message = null;
+    });
+    final ok = await ref.read(tripControllerProvider.notifier).report(issue);
+    if (!mounted) return;
+    setState(() {
+      _sending = null;
+      if (ok) _sent.add(issue);
+      _message = ok ? l10n.driverReportSent : l10n.errorNetwork;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final scheme = Theme.of(context).colorScheme;
+    Widget button(TripIssue issue, IconData icon, String label, {Color? colour}) => Expanded(
+          child: SizedBox(
+            height: 64,
+            child: OutlinedButton.icon(
+              style: OutlinedButton.styleFrom(foregroundColor: colour),
+              onPressed: _sending != null || _sent.contains(issue) ? null : () => _report(issue),
+              icon: _sent.contains(issue) ? const Icon(Icons.check) : Icon(icon),
+              label: Text(label, style: const TextStyle(fontSize: 18)),
+            ),
+          ),
+        );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            button(TripIssue.late, Icons.schedule, l10n.driverReportLate),
+            const SizedBox(width: 12),
+            button(TripIssue.breakdown, Icons.car_crash_outlined, l10n.driverReportBreakdown, colour: scheme.error),
+          ],
+        ),
+        if (_message case final message?)
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Text(message, textAlign: TextAlign.center),
+          ),
       ],
     );
   }

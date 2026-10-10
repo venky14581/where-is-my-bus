@@ -4,10 +4,12 @@
   "type": "module",
   "description": "Firebase emulator tooling, seed data and security-rules tests for Where Is My Bus",
   "scripts": {
-    "emulators": "firebase emulators:start --project demo-whereismybus",
+    "emulators": "npm --prefix functions run build && firebase emulators:start --project demo-whereismybus",
     "seed": "node scripts/seed-emulators.mjs",
     "build-paths": "node scripts/build-route-paths.mjs",
     "simulate-bus": "node scripts/simulate-bus.mjs",
+    "announce": "node scripts/announce.mjs",
+    "test:functions": "npm --prefix functions test",
     "test:rules": "firebase emulators:exec --project demo-whereismybus --only firestore,database \"vitest run tests/rules\""
   },
   "devDependencies": {

@@ -12,6 +12,11 @@ import 'package:where_is_my_bus/features/auth/domain/app_user.dart';
 import 'package:where_is_my_bus/features/auth/domain/auth_failure.dart';
 import 'package:where_is_my_bus/features/auth/domain/credentials.dart';
 import 'package:where_is_my_bus/features/auth/domain/session.dart';
+import 'package:where_is_my_bus/features/alerts/application/alerts_providers.dart';
+import 'package:where_is_my_bus/features/alerts/data/alerts_repository.dart';
+import 'package:where_is_my_bus/features/alerts/data/push_service.dart';
+import 'package:where_is_my_bus/features/alerts/domain/alert_prefs.dart';
+import 'package:where_is_my_bus/features/alerts/domain/feed_item.dart';
 import 'package:where_is_my_bus/features/eta/application/eta_providers.dart';
 import 'package:where_is_my_bus/features/eta/data/stop_times_repository.dart';
 import 'package:where_is_my_bus/features/live/application/live_providers.dart';
@@ -76,6 +81,12 @@ class FakeAuthRepository implements AuthRepository {
         stopId: stopId,
       ),
     );
+  }
+
+  void setAlertPrefs(AlertPrefs prefs) {
+    final account = _accounts[_currentEmail]!;
+    account.profile = account.profile!.copyWith(alerts: prefs);
+    _emit();
   }
 
   /// What a successful `users/{uid}` update does to the session.
@@ -258,6 +269,36 @@ class FakeRouteRepository implements RouteRepository {
       auth.setHomeStop(routeId, stopId);
 }
 
+class FakeAlertsRepository implements AlertsRepository {
+  FakeAlertsRepository(this.auth);
+
+  final FakeAuthRepository auth;
+  final feed = <FeedItem>[];
+  final saved = <AlertPrefs>[];
+
+  @override
+  Stream<List<FeedItem>> watchFeed(String routeId) => Stream.value(feed);
+
+  @override
+  Future<void> savePrefs(String uid, AlertPrefs prefs) async {
+    saved.add(prefs);
+    auth.setAlertPrefs(prefs);
+  }
+}
+
+class FakePushService implements PushService {
+  final registered = <String>[];
+  final unregistered = <String>[];
+
+  @override
+  Future<void> register(String uid) async {
+    if (!registered.contains(uid)) registered.add(uid);
+  }
+
+  @override
+  Future<void> unregister(String uid) async => unregistered.add(uid);
+}
+
 class FakeStopTimesRepository implements StopTimesRepository {
   final byTrip = <String, Map<String, DateTime>>{};
 
@@ -304,6 +345,8 @@ Future<void> pumpApp(
   FakeLocationSource? location,
   FakeLiveRepository? live,
   FakeStopTimesRepository? stopTimes,
+  FakeAlertsRepository? alerts,
+  FakePushService? push,
 }) async {
   // A phone-sized surface so layouts match what students and drivers see.
   tester.view.physicalSize = const Size(1080, 2340);
@@ -322,6 +365,8 @@ Future<void> pumpApp(
       liveRepositoryProvider.overrideWithValue(live ?? FakeLiveRepository()),
       mapTilesEnabledProvider.overrideWithValue(false),
       stopTimesRepositoryProvider.overrideWithValue(stopTimes ?? FakeStopTimesRepository()),
+      alertsRepositoryProvider.overrideWithValue(alerts ?? FakeAlertsRepository(auth)),
+      pushServiceProvider.overrideWithValue(push ?? FakePushService()),
     ],
     child: const WhereIsMyBusApp(),
   ));

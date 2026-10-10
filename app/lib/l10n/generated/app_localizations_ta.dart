@@ -483,4 +483,93 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get busIsHere => 'பேருந்து இங்கே';
+
+  @override
+  String get alertsTitle => 'அறிவிப்புகள்';
+
+  @override
+  String get alertsEmpty =>
+      'இப்போது அறிவிப்புகள் இல்லை. கடந்த ஒரு நாளின் பயணச் செய்திகளும் கடந்த வாரத்தின் அறிவிப்புகளும் இங்கே தெரியும்.';
+
+  @override
+  String alertTripStarted(String bus) {
+    return '$bus பயணத்தைத் தொடங்கியது.';
+  }
+
+  @override
+  String alertDelay(String bus, int minutes) {
+    return '$bus சுமார் $minutes நிமிடங்கள் தாமதமாக ஓடுகிறது.';
+  }
+
+  @override
+  String alertLate(String bus) {
+    return '$bus தாமதமாக வரும் என ஓட்டுநர் தெரிவித்துள்ளார்.';
+  }
+
+  @override
+  String alertBreakdown(String bus) {
+    return '$bus பழுதடைந்துள்ளது. போக்குவரத்து அலுவலகத்தின் அறிவிப்புக்குக் காத்திருக்கவும்.';
+  }
+
+  @override
+  String get announcementLabel => 'போக்குவரத்து அலுவலகம்';
+
+  @override
+  String get notificationSettingsTitle => 'அறிவிப்பு அமைப்புகள்';
+
+  @override
+  String get settingApproaching => 'பேருந்து என் நிறுத்தத்தை நெருங்கும்போது';
+
+  @override
+  String get settingLeadStops => 'எப்போது தெரிவிக்க வேண்டும்';
+
+  @override
+  String leadStopsOption(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count நிறுத்தங்கள் முன்',
+      one: '1 நிறுத்தம் முன்',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get settingTripStarted => 'பேருந்து புறப்பட்டதும்';
+
+  @override
+  String get settingDelays => 'தாமதம் மற்றும் பழுது';
+
+  @override
+  String get settingAnnouncements => 'போக்குவரத்து அலுவலக அறிவிப்புகள்';
+
+  @override
+  String get settingQuietDays => 'அமைதி நாட்கள்';
+
+  @override
+  String get settingQuietDaysHelp =>
+      'இந்த நாட்களில் பழுது தவிர வேறு அறிவிப்புகள் வராது.';
+
+  @override
+  String get settingsSaveFailed =>
+      'சேமிக்க முடியவில்லை. இணையத்தைச் சரிபார்த்து மீண்டும் முயலவும்.';
+
+  @override
+  String get driverReportLate => 'தாமதம்';
+
+  @override
+  String get driverReportBreakdown => 'பழுது';
+
+  @override
+  String get driverReportSent => 'பயணிகளுக்குத் தெரிவிக்கப்பட்டது.';
+
+  @override
+  String get breakdownConfirmTitle => 'பழுதைத் தெரிவிக்கவா?';
+
+  @override
+  String get breakdownConfirmBody =>
+      'இந்த வழித்தடத்தில் உள்ள எல்லாப் பயணிகளுக்கும் பேருந்து பழுதடைந்ததாகத் தெரிவிக்கப்படும்.';
+
+  @override
+  String get reportButton => 'தெரிவி';
 }
