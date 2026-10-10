@@ -715,6 +715,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Open settings'**
   String get openSettings;
+
+  /// No description provided for @agoSeconds.
+  ///
+  /// In en, this message translates to:
+  /// **'{seconds} s ago'**
+  String agoSeconds(int seconds);
+
+  /// No description provided for @agoMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min ago'**
+  String agoMinutes(int minutes);
+
+  /// No description provided for @busLive.
+  ///
+  /// In en, this message translates to:
+  /// **'Live · updated {ago}'**
+  String busLive(String ago);
+
+  /// No description provided for @busStale.
+  ///
+  /// In en, this message translates to:
+  /// **'Weak signal · last position {ago}'**
+  String busStale(String ago);
+
+  /// No description provided for @busOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline · last seen at {time}'**
+  String busOffline(String time);
+
+  /// No description provided for @busNotRunning.
+  ///
+  /// In en, this message translates to:
+  /// **'The bus isn\'t running right now.'**
+  String get busNotRunning;
+
+  /// No description provided for @noBusOnRoute.
+  ///
+  /// In en, this message translates to:
+  /// **'No bus is assigned to this route yet.'**
+  String get noBusOnRoute;
+
+  /// No description provided for @followBus.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow the bus'**
+  String get followBus;
+
+  /// No description provided for @allBusesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'All buses'**
+  String get allBusesTitle;
+
+  /// No description provided for @allBusesEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No buses are running right now.'**
+  String get allBusesEmpty;
+
+  /// No description provided for @mapAttribution.
+  ///
+  /// In en, this message translates to:
+  /// **'© OpenStreetMap contributors'**
+  String get mapAttribution;
 }
 
 class _AppLocalizationsDelegate

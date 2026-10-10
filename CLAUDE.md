@@ -13,7 +13,8 @@ Users: driver (driver mode in the app), day scholar (student app), hosteller or 
 - Module 1 (Setup and login): done 10 Oct 2026. See `docs/modules/module-01-setup-and-login.md`.
 - Module 2 (Route and bus data): done 10 Oct 2026. See `docs/modules/module-02-route-and-bus-data.md`. The route data in `data/base-data.json` is a placeholder until the transport office supplies the real stops and timings.
 - Module 3 (Driver trip and GPS): built and tested on web with a simulated drive, 10 Oct 2026. See `docs/modules/module-03-driver-trip-and-gps.md`. Not done until the screen-off test on a real Android phone passes (needs Android Studio).
-- Next step: that phone test, then Module 4 (Live map). Trip recording works, so stop times start building up for Module 11 as soon as real trips run.
+- Module 4 (Live map): done 10 Oct 2026. See `docs/modules/module-04-live-map.md`.
+- Next step: Module 5 (Arrival time). Still open from Module 3: the screen-off test on a real Android phone.
 
 ## Decisions made in the planning chat, in order
 
@@ -169,5 +170,7 @@ How to run and test everything is in `README.md`. Things that are easy to get wr
 - Live positions: Realtime Database instance `demo-whereismybus-default-rtdb` (the emulator only applies `database.rules.json` to `<projectId>-default-rtdb`). Its rules cannot read Firestore, so `busDrivers/{busId}` mirrors `buses/{busId}.driverId`; anything that changes a bus's driver must update both.
 - `--dart-define=SIMULATE_DRIVE=true` (debug builds only) drives the bus along its route without a phone. Simulated stop times use a 5× faster clock; never point a simulated build at a real project.
 - On the web, avoid bitwise tricks on negative numbers (`~x`): web ints give unsigned 32-bit results. Run pure-logic tests with `flutter test --platform chrome` when in doubt.
+- `npm run simulate-bus [busId]` moves a bus in the emulators without a driver, for working on student screens.
+- Run every `flutter` command for `app/` from the same shell (PowerShell here). Mixing bash and PowerShell makes Flutter's build cache delete `app/lib/l10n/generated/` as "stale outputs"; if those files vanish, run `flutter gen-l10n` again from that shell.
 - All user-facing app text goes in `app/lib/l10n/app_en.arb` and `app_ta.arb`, then `flutter gen-l10n`.
 - A module is done when its Done-when table in `docs/modules/` passes. Update the Status section above when it does.

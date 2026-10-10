@@ -379,4 +379,47 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get openSettings => 'Open settings';
+
+  @override
+  String agoSeconds(int seconds) {
+    return '$seconds s ago';
+  }
+
+  @override
+  String agoMinutes(int minutes) {
+    return '$minutes min ago';
+  }
+
+  @override
+  String busLive(String ago) {
+    return 'Live · updated $ago';
+  }
+
+  @override
+  String busStale(String ago) {
+    return 'Weak signal · last position $ago';
+  }
+
+  @override
+  String busOffline(String time) {
+    return 'Offline · last seen at $time';
+  }
+
+  @override
+  String get busNotRunning => 'The bus isn\'t running right now.';
+
+  @override
+  String get noBusOnRoute => 'No bus is assigned to this route yet.';
+
+  @override
+  String get followBus => 'Follow the bus';
+
+  @override
+  String get allBusesTitle => 'All buses';
+
+  @override
+  String get allBusesEmpty => 'No buses are running right now.';
+
+  @override
+  String get mapAttribution => '© OpenStreetMap contributors';
 }

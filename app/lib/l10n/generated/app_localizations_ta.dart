@@ -383,4 +383,48 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get openSettings => 'அமைப்புகளைத் திற';
+
+  @override
+  String agoSeconds(int seconds) {
+    return '$seconds வினாடிகள் முன்';
+  }
+
+  @override
+  String agoMinutes(int minutes) {
+    return '$minutes நிமிடங்கள் முன்';
+  }
+
+  @override
+  String busLive(String ago) {
+    return 'நேரலை · $ago புதுப்பிக்கப்பட்டது';
+  }
+
+  @override
+  String busStale(String ago) {
+    return 'சிக்னல் குறைவு · கடைசி இருப்பிடம் $ago';
+  }
+
+  @override
+  String busOffline(String time) {
+    return 'இணைப்பில் இல்லை · கடைசியாக $time மணிக்குத் தெரிந்தது';
+  }
+
+  @override
+  String get busNotRunning => 'பேருந்து இப்போது இயங்கவில்லை.';
+
+  @override
+  String get noBusOnRoute =>
+      'இந்த வழித்தடத்துக்கு இன்னும் பேருந்து ஒதுக்கப்படவில்லை.';
+
+  @override
+  String get followBus => 'பேருந்தைப் பின்தொடர்';
+
+  @override
+  String get allBusesTitle => 'எல்லாப் பேருந்துகளும்';
+
+  @override
+  String get allBusesEmpty => 'இப்போது எந்தப் பேருந்தும் இயங்கவில்லை.';
+
+  @override
+  String get mapAttribution => '© OpenStreetMap பங்களிப்பாளர்கள்';
 }

@@ -1,3 +1,4 @@
+import 'package:where_is_my_bus/core/clock.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -11,6 +12,9 @@ import 'package:where_is_my_bus/features/auth/domain/app_user.dart';
 import 'package:where_is_my_bus/features/auth/domain/auth_failure.dart';
 import 'package:where_is_my_bus/features/auth/domain/credentials.dart';
 import 'package:where_is_my_bus/features/auth/domain/session.dart';
+import 'package:where_is_my_bus/features/live/application/live_providers.dart';
+import 'package:where_is_my_bus/features/live/data/live_repository.dart';
+import 'package:where_is_my_bus/features/live/domain/live_bus.dart';
 import 'package:where_is_my_bus/features/routes/application/route_providers.dart';
 import 'package:where_is_my_bus/features/routes/data/route_repository.dart';
 import 'package:where_is_my_bus/features/routes/domain/bus_route.dart';
@@ -237,6 +241,9 @@ class FakeRouteRepository implements RouteRepository {
       Stream.value(routes.where((r) => r.id == routeId).firstOrNull);
 
   @override
+  Stream<List<Bus>> watchBuses() => Stream.value(buses);
+
+  @override
   Stream<Bus?> watchBusForRoute(String routeId) =>
       Stream.value(buses.where((b) => b.routeId == routeId).firstOrNull);
 
@@ -249,6 +256,36 @@ class FakeRouteRepository implements RouteRepository {
       auth.setHomeStop(routeId, stopId);
 }
 
+/// Live bus positions the test sets by hand.
+class FakeLiveRepository implements LiveRepository {
+  final _buses = <String, LiveBus>{};
+  final _changes = StreamController<void>.broadcast();
+
+  void put(LiveBus bus) {
+    _buses[bus.busId] = bus;
+    _changes.add(null);
+  }
+
+  @override
+  Stream<LiveBus?> watchBus(String busId) async* {
+    yield _buses[busId];
+    await for (final _ in _changes.stream) {
+      yield _buses[busId];
+    }
+  }
+
+  @override
+  Stream<List<LiveBus>> watchAll() async* {
+    yield _buses.values.toList();
+    await for (final _ in _changes.stream) {
+      yield _buses.values.toList();
+    }
+  }
+
+  @override
+  Stream<Duration> serverTimeOffset() => Stream.value(Duration.zero);
+}
+
 Future<void> pumpApp(
   WidgetTester tester,
   FakeAuthRepository auth, {
@@ -256,6 +293,7 @@ Future<void> pumpApp(
   FakeRouteRepository? routes,
   FakeTripRepository? trips,
   FakeLocationSource? location,
+  FakeLiveRepository? live,
 }) async {
   // A phone-sized surface so layouts match what students and drivers see.
   tester.view.physicalSize = const Size(1080, 2340);
@@ -271,6 +309,8 @@ Future<void> pumpApp(
       locationSourceProvider.overrideWithValue(location ?? FakeLocationSource()),
       tripKeepAliveProvider.overrideWithValue(FakeKeepAlive()),
       clockProvider.overrideWithValue(() => DateTime(2026, 10, 10, 7)),
+      liveRepositoryProvider.overrideWithValue(live ?? FakeLiveRepository()),
+      mapTilesEnabledProvider.overrideWithValue(false),
     ],
     child: const WhereIsMyBusApp(),
   ));
