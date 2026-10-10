@@ -11,6 +11,7 @@ import {
   ridershipByDay,
   ridershipByStop,
   routeSuggestions,
+  trackingHealth,
   type ReportRoute,
   type TripRecord,
 } from './reports';
@@ -132,4 +133,31 @@ describe('trip replay', () => {
 test('date ranges end today', () => {
   expect(dateRange('2026-10-14', 7)).toEqual({ from: '2026-10-08', to: '2026-10-14' });
   expect(dateRange('2026-03-01', 2)).toEqual({ from: '2026-02-28', to: '2026-03-01' });
+});
+
+describe('tracking health', () => {
+  const full = trip('2026-10-12', '08:00', [], { stopTimes: { a: 1, b: 2, campus: 3 } });
+  const gap = trip('2026-10-12', null, [], { id: 'e', direction: 'fromCampus', stopTimes: { campus: 1, a: 3 } });
+  const late = trip('2026-10-13', null, [], { stopTimes: { a: 1 } });
+
+  test('stops recorded per trip, which were missed, in travel order', () => {
+    const { rows } = trackingHealth([late, full, gap], [ROUTE]);
+    expect(rows.map((r) => [r.tripId, r.recorded, r.expected, r.missing])).toEqual([
+      ['2026-10-12_bus-01_toCampus', 3, 3, []],
+      ['e', 2, 3, ['Ukkadam']],
+      ['2026-10-13_bus-01_toCampus', 1, 3, ['Ukkadam', 'Campus']],
+    ]);
+  });
+
+  test('per day, and the stops missed most often', () => {
+    const { days, stops } = trackingHealth([full, gap, late], [ROUTE]);
+    expect(days).toEqual([
+      { date: '2026-10-12', trips: 2, complete: 1, recordedShare: 5 / 6 },
+      { date: '2026-10-13', trips: 1, complete: 0, recordedShare: 1 / 3 },
+    ]);
+    expect(stops).toEqual([
+      { routeId: 'r1', stopName: 'Ukkadam', missed: 2, of: 3 },
+      { routeId: 'r1', stopName: 'Campus', missed: 1, of: 3 },
+    ]);
+  });
 });

@@ -78,9 +78,12 @@ for (let back = days; back >= 1; back--) {
     });
     stops.forEach((stop, i) => {
       const minutes = minutesOf(stop.scheduledTime) + lateAtCampus * (i / (stops.length - 1)) + normal() * 0.5;
-      batch.set(db.doc(`trips/${morning}/stopTimes/${stop.id}`), {
-        stopId: stop.id, arrivedAt: Timestamp.fromDate(at(date, minutes)), recordedAt: Timestamp.fromDate(at(date, minutes)),
-      });
+      // Now and then the phone misses a stop (a moment without signal), for the Tracking report.
+      if (random() >= 0.04) {
+        batch.set(db.doc(`trips/${morning}/stopTimes/${stop.id}`), {
+          stopId: stop.id, arrivedAt: Timestamp.fromDate(at(date, minutes)), recordedAt: Timestamp.fromDate(at(date, minutes)),
+        });
+      }
       for (let n = count(RIDERS[route.id][stop.id] ?? 0); n > 0; n--) {
         const uid = `history-${route.id}-${stop.id}-${n}`;
         batch.set(db.doc(`trips/${morning}/boardings/${uid}`), {

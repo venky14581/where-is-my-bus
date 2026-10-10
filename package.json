@@ -12,7 +12,11 @@
     "export-trips": "node scripts/export-trips.mjs",
     "import-ml": "node scripts/learned-times.mjs",
     "seed-history": "node scripts/seed-history.mjs",
+    "import-routes": "node scripts/import-routes.mjs",
+    "pilot-check": "node scripts/pilot-check.mjs",
+    "load-base-data": "node scripts/load-base-data.mjs",
     "test:functions": "npm --prefix functions test",
+    "test:tools": "vitest run tests/tools",
     "test:e2e": "node scripts/e2e.mjs",
     "test:rules": "firebase emulators:exec --project demo-whereismybus --only firestore,database \"vitest run tests/rules\""
   },

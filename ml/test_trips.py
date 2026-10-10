@@ -62,5 +62,30 @@ class DelayPatternTest(unittest.TestCase):
         self.assertEqual(pattern, {"r": {"1": {"minutes": 6, "trips": 3}}})
 
 
+class EvaluateTest(unittest.TestCase):
+    def test_every_pair_of_recorded_stops_against_timetable_and_learned(self):
+        from evaluate_eta import estimates, learned_segments, summary
+        # Monday 12 Oct 2026, from 07:00 IST (01:30 UTC): a 12 min, b 21 min later, campus 51 min.
+        df = times([
+            ("m", "r", "2026-10-12", "toCampus", "a", "2026-10-12T01:30:00Z"),
+            ("m", "r", "2026-10-12", "toCampus", "b", "2026-10-12T01:42:00Z"),
+            ("m", "r", "2026-10-12", "toCampus", "c", "2026-10-12T02:03:00Z"),
+            ("m", "r", "2026-10-12", "toCampus", "campus", "2026-10-12T02:33:00Z"),
+        ])
+        learned = {"r": {"slotMinutes": 30, "toCampus": {"1": {"07:00": [720, 1260, 1800]}}}}
+        self.assertEqual(learned_segments(learned["r"], "toCampus", 1, 7 * 60 + 50, 4), [720, 1260, 1800])
+        self.assertIsNone(learned_segments(learned["r"], "toCampus", 1, 9 * 60, 4))
+        est = estimates([ROUTE], df, learned)
+        first = est.iloc[0]
+        self.assertEqual((first.actual_s, first.timetable_s, first.learned_s), (720, 600, 720))
+        self.assertEqual(len(est), 6)
+        rows = summary(est)
+        # Pairs 12, 21, 30, 33, 51 and 63 min apart: none under 10 min, one from 10 to 20.
+        self.assertEqual([r["pairs"] for r in rows], [0, 1, 5])
+        self.assertIsNone(rows[0]["timetable"])
+        self.assertEqual(rows[1]["timetable"], {"pairs": 1, "meanErrorMin": 2.0, "withinGood": 1.0})
+        self.assertEqual(rows[1]["learned"], {"pairs": 1, "meanErrorMin": 0.0, "withinGood": 1.0})
+
+
 if __name__ == "__main__":
     unittest.main()

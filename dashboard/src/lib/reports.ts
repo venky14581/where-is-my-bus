@@ -241,3 +241,73 @@ export function dateRange(today: string, days: number): { from: string; to: stri
   d.setUTCDate(d.getUTCDate() - (days - 1));
   return { from: d.toISOString().slice(0, 10), to: today };
 }
+
+export interface TrackingRow {
+  tripId: string;
+  date: string;
+  routeId: string;
+  busId: string;
+  direction: TripRecord['direction'];
+  recorded: number;
+  expected: number;
+  /** Names of the stops no time was recorded for, in travel order. */
+  missing: string[];
+}
+
+export interface TrackingDay {
+  date: string;
+  trips: number;
+  /** Trips with every stop recorded. */
+  complete: number;
+  /** Stops recorded out of stops on the routes driven. */
+  recordedShare: number;
+}
+
+/** A pilot target: a phone that tracks properly records nearly every stop. */
+export const TRACKING_TARGET = 0.95;
+
+/**
+ * How well the drivers' phones tracked: every stop a trip passes should get
+ * a time. Missing ones point at a phone that stopped sending (screen off,
+ * dead zone, app closed) or a stop placed off the road.
+ */
+export function trackingHealth(trips: TripRecord[], routes: ReportRoute[]): { rows: TrackingRow[]; days: TrackingDay[]; stops: { routeId: string; stopName: string; missed: number; of: number }[] } {
+  const rows: TrackingRow[] = [];
+  for (const trip of trips) {
+    const route = routes.find((r) => r.id === trip.routeId);
+    if (!route) continue;
+    const ordered = trip.direction === 'toCampus' ? route.stops : [...route.stops].reverse();
+    rows.push({
+      tripId: trip.id,
+      date: trip.date,
+      routeId: trip.routeId,
+      busId: trip.busId,
+      direction: trip.direction,
+      recorded: ordered.filter((s) => trip.stopTimes[s.id] !== undefined).length,
+      expected: ordered.length,
+      missing: ordered.filter((s) => trip.stopTimes[s.id] === undefined).map((s) => s.name),
+    });
+  }
+  rows.sort((a, b) => a.date.localeCompare(b.date) || a.tripId.localeCompare(b.tripId));
+  const days = [...new Set(rows.map((r) => r.date))].map((date) => {
+    const of = rows.filter((r) => r.date === date);
+    const expected = of.reduce((n, r) => n + r.expected, 0);
+    return {
+      date,
+      trips: of.length,
+      complete: of.filter((r) => r.recorded === r.expected).length,
+      recordedShare: expected ? of.reduce((n, r) => n + r.recorded, 0) / expected : 0,
+    };
+  });
+  // Stops missed again and again are more likely off the road than a phone problem.
+  const stops: { routeId: string; stopName: string; missed: number; of: number }[] = [];
+  for (const route of routes) {
+    const driven = rows.filter((r) => r.routeId === route.id);
+    for (const stop of route.stops) {
+      const missed = driven.filter((r) => r.missing.includes(stop.name)).length;
+      if (missed) stops.push({ routeId: route.id, stopName: stop.name, missed, of: driven.length });
+    }
+  }
+  stops.sort((a, b) => b.missed / b.of - a.missed / a.of);
+  return { rows, days, stops };
+}

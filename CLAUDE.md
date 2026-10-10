@@ -23,7 +23,8 @@ Users: driver (driver mode in the app), day scholar (student app), hosteller or 
 - `npm run test:e2e` checks the server side of Modules 1 to 10 on the emulators (`tests/e2e/`, one file per module). Add a file for each new module.
 - Module 11 (Smart features): built and tested on the emulators and the web app with synthetic trip history, 11 Oct 2026. See `docs/modules/module-11-smart-features.md`. Includes Not riding today. Retrain on recorded trips once there are two weeks of them.
 - Module 12 (Safety and reports): built and tested on the emulators, the web app and the dashboard, 11 Oct 2026. See `docs/modules/module-12-safety-and-reports.md`.
-- Next step: Module 13 (Testing and pilot). Still open on a real Android phone: Module 3 screen-off tracking, Module 6 push, Module 8 camera scan, Module 10 Razorpay checkout, Module 12 overspeed and off-route on a real drive.
+- Module 13 (Testing and pilot): pilot ready to run, 11 Oct 2026; the pilot itself not started. See `docs/modules/module-13-testing-and-pilot.md` and `docs/pilot/pilot-plan.md`.
+- Next step: the pilot. It needs a real Firebase project (pay-as-you-go), an Android phone with Android Studio, and the transport office's real stops for one route. The phone checks P1 to P11 in the pilot plan cover what is still open from Modules 3, 6, 8, 10 and 12.
 
 ## Decisions made in the planning chat, in order
 
@@ -193,6 +194,7 @@ How to run and test everything is in `README.md`. Things that are easy to get wr
 - Scheduled functions (`createEveningTrips`, `expireBookings`) do not run on the emulators: there is no Pub/Sub emulator. Keep their work in plain exported functions (`scheduleEveningTrips`, `expireUnpaidBookings` in `functions/src/bookings.ts`) so tests and scripts can call them. Demo payments are accepted only when `FUNCTIONS_EMULATOR` is true; Razorpay keys go in `functions/.env`, which is git-ignored.
 - Overspeed and off-route are detected on the driver's phone (`app/lib/features/trip/domain/safety_monitor.dart`), never by a function on position updates. SOS and trip links go through the `sendSos`, `shareTrip` and `viewSharedTrip` functions; a parent's page is the dashboard's `#/share/<token>`, which needs no sign-in. The app builds the link from `--dart-define=SHARE_BASE_URL`.
 - On the emulators each Cloud Function starts its own worker the first time it fires; on this Windows machine that took over 20 s by Module 12. End-to-end tests wait up to 45 s for trigger results (`waitFor` in `tests/e2e/support.js`); a test that times out on its first trigger but passes when rerun is this, not a bug.
+- Pilot tools: `npm run import-routes` (the office's CSV sheets, templates in `data/templates/`), `npm run load-base-data` (a real project), `npm run pilot-check` (readiness, emulators or `--project`), `ml/evaluate_eta.py` (arrival-time accuracy). Tests for the scripts: `npm run test:tools`. Real projects need `--database-url` for a Realtime Database outside the US.
 - `npm run seed-history` writes two weeks of synthetic past trips (`synthetic: true`) for the dashboard's reports and trip history. Stop-time triggers skip trips that have ended, so it alerts nobody.
 - Driver logins are created and their PINs reset only through the office-only callable functions `createDriver` and `setDriverPin`.
 - Pass QR codes: `functions/src/passCode.ts` and `app/lib/features/pass/domain/pass_code.dart` must produce identical codes; both test the same example. Boarding is decided only by the `scanPass` function.
