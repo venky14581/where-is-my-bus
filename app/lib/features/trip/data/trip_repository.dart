@@ -35,7 +35,8 @@ abstract interface class TripRepository {
   Future<void> publishPosition({required String busId, required String tripId, required Fix fix});
 
   /// Arranges for `live/{busId}` to show `offline` if the phone drops off
-  /// the network. Must be repeated after every reconnect.
+  /// the network. Must be repeated after every reconnect, and only once a
+  /// position has been written.
   Future<void> armDisconnect(String busId);
 
   Future<void> markLiveEnded({required String busId, required String tripId});
