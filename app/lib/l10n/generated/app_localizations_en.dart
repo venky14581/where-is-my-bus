@@ -422,4 +422,59 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get mapAttribution => '© OpenStreetMap contributors';
+
+  @override
+  String etaMinutes(int minutes) {
+    return 'Arrives in $minutes min';
+  }
+
+  @override
+  String etaAround(String time) {
+    return 'around $time';
+  }
+
+  @override
+  String get arrivingNow => 'The bus is at your stop now';
+
+  @override
+  String passedAt(String time) {
+    return 'Passed your stop at $time';
+  }
+
+  @override
+  String get passedNoTime => 'The bus has passed your stop';
+
+  @override
+  String get offRoute =>
+      'The bus is away from its usual route, so there is no arrival time.';
+
+  @override
+  String get etaFromLastPosition => 'Estimated from the last known position';
+
+  @override
+  String get fullRouteTitle => 'Full route';
+
+  @override
+  String get fullRouteButton => 'See all stops';
+
+  @override
+  String stopScheduled(String time) {
+    return 'Scheduled $time';
+  }
+
+  @override
+  String stopPassedAt(String time) {
+    return 'Passed at $time';
+  }
+
+  @override
+  String get stopPassed => 'Passed';
+
+  @override
+  String stopExpected(String time) {
+    return 'Expected $time';
+  }
+
+  @override
+  String get busIsHere => 'Bus is here';
 }

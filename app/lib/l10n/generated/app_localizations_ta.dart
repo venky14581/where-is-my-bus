@@ -427,4 +427,60 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get mapAttribution => '© OpenStreetMap பங்களிப்பாளர்கள்';
+
+  @override
+  String etaMinutes(int minutes) {
+    return '$minutes நிமிடங்களில் வரும்';
+  }
+
+  @override
+  String etaAround(String time) {
+    return 'சுமார் $time';
+  }
+
+  @override
+  String get arrivingNow => 'பேருந்து இப்போது உங்கள் நிறுத்தத்தில் உள்ளது';
+
+  @override
+  String passedAt(String time) {
+    return '$time மணிக்கு உங்கள் நிறுத்தத்தைக் கடந்தது';
+  }
+
+  @override
+  String get passedNoTime => 'பேருந்து உங்கள் நிறுத்தத்தைக் கடந்துவிட்டது';
+
+  @override
+  String get offRoute =>
+      'பேருந்து வழக்கமான வழித்தடத்தில் இல்லை, அதனால் வருகை நேரத்தைக் கணிக்க முடியவில்லை.';
+
+  @override
+  String get etaFromLastPosition =>
+      'கடைசியாகத் தெரிந்த இருப்பிடத்தின் அடிப்படையில் கணிக்கப்பட்டது';
+
+  @override
+  String get fullRouteTitle => 'முழு வழித்தடம்';
+
+  @override
+  String get fullRouteButton => 'எல்லா நிறுத்தங்களையும் பார்';
+
+  @override
+  String stopScheduled(String time) {
+    return 'அட்டவணை நேரம் $time';
+  }
+
+  @override
+  String stopPassedAt(String time) {
+    return '$time மணிக்குக் கடந்தது';
+  }
+
+  @override
+  String get stopPassed => 'கடந்தது';
+
+  @override
+  String stopExpected(String time) {
+    return 'எதிர்பார்ப்பு $time';
+  }
+
+  @override
+  String get busIsHere => 'பேருந்து இங்கே';
 }

@@ -7,6 +7,7 @@ import '../../routing/routes.dart';
 import '../auth/application/auth_providers.dart';
 import '../auth/domain/session.dart';
 import '../auth/ui/widgets.dart';
+import '../eta/ui/arrival_panel.dart';
 import '../live/application/live_providers.dart';
 import '../live/ui/bus_map.dart';
 import '../live/ui/live_status.dart';
@@ -82,6 +83,8 @@ class _MyBus extends ConsumerWidget {
                   child: ListView(
                     padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
                     children: [
+                      if (bus != null)
+                        ArrivalPanel(route: route, stopId: stop.id, live: live, serverNow: now),
                       if (bus == null)
                         Text(context.l10n.noBusOnRoute)
                       else
@@ -134,6 +137,15 @@ class _StopCard extends StatelessWidget {
             if (busNumber != null) Text(l10n.busNumber(busNumber!)),
             const SizedBox(height: 8),
             Text(l10n.busDueAt(formatScheduledTime(context, stop.scheduledTime)), style: text.titleMedium),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton.icon(
+                style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                onPressed: () => context.push(Routes.studentFullRoute),
+                icon: const Icon(Icons.format_list_bulleted),
+                label: Text(l10n.fullRouteButton),
+              ),
+            ),
           ],
         ),
       ),

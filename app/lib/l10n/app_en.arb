@@ -270,5 +270,61 @@
   "followBus": "Follow the bus",
   "allBusesTitle": "All buses",
   "allBusesEmpty": "No buses are running right now.",
-  "mapAttribution": "© OpenStreetMap contributors"
+  "mapAttribution": "© OpenStreetMap contributors",
+  "etaMinutes": "Arrives in {minutes} min",
+  "@etaMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "etaAround": "around {time}",
+  "@etaAround": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "arrivingNow": "The bus is at your stop now",
+  "passedAt": "Passed your stop at {time}",
+  "@passedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "passedNoTime": "The bus has passed your stop",
+  "offRoute": "The bus is away from its usual route, so there is no arrival time.",
+  "etaFromLastPosition": "Estimated from the last known position",
+  "fullRouteTitle": "Full route",
+  "fullRouteButton": "See all stops",
+  "stopScheduled": "Scheduled {time}",
+  "@stopScheduled": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "stopPassedAt": "Passed at {time}",
+  "@stopPassedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "stopPassed": "Passed",
+  "stopExpected": "Expected {time}",
+  "@stopExpected": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "busIsHere": "Bus is here"
 }

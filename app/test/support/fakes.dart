@@ -12,6 +12,8 @@ import 'package:where_is_my_bus/features/auth/domain/app_user.dart';
 import 'package:where_is_my_bus/features/auth/domain/auth_failure.dart';
 import 'package:where_is_my_bus/features/auth/domain/credentials.dart';
 import 'package:where_is_my_bus/features/auth/domain/session.dart';
+import 'package:where_is_my_bus/features/eta/application/eta_providers.dart';
+import 'package:where_is_my_bus/features/eta/data/stop_times_repository.dart';
 import 'package:where_is_my_bus/features/live/application/live_providers.dart';
 import 'package:where_is_my_bus/features/live/data/live_repository.dart';
 import 'package:where_is_my_bus/features/live/domain/live_bus.dart';
@@ -256,6 +258,13 @@ class FakeRouteRepository implements RouteRepository {
       auth.setHomeStop(routeId, stopId);
 }
 
+class FakeStopTimesRepository implements StopTimesRepository {
+  final byTrip = <String, Map<String, DateTime>>{};
+
+  @override
+  Stream<Map<String, DateTime>> watch(String tripId) => Stream.value(byTrip[tripId] ?? const {});
+}
+
 /// Live bus positions the test sets by hand.
 class FakeLiveRepository implements LiveRepository {
   final _buses = <String, LiveBus>{};
@@ -294,6 +303,7 @@ Future<void> pumpApp(
   FakeTripRepository? trips,
   FakeLocationSource? location,
   FakeLiveRepository? live,
+  FakeStopTimesRepository? stopTimes,
 }) async {
   // A phone-sized surface so layouts match what students and drivers see.
   tester.view.physicalSize = const Size(1080, 2340);
@@ -311,6 +321,7 @@ Future<void> pumpApp(
       clockProvider.overrideWithValue(() => DateTime(2026, 10, 10, 7)),
       liveRepositoryProvider.overrideWithValue(live ?? FakeLiveRepository()),
       mapTilesEnabledProvider.overrideWithValue(false),
+      stopTimesRepositoryProvider.overrideWithValue(stopTimes ?? FakeStopTimesRepository()),
     ],
     child: const WhereIsMyBusApp(),
   ));
