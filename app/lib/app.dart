@@ -4,7 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/l10n.dart';
 import 'core/locale_controller.dart';
 import 'core/theme.dart';
+import 'features/alerts/application/alerts_providers.dart';
 import 'features/auth/application/auth_providers.dart';
+import 'features/auth/domain/app_user.dart';
 import 'features/auth/domain/session.dart';
 import 'routing/app_router.dart';
 
@@ -21,6 +23,11 @@ class WhereIsMyBusApp extends ConsumerWidget {
       final after = _profileLanguage(next.value);
       if (after != null && after != before) {
         ref.read(localeControllerProvider.notifier).select(after);
+      }
+      // Verified students get push alerts on this device. Registering again
+      // is a no-op, so every session update can ask.
+      if (next.value case SignedIn(emailVerified: true, profile: AppUser(role: UserRole.student, :final uid))) {
+        ref.read(pushServiceProvider).register(uid);
       }
     });
 

@@ -1,3 +1,5 @@
+import '../../alerts/domain/alert_prefs.dart';
+
 enum UserRole {
   student,
   driver,
@@ -23,6 +25,7 @@ class AppUser {
     this.stopId,
     this.passValid = false,
     this.language,
+    this.alerts = const AlertPrefs(),
   });
 
   final String uid;
@@ -37,7 +40,10 @@ class AppUser {
   /// `en` or `ta`. Null until a driver picks one at first login.
   final String? language;
 
-  AppUser copyWith({String? name, String? routeId, String? stopId, String? language}) => AppUser(
+  /// Notification choices; students only.
+  final AlertPrefs alerts;
+
+  AppUser copyWith({String? name, String? routeId, String? stopId, String? language, AlertPrefs? alerts}) => AppUser(
         uid: uid,
         name: name ?? this.name,
         role: role,
@@ -47,6 +53,7 @@ class AppUser {
         stopId: stopId ?? this.stopId,
         passValid: passValid,
         language: language ?? this.language,
+        alerts: alerts ?? this.alerts,
       );
 
   /// Returns null when the document has no recognisable role, so a malformed
@@ -64,6 +71,7 @@ class AppUser {
       stopId: data['stopId'] as String?,
       passValid: data['passValid'] as bool? ?? false,
       language: data['language'] as String?,
+      alerts: AlertPrefs.fromMap(data['alerts']),
     );
   }
 }

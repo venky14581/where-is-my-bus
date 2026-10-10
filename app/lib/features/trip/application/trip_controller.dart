@@ -252,6 +252,20 @@ class TripController extends Notifier<TripState> {
     }, onError: (Object _) => _pending ??= fix);
   }
 
+  /// Tells the route's riders the bus is late or has broken down. Returns
+  /// false when there is no trip running or the report could not be sent.
+  Future<bool> report(TripIssue issue) async {
+    final active = _active;
+    if (active == null) return false;
+    try {
+      // Waits for the server so the driver only sees "told" when it is true.
+      await _repo.reportIssue(tripId: active.tripId, issue: issue).timeout(const Duration(seconds: 15));
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   Future<void> end() async {
     final active = _active;
     if (state.phase != TripPhase.running || active == null) return;

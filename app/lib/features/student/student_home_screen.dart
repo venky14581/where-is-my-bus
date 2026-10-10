@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/l10n.dart';
 import '../../routing/routes.dart';
+import '../alerts/application/alerts_providers.dart';
 import '../auth/application/auth_providers.dart';
 import '../auth/domain/session.dart';
 import '../auth/ui/widgets.dart';
@@ -29,6 +30,7 @@ class StudentHomeScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text(l10n.appTitle),
         actions: [
+          if (routeId != null) _AlertsButton(routeId: routeId),
           IconButton(
             tooltip: l10n.allBusesTitle,
             icon: const Icon(Icons.map_outlined),
@@ -40,6 +42,29 @@ class StudentHomeScreen extends ConsumerWidget {
       body: routeId == null
           ? const SizedBox.shrink()
           : _MyBus(routeId: routeId, stopId: profile?.stopId, name: profile?.name ?? ''),
+    );
+  }
+}
+
+/// Bell with a dot when something arrived since the list was last opened.
+class _AlertsButton extends ConsumerWidget {
+  const _AlertsButton({required this.routeId});
+
+  final String routeId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final items = ref.watch(alertsFeedProvider(routeId)).value ?? const [];
+    final seen = ref.watch(alertsSeenProvider);
+    final unread = items.where((i) => seen == null || i.createdAt.isAfter(seen)).length;
+    return IconButton(
+      tooltip: context.l10n.alertsTitle,
+      onPressed: () => context.push(Routes.studentAlerts),
+      icon: Badge(
+        isLabelVisible: unread > 0,
+        label: Text('$unread'),
+        child: const Icon(Icons.notifications_outlined),
+      ),
     );
   }
 }

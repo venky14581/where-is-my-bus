@@ -865,6 +865,144 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Bus is here'**
   String get busIsHere;
+
+  /// No description provided for @alertsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Alerts'**
+  String get alertsTitle;
+
+  /// No description provided for @alertsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No alerts right now. Trip news from the last day and announcements from the last week appear here.'**
+  String get alertsEmpty;
+
+  /// No description provided for @alertTripStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'{bus} has started its trip.'**
+  String alertTripStarted(String bus);
+
+  /// No description provided for @alertDelay.
+  ///
+  /// In en, this message translates to:
+  /// **'{bus} is running about {minutes} min behind schedule.'**
+  String alertDelay(String bus, int minutes);
+
+  /// No description provided for @alertLate.
+  ///
+  /// In en, this message translates to:
+  /// **'The driver of {bus} reports the bus is running late.'**
+  String alertLate(String bus);
+
+  /// No description provided for @alertBreakdown.
+  ///
+  /// In en, this message translates to:
+  /// **'{bus} has broken down. Watch for news from the transport office.'**
+  String alertBreakdown(String bus);
+
+  /// No description provided for @announcementLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Transport office'**
+  String get announcementLabel;
+
+  /// No description provided for @notificationSettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notificationSettingsTitle;
+
+  /// No description provided for @settingApproaching.
+  ///
+  /// In en, this message translates to:
+  /// **'Bus approaching my stop'**
+  String get settingApproaching;
+
+  /// No description provided for @settingLeadStops.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell me when it is'**
+  String get settingLeadStops;
+
+  /// No description provided for @leadStopsOption.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 stop away} other{{count} stops away}}'**
+  String leadStopsOption(int count);
+
+  /// No description provided for @settingTripStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Bus has started'**
+  String get settingTripStarted;
+
+  /// No description provided for @settingDelays.
+  ///
+  /// In en, this message translates to:
+  /// **'Delays and breakdowns'**
+  String get settingDelays;
+
+  /// No description provided for @settingAnnouncements.
+  ///
+  /// In en, this message translates to:
+  /// **'Transport office announcements'**
+  String get settingAnnouncements;
+
+  /// No description provided for @settingQuietDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Quiet days'**
+  String get settingQuietDays;
+
+  /// No description provided for @settingQuietDaysHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'No notifications on these days, except breakdowns.'**
+  String get settingQuietDaysHelp;
+
+  /// No description provided for @settingsSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t save. Check the internet and try again.'**
+  String get settingsSaveFailed;
+
+  /// No description provided for @driverReportLate.
+  ///
+  /// In en, this message translates to:
+  /// **'Running late'**
+  String get driverReportLate;
+
+  /// No description provided for @driverReportBreakdown.
+  ///
+  /// In en, this message translates to:
+  /// **'Breakdown'**
+  String get driverReportBreakdown;
+
+  /// No description provided for @driverReportSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Riders have been told.'**
+  String get driverReportSent;
+
+  /// No description provided for @breakdownConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Report a breakdown?'**
+  String get breakdownConfirmTitle;
+
+  /// No description provided for @breakdownConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Every rider on this route will be told the bus has broken down.'**
+  String get breakdownConfirmBody;
+
+  /// No description provided for @reportButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Report'**
+  String get reportButton;
 }
 
 class _AppLocalizationsDelegate

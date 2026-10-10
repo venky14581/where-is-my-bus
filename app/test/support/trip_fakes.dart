@@ -64,6 +64,11 @@ class FakeTripRepository implements TripRepository {
 
   @override
   Stream<bool> connection() => _connection.stream;
+
+  final reports = <TripIssue>[];
+
+  @override
+  Future<void> reportIssue({required String tripId, required TripIssue issue}) async => reports.add(issue);
 }
 
 class FakeKeepAlive implements TripKeepAlive {

@@ -45,7 +45,12 @@ abstract interface class TripRepository {
 
   /// Whether the phone can reach the Realtime Database right now.
   Stream<bool> connection();
+
+  /// Running late or Breakdown. A Cloud Function tells the route's riders.
+  Future<void> reportIssue({required String tripId, required TripIssue issue});
 }
+
+enum TripIssue { late, breakdown }
 
 class FirebaseTripRepository implements TripRepository {
   FirebaseTripRepository(this._db, this._rtdb);
@@ -114,6 +119,10 @@ class FirebaseTripRepository implements TripRepository {
         'arrivedAt': Timestamp.fromDate(at),
         'recordedAt': FieldValue.serverTimestamp(),
       });
+
+  @override
+  Future<void> reportIssue({required String tripId, required TripIssue issue}) =>
+      _db.collection('trips/$tripId/reports').add({'type': issue.name, 'createdAt': FieldValue.serverTimestamp()});
 
   @override
   Stream<bool> connection() =>

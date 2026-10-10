@@ -2,6 +2,8 @@ rules_version = '2';
 
 // Paths not listed here stay closed until the module that needs them opens
 // them. Module 1: users. Module 2: routes, buses, routeAccess. Module 3: trips.
+// Module 6: alert settings, devices, driver reports, alerts, announcements.
+// Server-only paths (pushLog, trips/*/approachingSent) stay closed to clients.
 service cloud.firestore {
   match /databases/{database}/documents {
 
@@ -85,6 +87,23 @@ service cloud.firestore {
       return !('language' in data) || data.language == null || data.language in ['en', 'ta'];
     }
 
+    // users/{uid}.alerts: which notifications a student wants. Keep in step
+    // with functions/src/audience.ts.
+    function validAlertPrefs(data) {
+      return !('alerts' in data) || (
+        data.alerts is map
+        && data.alerts.keys().hasOnly(
+             ['approaching', 'tripStarted', 'delays', 'announcements', 'leadStops', 'quietDays'])
+        && data.alerts.get('approaching', true) is bool
+        && data.alerts.get('tripStarted', true) is bool
+        && data.alerts.get('delays', true) is bool
+        && data.alerts.get('announcements', true) is bool
+        && data.alerts.get('leadStops', 2) in [1, 2, 3]
+        && data.alerts.get('quietDays', []) is list
+        && data.alerts.get('quietDays', []).size() <= 7
+      );
+    }
+
     function onlyChanged(fields) {
       return request.resource.data.diff(resource.data).affectedKeys().hasOnly(fields);
     }
@@ -117,14 +136,25 @@ service cloud.firestore {
         && validLanguage(request.resource.data)
         && (
           (resource.data.role == 'student'
-            && onlyChanged(['name', 'language', 'routeId', 'stopId'])
+            && onlyChanged(['name', 'language', 'routeId', 'stopId', 'alerts'])
             && validName(request.resource.data)
-            && validHomeStop(request.resource.data))
+            && validHomeStop(request.resource.data)
+            && validAlertPrefs(request.resource.data))
           || (resource.data.role == 'driver' && onlyChanged(['language']))
         )
       );
 
       allow delete: if isOffice();
+
+      // Push tokens, one document per device, named by the token.
+      match /devices/{token} {
+        allow read, delete: if signedIn() && request.auth.uid == uid;
+        allow create, update: if signedIn()
+          && request.auth.uid == uid
+          && request.resource.data.keys().hasOnly(['platform', 'updatedAt'])
+          && request.resource.data.platform in ['android', 'ios', 'web']
+          && request.resource.data.updatedAt == request.time;
+      }
     }
 
     // Only the office edits base data. The import script and the dashboard
@@ -181,6 +211,38 @@ service cloud.firestore {
           && request.resource.data.arrivedAt is timestamp
           && request.resource.data.recordedAt == request.time;
       }
+
+      // Running late and Breakdown, from the trip's driver while it runs.
+      match /reports/{reportId} {
+        allow read: if canReadBaseData();
+        allow create: if signedIn()
+          && exists(tripPath(tripId))
+          && get(tripPath(tripId)).data.driverId == request.auth.uid
+          && get(tripPath(tripId)).data.status == 'running'
+          && request.resource.data.keys().hasOnly(['type', 'createdAt'])
+          && request.resource.data.type in ['late', 'breakdown']
+          && request.resource.data.createdAt == request.time;
+      }
+    }
+
+    // The in-app alerts list. Written only by Cloud Functions.
+    match /alerts/{alertId} {
+      allow read: if canReadBaseData();
+    }
+
+    // To one route (routeId) or to everyone (routeId null).
+    match /announcements/{id} {
+      allow read: if canReadBaseData();
+      allow create: if isOffice()
+        && request.resource.data.keys().hasOnly(['routeId', 'title', 'body', 'createdAt', 'createdBy'])
+        && (request.resource.data.routeId == null || exists(routePath(request.resource.data.routeId)))
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 0 && request.resource.data.title.size() <= 80
+        && request.resource.data.body is string
+        && request.resource.data.body.size() <= 500
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.createdBy == request.auth.uid;
+      allow delete: if isOffice();
     }
 
     match /{document=**} {
