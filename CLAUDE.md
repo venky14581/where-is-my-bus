@@ -22,7 +22,8 @@ Users: driver (driver mode in the app), day scholar (student app), hosteller or 
 - Module 10 (Evening seat booking): built and tested on the emulators, 11 Oct 2026. See `docs/modules/module-10-evening-seat-booking.md`. Razorpay checkout still needs a real project with test keys and a phone.
 - `npm run test:e2e` checks the server side of Modules 1 to 10 on the emulators (`tests/e2e/`, one file per module). Add a file for each new module.
 - Module 11 (Smart features): built and tested on the emulators and the web app with synthetic trip history, 11 Oct 2026. See `docs/modules/module-11-smart-features.md`. Includes Not riding today. Retrain on recorded trips once there are two weeks of them.
-- Next step: Module 12 (Safety and reports). Still open on a real Android phone: Module 3 screen-off tracking, Module 6 push, Module 8 camera scan, Module 10 Razorpay checkout.
+- Module 12 (Safety and reports): built and tested on the emulators, the web app and the dashboard, 11 Oct 2026. See `docs/modules/module-12-safety-and-reports.md`.
+- Next step: Module 13 (Testing and pilot). Still open on a real Android phone: Module 3 screen-off tracking, Module 6 push, Module 8 camera scan, Module 10 Razorpay checkout, Module 12 overspeed and off-route on a real drive.
 
 ## Decisions made in the planning chat, in order
 
@@ -132,10 +133,13 @@ Use exactly these. Where `SPEC.md` says "Flutter Web or React", the dashboard is
 - `trips/{tripId}`: busId, routeId, date, direction, start and end time, capacity, passHolders, notRiding, seatsBooked, booking open and close time. Built so far: passHolders (the route's valid passes, counted when the trip starts) and altHeld (seats held or used by riders from other routes), both server-written.
 - `trips/{tripId}/stopTimes`: actual time at each stop
 - `trips/{tripId}/boardings/{uid}`: time, stop, type (pass, alternate, guest). (Planned as `boardings/{tripId}/{uid}`, which is not a valid Firestore path.)
+- `trips/{tripId}/events/{id}`: overspeed or offRoute noticed by the driver's phone, one per episode. `safetyAlerts/{id}`: SOS, overspeed and off-route alerts for the office (server-written; the office sets status acknowledged).
+- `shares/{token}`: a student's trip link for a parent (tripId, uid, stopId, expiresAt); read only through `viewSharedTrip`.
 - `trips/{tripId}/notRiding/{uid}`: a pass holder not taking this evening trip (setNotRiding). The trip's `notRiding` counts them.
 - `trips/{tripId}/holds/{uid}`: pickup stop, time, status (held, boarded, cancelled, missed). (Planned as `holds/{tripId}/{uid}`, not a valid Firestore path.)
 - `bookings/{bookingId}`: tripId, uid, stop, fare, status, ticket code
 - `routeAccess/{routeId}`: routes it accepts riders from
+- `settings/safety`: speedLimitKmh (default 60, in the app's trip repository and the dashboard).
 - `segmentTimes/{routeId}`: learned seconds per stretch by weekday and half-hour slot, and the usual delay by weekday, from `ml/train.py`. `conditions/{date}`: how today's stretches compare with the expected (ratioSum, count), server-written.
 - `announcements/{id}`, `timetable/{id}`, `settings/booking`
 
@@ -187,6 +191,9 @@ How to run and test everything is in `README.md`. Things that are easy to get wr
 - The arrival-time model: `ml/` (Python 3.12 venv at `ml/.venv`, `pip install -r ml/requirements.txt`). `ml/synth_trips.py` or `npm run export-trips` → `ml/data/`; `ml/train.py` → `ml/out/segment_times.json` (committed; the seed loads it). `functions/src/learned.ts` and `app/lib/features/eta/domain/learned_times.dart` read it the same way and test the same example, like the pass codes. Python tests: `ml/.venv/Scripts/python -m unittest discover -s ml`.
 - Cloud Functions live in `functions/` (TypeScript). `npm run emulators` builds them first and allows 60 s for a cold load. They trigger on trips, stop times, reports and announcements only. Every trigger must be safe to run twice (delivery is at least once): claim a `functionRuns/{key}` marker or use a transaction. On the emulators, notifications go to `pushLog` instead of FCM.
 - Scheduled functions (`createEveningTrips`, `expireBookings`) do not run on the emulators: there is no Pub/Sub emulator. Keep their work in plain exported functions (`scheduleEveningTrips`, `expireUnpaidBookings` in `functions/src/bookings.ts`) so tests and scripts can call them. Demo payments are accepted only when `FUNCTIONS_EMULATOR` is true; Razorpay keys go in `functions/.env`, which is git-ignored.
+- Overspeed and off-route are detected on the driver's phone (`app/lib/features/trip/domain/safety_monitor.dart`), never by a function on position updates. SOS and trip links go through the `sendSos`, `shareTrip` and `viewSharedTrip` functions; a parent's page is the dashboard's `#/share/<token>`, which needs no sign-in. The app builds the link from `--dart-define=SHARE_BASE_URL`.
+- On the emulators each Cloud Function starts its own worker the first time it fires; on this Windows machine that took over 20 s by Module 12. End-to-end tests wait up to 45 s for trigger results (`waitFor` in `tests/e2e/support.js`); a test that times out on its first trigger but passes when rerun is this, not a bug.
+- `npm run seed-history` writes two weeks of synthetic past trips (`synthetic: true`) for the dashboard's reports and trip history. Stop-time triggers skip trips that have ended, so it alerts nobody.
 - Driver logins are created and their PINs reset only through the office-only callable functions `createDriver` and `setDriverPin`.
 - Pass QR codes: `functions/src/passCode.ts` and `app/lib/features/pass/domain/pass_code.dart` must produce identical codes; both test the same example. Boarding is decided only by the `scanPass` function.
 - All user-facing app text goes in `app/lib/l10n/app_en.arb` and `app_ta.arb`, then `flutter gen-l10n`.

@@ -166,6 +166,7 @@ void main() {
         ..learned['cbe-gandhipuram'] = everywhere([900, 2700])
         ..seats[trip] = const TripSeats(passHolders: 46, altHeld: 1);
       await open(tester, smart: smart);
+      await tester.scrollUntilVisible(find.text('Few seats left'), 150, scrollable: find.descendant(of: find.byType(ListView), matching: find.byType(Scrollable)).first);
       expect(find.textContaining('Usually about 6 min late on'), findsOneWidget);
       expect(find.text('Few seats left'), findsOneWidget);
     });

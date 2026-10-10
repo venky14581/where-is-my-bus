@@ -77,7 +77,8 @@ void main() {
     // Between Gandhipuram and Ukkadam.
     await _openHome(tester, live: _busAt(11.0035, 76.9646), stopTimes: stopTimes);
 
-    await tester.ensureVisible(find.text('See all stops'));
+    // The list below the map builds only what is on screen.
+    await tester.scrollUntilVisible(find.text('See all stops'), 150, scrollable: find.descendant(of: find.byType(ListView), matching: find.byType(Scrollable)).first);
     await tester.pump();
     await tester.tap(find.text('See all stops'));
     await _settle(tester);

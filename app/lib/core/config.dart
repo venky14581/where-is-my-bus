@@ -17,4 +17,11 @@ abstract final class AppConfig {
   static const minStudentPasswordLength = 8;
 
   static const supportedLanguageCodes = ['en', 'ta'];
+
+  /// Where parents open a shared trip: the dashboard's hosting address. Set
+  /// with `--dart-define=SHARE_BASE_URL=https://<project>.web.app` for a
+  /// real project; the default is the dashboard's local dev server.
+  static const shareBaseUrl = String.fromEnvironment('SHARE_BASE_URL', defaultValue: 'http://localhost:5173');
+
+  static String shareLink(String token) => '$shareBaseUrl/#/share/$token';
 }

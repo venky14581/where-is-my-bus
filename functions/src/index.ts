@@ -7,6 +7,7 @@ export { issuePassSecret, scanPass } from './boarding.js';
 export { cancelHold, countTripSeats, holdSeat, releasePassedHolds } from './holds.js';
 export { bookSeat, cancelBooking, createEveningTrips, expireBookings, payBooking } from './bookings.js';
 export { noteTraffic, setNotRiding } from './smart.js';
+export { onSafetyEvent, sendSos, shareTrip, viewSharedTrip } from './safety.js';
 
 import { FieldValue, type DocumentSnapshot, type Timestamp } from 'firebase-admin/firestore';
 import { getMessaging } from 'firebase-admin/messaging';
@@ -130,7 +131,9 @@ export const onTripStarted = onDocumentWritten('trips/{tripId}', async (event) =
 export const onStopReached = onDocumentCreated('trips/{tripId}/stopTimes/{stopId}', async (event) => {
   const { tripId, stopId } = event.params;
   const ctx = await tripContext(tripId);
-  if (!ctx) return;
+  // A stop time can arrive after the trip ended (queued in a dead zone, or
+  // history loaded later); riders need no alert for a bus already gone.
+  if (!ctx || ctx.trip.status === 'ended') return;
   const now = new Date();
   const students = await studentsOn(ctx.routeId);
 

@@ -116,6 +116,17 @@ Nothing here touches a real Firebase project: the app and dashboard use the
    npm --prefix dashboard run dev
    ```
 
+For the office reports and trip history, load two weeks of synthetic past
+trips (after `npm run seed`):
+
+```bash
+npm run seed-history
+```
+
+A student's "Share my trip" link opens the dashboard's parent page,
+`http://localhost:5173/#/share/<token>`, with no sign-in. For a real
+project, build the app with `--dart-define=SHARE_BASE_URL=https://<project>.web.app`.
+
 Push notifications are not sent anywhere either: on the emulators the alert
 functions write each message to the `pushLog` collection (Firestore tab of
 the emulator UI) instead. To post an announcement:

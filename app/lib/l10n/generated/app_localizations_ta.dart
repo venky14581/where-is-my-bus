@@ -1030,4 +1030,48 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get walkMinutesNone => 'அமைக்கவில்லை';
+
+  @override
+  String get sosButton => 'SOS';
+
+  @override
+  String get sosConfirmTitle => 'SOS அனுப்பவா?';
+
+  @override
+  String get sosConfirmBody =>
+      'இந்தப் பேருந்தின் எண்ணும் அது இப்போது இருக்கும் இடமும் போக்குவரத்து அலுவலகத்துக்குச் செல்லும். அவசர நேரத்தில் மட்டும் பயன்படுத்தவும்.';
+
+  @override
+  String get sosSendButton => 'SOS அனுப்பு';
+
+  @override
+  String get sosSent =>
+      'SOS அனுப்பப்பட்டது. பேருந்து இருக்கும் இடம் போக்குவரத்து அலுவலகத்துக்குத் தெரியும்.';
+
+  @override
+  String get sosNoTrip =>
+      'பயணம் எதுவும் நடக்காததால் அனுப்ப பேருந்து இருப்பிடம் இல்லை. போக்குவரத்து அலுவலகத்தை அழைக்கவும்.';
+
+  @override
+  String get shareTripButton => 'என் பயணத்தைப் பகிர்';
+
+  @override
+  String get shareTripTitle => 'என் பயணத்தைப் பகிர்';
+
+  @override
+  String get shareTripBody =>
+      'இந்த இணைப்பு உள்ள எவரும் பயணம் முடியும் வரை உங்கள் பேருந்தை வரைபடத்தில் பார்க்கலாம். இது பேருந்தை மட்டுமே காட்டும், உங்களை அல்ல.';
+
+  @override
+  String get shareNoTrip =>
+      'உங்கள் பேருந்து ஓடவில்லை, அதனால் பகிர பயணம் இல்லை.';
+
+  @override
+  String get copyLinkButton => 'இணைப்பை நகலெடு';
+
+  @override
+  String get linkCopied => 'இணைப்பு நகலெடுக்கப்பட்டது';
+
+  @override
+  String get closeButton => 'மூடு';
 }

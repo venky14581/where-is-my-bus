@@ -15,21 +15,24 @@ export interface BookingSettings {
 // minutes before departure.
 const DEFAULTS: BookingSettings = { opensAt: '18:00', closesMinutesBefore: 30 };
 
-/** Guest fares and the booking window for evening seats (used from Module 10). */
+/** Guest fares and the booking window for evening seats (Module 10), and the bus speed limit (Module 12). */
 export function SettingsPage() {
   const saved = useDocument(doc(db, 'settings', 'booking'), (d) => ({
     opensAt: typeof d?.opensAt === 'string' ? d.opensAt : DEFAULTS.opensAt,
     closesMinutesBefore: typeof d?.closesMinutesBefore === 'number' ? d.closesMinutesBefore : DEFAULTS.closesMinutesBefore,
   }), 'settings/booking');
+  const safety = useDocument(doc(db, 'settings', 'safety'), (d) =>
+    typeof d?.speedLimitKmh === 'number' ? d.speedLimitKmh : DEFAULT_SPEED_LIMIT_KMH, 'settings/safety');
   const routes = useRoutes().data.slice().sort(byName);
   const [notice, setNotice] = useState<string | null>(null);
 
   return (
     <section className="page">
-      <h2>Fares and booking</h2>
+      <h2>Settings</h2>
       {notice && <p className="muted" role="status">{notice}</p>}
       {/* Keyed by the saved values, so the form restarts from them when they change. */}
       <BookingForm key={`${saved.data.opensAt}|${saved.data.closesMinutesBefore}`} initial={saved.data} onNotice={setNotice} />
+      <SpeedLimitForm key={safety.data} initial={safety.data} onNotice={setNotice} />
 
       <h3>Guest fare per route</h3>
       <p className="muted">What a student without a pass pays for one evening seat. Leave empty to offer no guest seats on that route.</p>
@@ -49,7 +52,8 @@ function BookingForm({ initial, onNotice }: { initial: BookingSettings; onNotice
   async function save(event: FormEvent) {
     event.preventDefault();
     try {
-      await setDoc(doc(db, 'settings', 'booking'), booking);
+      // Merged: settings/booking also holds the evening departure time.
+      await setDoc(doc(db, 'settings', 'booking'), booking, { merge: true });
       onNotice('Booking window saved.');
     } catch {
       onNotice("Couldn't save. Check the connection and try again.");
@@ -69,6 +73,36 @@ function BookingForm({ initial, onNotice }: { initial: BookingSettings; onNotice
         </select>
       </label>
       <div className="actions"><button className="primary">Save booking window</button></div>
+    </form>
+  );
+}
+
+/** Same default as defaultSpeedLimitKmh in the app's trip repository. */
+const DEFAULT_SPEED_LIMIT_KMH = 60;
+
+function SpeedLimitForm({ initial, onNotice }: { initial: number; onNotice: (m: string) => void }) {
+  const [limit, setLimit] = useState(String(initial));
+
+  async function save(event: FormEvent) {
+    event.preventDefault();
+    const value = Number(limit);
+    if (!Number.isInteger(value) || value < 20 || value > 120) return onNotice('The speed limit must be a whole number from 20 to 120 km/h.');
+    try {
+      await setDoc(doc(db, 'settings', 'safety'), { speedLimitKmh: value }, { merge: true });
+      onNotice('Speed limit saved. Drivers pick it up at their next trip.');
+    } catch {
+      onNotice("Couldn't save. Check the connection and try again.");
+    }
+  }
+
+  return (
+    <form className="panel form-grid" onSubmit={save}>
+      <h3>Speed limit for buses</h3>
+      <label className="field"><span>Alert the office above (km/h)</span>
+        <input type="number" min={20} max={120} value={limit} onChange={(e) => setLimit(e.target.value)} />
+      </label>
+      <p className="muted">The driver's phone reports a bus above this speed for 10 seconds, or more than 300 m off its route for a minute, under Safety alerts.</p>
+      <div className="actions"><button className="primary">Save speed limit</button></div>
     </form>
   );
 }

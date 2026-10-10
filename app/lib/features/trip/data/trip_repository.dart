@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
 
 import '../domain/fix.dart';
+import '../domain/safety_monitor.dart';
 import '../domain/trip_plan.dart';
 
 class TripStart {
@@ -48,7 +49,16 @@ abstract interface class TripRepository {
 
   /// Running late or Breakdown. A Cloud Function tells the route's riders.
   Future<void> reportIssue({required String tripId, required TripIssue issue});
+
+  /// The office's speed limit for buses (`settings/safety`), in km/h.
+  Future<int> speedLimitKmh();
+
+  /// Overspeeding or leaving the route. A Cloud Function alerts the office.
+  Future<void> recordSafetyEvent({required String tripId, required SafetyEvent event});
 }
+
+/// Used until the office sets one, and if it cannot be read.
+const defaultSpeedLimitKmh = 60;
 
 enum TripIssue { late, breakdown }
 
@@ -123,6 +133,24 @@ class FirebaseTripRepository implements TripRepository {
   @override
   Future<void> reportIssue({required String tripId, required TripIssue issue}) =>
       _db.collection('trips/$tripId/reports').add({'type': issue.name, 'createdAt': FieldValue.serverTimestamp()});
+
+  @override
+  Future<int> speedLimitKmh() async {
+    final limit = (await _db.doc('settings/safety').get()).data()?['speedLimitKmh'];
+    return limit is int && limit >= 20 && limit <= 120 ? limit : defaultSpeedLimitKmh;
+  }
+
+  @override
+  Future<void> recordSafetyEvent({required String tripId, required SafetyEvent event}) =>
+      _db.collection('trips/$tripId/events').add({
+        'type': event.type.name,
+        'lat': event.lat,
+        'lng': event.lng,
+        'speedKmh': ?event.speedKmh,
+        'limitKmh': ?event.limitKmh,
+        'distanceM': ?event.distanceM,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
 
   @override
   Stream<bool> connection() =>
