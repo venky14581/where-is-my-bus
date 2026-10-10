@@ -14,7 +14,8 @@ Users: driver (driver mode in the app), day scholar (student app), hosteller or 
 - Module 2 (Route and bus data): done 10 Oct 2026. See `docs/modules/module-02-route-and-bus-data.md`. The route data in `data/base-data.json` is a placeholder until the transport office supplies the real stops and timings.
 - Module 3 (Driver trip and GPS): built and tested on web with a simulated drive, 10 Oct 2026. See `docs/modules/module-03-driver-trip-and-gps.md`. Not done until the screen-off test on a real Android phone passes (needs Android Studio).
 - Module 4 (Live map): done 10 Oct 2026. See `docs/modules/module-04-live-map.md`.
-- Next step: Module 5 (Arrival time). Still open from Module 3: the screen-off test on a real Android phone.
+- Module 5 (Arrival time): done 10 Oct 2026. See `docs/modules/module-05-arrival-time.md`.
+- Next step: Module 6 (Alerts). Still open from Module 3: the screen-off test on a real Android phone.
 
 ## Decisions made in the planning chat, in order
 

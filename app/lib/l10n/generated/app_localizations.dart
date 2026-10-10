@@ -781,6 +781,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'© OpenStreetMap contributors'**
   String get mapAttribution;
+
+  /// No description provided for @etaMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'Arrives in {minutes} min'**
+  String etaMinutes(int minutes);
+
+  /// No description provided for @etaAround.
+  ///
+  /// In en, this message translates to:
+  /// **'around {time}'**
+  String etaAround(String time);
+
+  /// No description provided for @arrivingNow.
+  ///
+  /// In en, this message translates to:
+  /// **'The bus is at your stop now'**
+  String get arrivingNow;
+
+  /// No description provided for @passedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Passed your stop at {time}'**
+  String passedAt(String time);
+
+  /// No description provided for @passedNoTime.
+  ///
+  /// In en, this message translates to:
+  /// **'The bus has passed your stop'**
+  String get passedNoTime;
+
+  /// No description provided for @offRoute.
+  ///
+  /// In en, this message translates to:
+  /// **'The bus is away from its usual route, so there is no arrival time.'**
+  String get offRoute;
+
+  /// No description provided for @etaFromLastPosition.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated from the last known position'**
+  String get etaFromLastPosition;
+
+  /// No description provided for @fullRouteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Full route'**
+  String get fullRouteTitle;
+
+  /// No description provided for @fullRouteButton.
+  ///
+  /// In en, this message translates to:
+  /// **'See all stops'**
+  String get fullRouteButton;
+
+  /// No description provided for @stopScheduled.
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled {time}'**
+  String stopScheduled(String time);
+
+  /// No description provided for @stopPassedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Passed at {time}'**
+  String stopPassedAt(String time);
+
+  /// No description provided for @stopPassed.
+  ///
+  /// In en, this message translates to:
+  /// **'Passed'**
+  String get stopPassed;
+
+  /// No description provided for @stopExpected.
+  ///
+  /// In en, this message translates to:
+  /// **'Expected {time}'**
+  String stopExpected(String time);
+
+  /// No description provided for @busIsHere.
+  ///
+  /// In en, this message translates to:
+  /// **'Bus is here'**
+  String get busIsHere;
 }
 
 class _AppLocalizationsDelegate

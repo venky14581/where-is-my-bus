@@ -113,5 +113,19 @@
   "followBus": "பேருந்தைப் பின்தொடர்",
   "allBusesTitle": "எல்லாப் பேருந்துகளும்",
   "allBusesEmpty": "இப்போது எந்தப் பேருந்தும் இயங்கவில்லை.",
-  "mapAttribution": "© OpenStreetMap பங்களிப்பாளர்கள்"
+  "mapAttribution": "© OpenStreetMap பங்களிப்பாளர்கள்",
+  "etaMinutes": "{minutes} நிமிடங்களில் வரும்",
+  "etaAround": "சுமார் {time}",
+  "arrivingNow": "பேருந்து இப்போது உங்கள் நிறுத்தத்தில் உள்ளது",
+  "passedAt": "{time} மணிக்கு உங்கள் நிறுத்தத்தைக் கடந்தது",
+  "passedNoTime": "பேருந்து உங்கள் நிறுத்தத்தைக் கடந்துவிட்டது",
+  "offRoute": "பேருந்து வழக்கமான வழித்தடத்தில் இல்லை, அதனால் வருகை நேரத்தைக் கணிக்க முடியவில்லை.",
+  "etaFromLastPosition": "கடைசியாகத் தெரிந்த இருப்பிடத்தின் அடிப்படையில் கணிக்கப்பட்டது",
+  "fullRouteTitle": "முழு வழித்தடம்",
+  "fullRouteButton": "எல்லா நிறுத்தங்களையும் பார்",
+  "stopScheduled": "அட்டவணை நேரம் {time}",
+  "stopPassedAt": "{time} மணிக்குக் கடந்தது",
+  "stopPassed": "கடந்தது",
+  "stopExpected": "எதிர்பார்ப்பு {time}",
+  "busIsHere": "பேருந்து இங்கே"
 }
