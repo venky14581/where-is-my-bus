@@ -1771,6 +1771,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Test mode: no email is sent here. Tap below to verify this account straight away.'**
   String get verifyTestModeNote;
+
+  /// No description provided for @demoDriveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Demo drive (test mode)'**
+  String get demoDriveTitle;
+
+  /// No description provided for @demoDriveSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Moves the bus along its route without GPS, to show the app on campus.'**
+  String get demoDriveSubtitle;
+
+  /// No description provided for @shareButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get shareButton;
+
+  /// No description provided for @shareTripMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow my college bus live: {link}'**
+  String shareTripMessage(String link);
+
+  /// No description provided for @publicTransportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Public bus and train'**
+  String get publicTransportTitle;
+
+  /// No description provided for @publicTransportNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Fixed timings from the transport office. Not tracked live.'**
+  String get publicTransportNote;
+
+  /// No description provided for @publicTransportNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No more public buses or trains listed for your route today.'**
+  String get publicTransportNone;
+
+  /// No description provided for @publicLeaves.
+  ///
+  /// In en, this message translates to:
+  /// **'Leaves {time}'**
+  String publicLeaves(String time);
+
+  /// No description provided for @publicFromTo.
+  ///
+  /// In en, this message translates to:
+  /// **'{from} → {to}'**
+  String publicFromTo(String from, String to);
+
+  /// No description provided for @payMethodUpi.
+  ///
+  /// In en, this message translates to:
+  /// **'UPI'**
+  String get payMethodUpi;
+
+  /// No description provided for @payMethodCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Debit or credit card'**
+  String get payMethodCard;
+
+  /// No description provided for @payMethodNetbanking.
+  ///
+  /// In en, this message translates to:
+  /// **'Net banking'**
+  String get payMethodNetbanking;
+
+  /// No description provided for @payMethodTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay with'**
+  String get payMethodTitle;
+
+  /// No description provided for @paymentProcessing.
+  ///
+  /// In en, this message translates to:
+  /// **'Processing payment…'**
+  String get paymentProcessing;
+
+  /// No description provided for @paymentSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment successful'**
+  String get paymentSuccess;
 }
 
 class _AppLocalizationsDelegate

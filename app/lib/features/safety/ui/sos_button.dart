@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:share_plus/share_plus.dart' as sp;
 
 import '../../../core/config.dart';
 import '../../../core/l10n.dart';
@@ -130,7 +131,7 @@ class _ShareTripButtonState extends ConsumerState<ShareTripButton> {
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.closeButton)),
-          FilledButton.icon(
+          TextButton.icon(
             onPressed: () async {
               await Clipboard.setData(ClipboardData(text: link));
               if (!context.mounted) return;
@@ -139,6 +140,19 @@ class _ShareTripButtonState extends ConsumerState<ShareTripButton> {
             },
             icon: const Icon(Icons.copy),
             label: Text(l10n.copyLinkButton),
+          ),
+          // The phone's own share sheet: WhatsApp, SMS and the rest.
+          FilledButton.icon(
+            onPressed: () async {
+              Navigator.pop(context);
+              try {
+                await sp.SharePlus.instance.share(sp.ShareParams(text: l10n.shareTripMessage(link), subject: l10n.shareTripTitle));
+              } catch (_) {
+                await Clipboard.setData(ClipboardData(text: link));
+              }
+            },
+            icon: const Icon(Icons.share),
+            label: Text(l10n.shareButton),
           ),
         ],
       ),

@@ -341,6 +341,27 @@ service cloud.firestore {
       allow read: if canReadBaseData();
     }
 
+    // Public buses and trains a student can take instead of a college bus
+    // (missed-bus help). Fixed timings entered by the office, not live.
+    function validTimetable(d) {
+      return d.keys().hasOnly(['routeId', 'mode', 'name', 'from', 'to', 'departs', 'direction', 'note', 'fare'])
+        && d.routeId is string && exists(routePath(d.routeId))
+        && d.mode in ['bus', 'train']
+        && d.name is string && d.name.size() > 0 && d.name.size() <= 60
+        && d.from is string && d.from.size() > 0 && d.from.size() <= 60
+        && d.to is string && d.to.size() > 0 && d.to.size() <= 60
+        && d.departs is string && d.departs.matches('^([01][0-9]|2[0-3]):[0-5][0-9]$')
+        && d.direction in ['toCampus', 'fromCampus']
+        && (!('note' in d) || d.note == null || (d.note is string && d.note.size() <= 140))
+        && (!('fare' in d) || d.fare == null || (d.fare is number && d.fare >= 0 && d.fare <= 1000));
+    }
+
+    match /timetable/{id} {
+      allow read: if canReadBaseData();
+      allow create, update: if isOffice() && validTimetable(request.resource.data);
+      allow delete: if isOffice();
+    }
+
     // To one route (routeId) or to everyone (routeId null).
     match /announcements/{id} {
       allow read: if canReadBaseData();

@@ -32,6 +32,7 @@ import 'package:where_is_my_bus/features/live/domain/live_bus.dart';
 import 'package:where_is_my_bus/features/missed_bus/application/missed_bus_providers.dart';
 import 'package:where_is_my_bus/features/missed_bus/data/missed_bus_repository.dart';
 import 'package:where_is_my_bus/features/missed_bus/domain/missed_bus.dart';
+import 'package:where_is_my_bus/features/missed_bus/domain/public_transport.dart';
 import 'package:where_is_my_bus/features/routes/application/route_providers.dart';
 import 'package:where_is_my_bus/features/routes/data/route_repository.dart';
 import 'package:where_is_my_bus/features/routes/domain/bus_route.dart';
@@ -469,6 +470,13 @@ class FakeMissedBusRepository implements MissedBusRepository {
 
   @override
   Stream<List<RunningTrip>> watchRunningTrips(String date) => _watch(() => [...trips]);
+
+  /// Public buses and trains, all routes.
+  final timetable = <PublicDeparture>[];
+
+  @override
+  Stream<List<PublicDeparture>> watchTimetable(String routeId) =>
+      _watch(() => [for (final d in timetable) if (d.routeId == routeId) d]);
 
   @override
   Stream<Map<String, List<String>>> watchRouteAccess() => _watch(() => {...access});

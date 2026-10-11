@@ -782,5 +782,44 @@
   "linkCopied": "Link copied",
   "closeButton": "Close",
   "verifyNowTestButton": "Verify now (test mode)",
-  "verifyTestModeNote": "Test mode: no email is sent here. Tap below to verify this account straight away."
+  "verifyTestModeNote": "Test mode: no email is sent here. Tap below to verify this account straight away.",
+  "demoDriveTitle": "Demo drive (test mode)",
+  "demoDriveSubtitle": "Moves the bus along its route without GPS, to show the app on campus.",
+  "shareButton": "Share",
+  "shareTripMessage": "Follow my college bus live: {link}",
+  "@shareTripMessage": {
+    "placeholders": {
+      "link": {
+        "type": "String"
+      }
+    }
+  },
+  "publicTransportTitle": "Public bus and train",
+  "publicTransportNote": "Fixed timings from the transport office. Not tracked live.",
+  "publicTransportNone": "No more public buses or trains listed for your route today.",
+  "publicLeaves": "Leaves {time}",
+  "@publicLeaves": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "publicFromTo": "{from} → {to}",
+  "@publicFromTo": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "payMethodUpi": "UPI",
+  "payMethodCard": "Debit or credit card",
+  "payMethodNetbanking": "Net banking",
+  "payMethodTitle": "Pay with",
+  "paymentProcessing": "Processing payment…",
+  "paymentSuccess": "Payment successful"
 }

@@ -114,6 +114,7 @@ async function seed() {
   console.log(`  ${counts.routes} routes and ${counts.buses} buses from data/base-data.json`);
   if (learned) console.log(`  learned arrival times for ${learned} routes from ml/out/segment_times.json`);
   console.log('Passwords and PINs are in scripts/seed-emulators.mjs.');
+  console.log('For a demo, run next: npm run demo-ready');
 }
 
 seed().then(() => process.exit(0)).catch((error) => {

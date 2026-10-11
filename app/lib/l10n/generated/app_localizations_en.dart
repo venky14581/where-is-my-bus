@@ -1064,4 +1064,58 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get verifyTestModeNote =>
       'Test mode: no email is sent here. Tap below to verify this account straight away.';
+
+  @override
+  String get demoDriveTitle => 'Demo drive (test mode)';
+
+  @override
+  String get demoDriveSubtitle =>
+      'Moves the bus along its route without GPS, to show the app on campus.';
+
+  @override
+  String get shareButton => 'Share';
+
+  @override
+  String shareTripMessage(String link) {
+    return 'Follow my college bus live: $link';
+  }
+
+  @override
+  String get publicTransportTitle => 'Public bus and train';
+
+  @override
+  String get publicTransportNote =>
+      'Fixed timings from the transport office. Not tracked live.';
+
+  @override
+  String get publicTransportNone =>
+      'No more public buses or trains listed for your route today.';
+
+  @override
+  String publicLeaves(String time) {
+    return 'Leaves $time';
+  }
+
+  @override
+  String publicFromTo(String from, String to) {
+    return '$from → $to';
+  }
+
+  @override
+  String get payMethodUpi => 'UPI';
+
+  @override
+  String get payMethodCard => 'Debit or credit card';
+
+  @override
+  String get payMethodNetbanking => 'Net banking';
+
+  @override
+  String get payMethodTitle => 'Pay with';
+
+  @override
+  String get paymentProcessing => 'Processing payment…';
+
+  @override
+  String get paymentSuccess => 'Payment successful';
 }

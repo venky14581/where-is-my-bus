@@ -215,7 +215,7 @@ class _BusMapState extends ConsumerState<BusMap> {
   }
 }
 
-/// Glides the marker to each new position instead of jumping every 3 s.
+/// Glides the marker to each new position instead of jumping every second.
 class _AnimatedBusMarker extends StatelessWidget {
   const _AnimatedBusMarker({super.key, required this.bus, this.onTap});
 
@@ -229,7 +229,7 @@ class _AnimatedBusMarker extends StatelessWidget {
     final colour = live ? scheme.primary : Colors.grey.shade600;
     return TweenAnimationBuilder<LatLng>(
       tween: _LatLngTween(end: LatLng(bus.live.lat, bus.live.lng)),
-      duration: const Duration(milliseconds: 2500),
+      duration: const Duration(milliseconds: 1000),
       curve: Curves.linear,
       builder: (context, point, _) => MarkerLayer(markers: [
         Marker(
