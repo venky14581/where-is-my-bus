@@ -19,6 +19,11 @@ const _emulatorHostOverride = String.fromEnvironment('EMULATOR_HOST');
 /// Same region as functions/src/app.ts.
 const functionsRegion = 'asia-south1';
 
+/// The Auth emulator's address, e.g. `http://127.0.0.1:9099`, while the app
+/// runs against the emulators; null on a real project. The emulator sends no
+/// email, so sign-up uses it to verify a new student in test mode.
+String? authEmulatorOrigin;
+
 Future<void> initFirebase() async {
   var options = DefaultFirebaseOptions.currentPlatform;
   final useEmulators = _useEmulatorsOverride.isEmpty
@@ -42,11 +47,19 @@ Future<void> initFirebase() async {
   // as 127.0.0.1 for a phone on USB with `adb reverse`, must be kept as is.
   final map = _emulatorHostOverride.isEmpty;
   await FirebaseAuth.instance.useAuthEmulator(host, 9099, automaticHostMapping: map);
+  authEmulatorOrigin = 'http://${!map ? host : _mappedForAuth(host)}:9099';
   FirebaseFirestore.instance.useFirestoreEmulator(host, 8080, automaticHostMapping: map);
   if (!native) FirebaseDatabase.instance.useDatabaseEmulator(host, 9000, automaticHostMapping: map);
   FirebaseFunctions.instanceFor(region: functionsRegion).useFunctionsEmulator(host, 5001, automaticHostMapping: map);
   debugPrint('Using Firebase emulators on $host');
 }
+
+/// Where the Auth plugin really connects: on Android it maps 127.0.0.1 and
+/// localhost to the Android emulator's 10.0.2.2.
+String _mappedForAuth(String host) =>
+    !kIsWeb && defaultTargetPlatform == TargetPlatform.android && (host == '127.0.0.1' || host == 'localhost')
+        ? '10.0.2.2'
+        : host;
 
 String _emulatorHost() {
   if (_emulatorHostOverride.isNotEmpty) return _emulatorHostOverride;

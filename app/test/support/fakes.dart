@@ -247,6 +247,20 @@ class FakeAuthRepository implements AuthRepository {
     return current is SignedIn && current.emailVerified;
   }
 
+  /// Set to show the test-mode "verify now" button, as on the emulators.
+  bool emulatorMode = false;
+
+  @override
+  bool get canVerifyWithoutEmail => emulatorMode;
+
+  @override
+  Future<bool> verifyEmailOnEmulator() async {
+    final current = _current;
+    if (current is! SignedIn) return false;
+    _accounts[current.email]!.verified = true;
+    return refreshEmailVerified();
+  }
+
   @override
   Future<void> sendPasswordReset(String email) async {}
 

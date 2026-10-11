@@ -1759,6 +1759,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Close'**
   String get closeButton;
+
+  /// No description provided for @verifyNowTestButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify now (test mode)'**
+  String get verifyNowTestButton;
+
+  /// No description provided for @verifyTestModeNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Test mode: no email is sent here. Tap below to verify this account straight away.'**
+  String get verifyTestModeNote;
 }
 
 class _AppLocalizationsDelegate

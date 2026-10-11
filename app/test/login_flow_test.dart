@@ -109,6 +109,23 @@ void main() {
       expect(find.text('Where do you travel from?'), findsOneWidget);
     });
 
+    testWidgets('on the emulators a new student verifies in one tap (no email is sent)', (tester) async {
+      final auth = FakeAuthRepository()..emulatorMode = true;
+      await pumpApp(tester, auth);
+
+      await _tap(tester, find.text("I'm a student"));
+      await _tap(tester, find.text('Create an account'));
+      await _enter(tester, 'Full name', 'Asha Raman');
+      await _enter(tester, 'College email', _studentEmail);
+      await _enter(tester, 'Password', 'bus-pass-123');
+      await _enter(tester, 'Confirm password', 'bus-pass-123');
+      await _tap(tester, find.widgetWithText(FilledButton, 'Create account'));
+
+      expect(find.textContaining('Test mode: no email is sent'), findsOneWidget);
+      await _tap(tester, find.widgetWithText(FilledButton, 'Verify now (test mode)'));
+      expect(find.text('Where do you travel from?'), findsOneWidget);
+    });
+
     testWidgets('a verified student signs in straight to the home screen and can sign out', (tester) async {
       final auth = FakeAuthRepository()
         ..addStudent(_studentEmail, 'bus-pass-123', routeId: 'cbe-gandhipuram', stopId: 'ukkadam');

@@ -1057,4 +1057,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get closeButton => 'Close';
+
+  @override
+  String get verifyNowTestButton => 'Verify now (test mode)';
+
+  @override
+  String get verifyTestModeNote =>
+      'Test mode: no email is sent here. Tap below to verify this account straight away.';
 }
