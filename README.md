@@ -1,8 +1,7 @@
 # Where Is My Bus
 
 Live college bus tracking for Amrita Coimbatore day scholars. The driver's
-phone is the only tracker. Project knowledge, decisions and the module plan
-are in [CLAUDE.md](CLAUDE.md); progress per module is in [docs/modules](docs/modules).
+phone is the only tracker. 
 
 | Folder | What |
 | --- | --- |
