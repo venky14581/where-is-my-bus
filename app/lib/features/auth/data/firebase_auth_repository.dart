@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:http/http.dart' as http;
 
+import '../../../core/firebase_bootstrap.dart';
 import '../domain/app_user.dart';
 import '../domain/auth_failure.dart';
 import '../domain/credentials.dart';
@@ -124,6 +127,45 @@ class FirebaseAuthRepository implements AuthRepository {
     final fresh = _auth.currentUser!;
     if (fresh.emailVerified) await _guard(() => fresh.getIdToken(true));
     return fresh.emailVerified;
+  }
+
+  @override
+  bool get canVerifyWithoutEmail => authEmulatorOrigin != null;
+
+  @override
+  Future<bool> verifyEmailOnEmulator() async {
+    final origin = authEmulatorOrigin;
+    final user = _auth.currentUser;
+    if (origin == null || user == null) return false;
+    // The emulator keeps every link it would have emailed:
+    // https://firebase.google.com/docs/emulator-suite/connect_auth
+    Future<String?> pendingCode() async {
+      final response = await http
+          .get(Uri.parse('$origin/emulator/v1/projects/${_auth.app.options.projectId}/oobCodes'))
+          .timeout(const Duration(seconds: 15));
+      if (response.statusCode != 200) return null;
+      final codes = (jsonDecode(response.body) as Map<String, dynamic>)['oobCodes'] as List? ?? const [];
+      final mine = [
+        for (final c in codes)
+          if (c is Map && c['requestType'] == 'VERIFY_EMAIL' && c['email'] == user.email) c['oobCode'] as String,
+      ];
+      return mine.isEmpty ? null : mine.last;
+    }
+
+    try {
+      var code = await pendingCode();
+      if (code == null) {
+        await sendVerificationEmail();
+        code = await pendingCode();
+      }
+      if (code == null) return false;
+      await _guard(() => _auth.applyActionCode(code!));
+    } on AuthFailure {
+      rethrow;
+    } catch (_) {
+      throw const AuthFailure(AuthFailureCode.network);
+    }
+    return refreshEmailVerified();
   }
 
   @override

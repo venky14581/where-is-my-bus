@@ -40,6 +40,17 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> with Auth
     }
   }
 
+  /// Emulators only: they send no email, so verify from the link they hold.
+  Future<void> _verifyTestMode() async {
+    var verified = false;
+    await submit(() async {
+      verified = await ref.read(authRepositoryProvider).verifyEmailOnEmulator();
+    });
+    if (!verified && error == null && mounted) {
+      setState(() => _info = context.l10n.notVerifiedYet);
+    }
+  }
+
   Future<void> _resend() async {
     final ok = await submit(() => ref.read(authRepositoryProvider).sendVerificationEmail());
     if (!ok || !mounted) return;
@@ -72,7 +83,14 @@ class _VerifyEmailScreenState extends ConsumerState<VerifyEmailScreen> with Auth
           Text(_info!, style: TextStyle(color: Theme.of(context).colorScheme.primary)),
           const SizedBox(height: 16),
         ],
-        BusyButton(label: l10n.verifiedButton, busy: busy, onPressed: _checkVerified),
+        if (ref.read(authRepositoryProvider).canVerifyWithoutEmail) ...[
+          Text(l10n.verifyTestModeNote, style: Theme.of(context).textTheme.bodyMedium),
+          const SizedBox(height: 12),
+          BusyButton(label: l10n.verifyNowTestButton, busy: busy, onPressed: _verifyTestMode),
+          const SizedBox(height: 12),
+          OutlinedButton(onPressed: busy ? null : _checkVerified, child: Text(l10n.verifiedButton)),
+        ] else
+          BusyButton(label: l10n.verifiedButton, busy: busy, onPressed: _checkVerified),
         const SizedBox(height: 12),
         OutlinedButton(
           onPressed: busy || _secondsLeft > 0 ? null : _resend,

@@ -780,5 +780,7 @@
   "shareNoTrip": "Your bus is not running, so there is no trip to share.",
   "copyLinkButton": "Copy link",
   "linkCopied": "Link copied",
-  "closeButton": "Close"
+  "closeButton": "Close",
+  "verifyNowTestButton": "Verify now (test mode)",
+  "verifyTestModeNote": "Test mode: no email is sent here. Tap below to verify this account straight away."
 }

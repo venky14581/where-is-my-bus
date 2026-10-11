@@ -1074,4 +1074,11 @@ class AppLocalizationsTa extends AppLocalizations {
 
   @override
   String get closeButton => 'மூடு';
+
+  @override
+  String get verifyNowTestButton => 'இப்போதே சரிபார் (சோதனை முறை)';
+
+  @override
+  String get verifyTestModeNote =>
+      'சோதனை முறை: இங்கு மின்னஞ்சல் அனுப்பப்படாது. இந்தக் கணக்கை உடனே சரிபார்க்க கீழே தட்டவும்.';
 }

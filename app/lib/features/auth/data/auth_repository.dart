@@ -24,6 +24,13 @@ abstract interface class AuthRepository {
   /// refreshes the ID token so security rules see `email_verified`.
   Future<bool> refreshEmailVerified();
 
+  /// True only against the Firebase emulators, which send no email.
+  bool get canVerifyWithoutEmail;
+
+  /// Test mode only: applies the verification link the Auth emulator holds
+  /// for the signed-in student, then refreshes like [refreshEmailVerified].
+  Future<bool> verifyEmailOnEmulator();
+
   Future<void> sendPasswordReset(String email);
 
   /// For a signed-in college account that has no profile document yet.
