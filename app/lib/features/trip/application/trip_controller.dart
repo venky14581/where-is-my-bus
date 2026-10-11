@@ -269,9 +269,17 @@ class TripController extends Notifier<TripState> {
       // for a bus with no lat and lng, e.g. on its very first trip.
       if (!_disconnectArmed) {
         _disconnectArmed = true;
-        _repo.armDisconnect(active.busId).catchError((_) => _disconnectArmed = false);
+        _repo.armDisconnect(active.busId).catchError((Object e) {
+          debugPrint('Arming the offline marker failed: $e');
+          _disconnectArmed = false;
+        });
       }
-    }, onError: (Object _) => _pending ??= fix);
+    }, onError: (Object e) {
+      // Handlers must not return a value here: `then` would throw instead of
+      // keeping the point for the next try.
+      debugPrint('Sending the bus position failed: $e');
+      _pending ??= fix;
+    });
   }
 
   /// Tells the route's riders the bus is late or has broken down. Returns
