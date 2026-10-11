@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/config.dart';
 import '../../../core/l10n.dart';
+import '../../../core/ui.dart';
 import '../application/safety_providers.dart';
 import '../data/safety_repository.dart';
 
@@ -88,7 +89,10 @@ class _SosButtonState extends ConsumerState<SosButton> {
 
 /// Makes a link a parent can open to follow this trip, and shows it to copy.
 class ShareTripButton extends ConsumerStatefulWidget {
-  const ShareTripButton({super.key});
+  const ShareTripButton({super.key, this.asTile = false});
+
+  /// Drawn as an [ActionTile], to sit with the other shortcuts on the home.
+  final bool asTile;
 
   @override
   ConsumerState<ShareTripButton> createState() => _ShareTripButtonState();
@@ -142,9 +146,11 @@ class _ShareTripButtonState extends ConsumerState<ShareTripButton> {
   }
 
   @override
-  Widget build(BuildContext context) => OutlinedButton.icon(
-        onPressed: _busy ? null : _share,
-        icon: const Icon(Icons.share_location),
-        label: Text(context.l10n.shareTripButton),
-      );
+  Widget build(BuildContext context) => widget.asTile
+      ? ActionTile(icon: Icons.share_location, label: context.l10n.shareTripButton, onTap: _share, busy: _busy)
+      : OutlinedButton.icon(
+          onPressed: _busy ? null : _share,
+          icon: const Icon(Icons.share_location),
+          label: Text(context.l10n.shareTripButton),
+        );
 }

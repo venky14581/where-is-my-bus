@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../core/l10n.dart';
+import '../../core/theme.dart';
+import '../../core/ui.dart';
 import '../../routing/routes.dart';
 import '../alerts/application/alerts_providers.dart';
 import '../auth/application/auth_providers.dart';
@@ -105,74 +107,127 @@ class _MyBus extends ConsumerWidget {
           builder: (context, now) {
             final running = live != null && live.stateAt(now) != BusLiveState.notRunning;
             return LayoutBuilder(
-            builder: (context, constraints) => Column(
-              children: [
-                SizedBox(
-                  height: constraints.maxHeight * 0.55,
-                  child: BusMap(
-                    route: route,
-                    homeStopId: stop.id,
-                    followBusId: bus?.id,
-                    buses: [
-                      if (bus != null && live != null)
-                        MapBus(live: live, state: live.stateAt(now), label: bus.number),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: ListView(
-                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
-                    children: [
-                      if (bus != null)
-                        ArrivalPanel(route: route, stopId: stop.id, live: live, serverNow: now, walkMinutes: walkMinutes),
-                      if (bus == null)
-                        Text(context.l10n.noBusOnRoute)
-                      else
-                        LiveStatusLine(bus: live, serverNow: now),
-                      const SizedBox(height: 8),
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: [
-                          OutlinedButton.icon(
-                            onPressed: () => context.push(Routes.studentMissedBus),
-                            icon: const Icon(Icons.directions_run),
-                            label: Text(context.l10n.missedBusButton),
-                          ),
-                          OutlinedButton.icon(
-                            onPressed: () => context.push(Routes.studentEveningSeats),
-                            icon: const Icon(Icons.nights_stay_outlined),
-                            label: Text(context.l10n.eveningSeatsButton),
-                          ),
-                          if (running) const ShareTripButton(),
+              builder: (context, constraints) {
+                final mapHeight = constraints.maxHeight * 0.42;
+                return Stack(
+                  children: [
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      // Runs under the panel's rounded top, so no gap shows.
+                      height: mapHeight + Radii.sheet,
+                      child: BusMap(
+                        route: route,
+                        homeStopId: stop.id,
+                        followBusId: bus?.id,
+                        buses: [
+                          if (bus != null && live != null)
+                            MapBus(live: live, state: live.stateAt(now), label: bus.number),
                         ],
                       ),
-                      const SizedBox(height: 12),
-                      _StopCard(
-                        route: route,
-                        stop: stop,
-                        busNumber: bus?.number,
-                        weekday: campusClock(now).weekday,
-                        usualDelay: learned?.delayByWeekday[campusClock(now).weekday],
-                        crowd: switch ((bus, live?.tripId)) {
-                          (final bus?, final tripId?) when running => _crowdOn(ref, tripId, bus.capacity),
-                          _ => null,
-                        },
+                    ),
+                    Positioned(
+                      top: mapHeight,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      child: _Panel(
+                        children: [
+                          if (bus != null)
+                            ArrivalPanel(route: route, stopId: stop.id, live: live, serverNow: now, walkMinutes: walkMinutes),
+                          if (bus == null)
+                            Text(context.l10n.noBusOnRoute)
+                          else
+                            LiveStatusLine(bus: live, serverNow: now),
+                          const SizedBox(height: 16),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: ActionTile(
+                                  icon: Icons.directions_run,
+                                  label: context.l10n.missedBusButton,
+                                  onTap: () => context.push(Routes.studentMissedBus),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: ActionTile(
+                                  icon: Icons.nights_stay_outlined,
+                                  label: context.l10n.eveningSeatsButton,
+                                  onTap: () => context.push(Routes.studentEveningSeats),
+                                ),
+                              ),
+                              if (running) ...[
+                                const SizedBox(width: 10),
+                                const Expanded(child: ShareTripButton(asTile: true)),
+                              ],
+                            ],
+                          ),
+                          const SizedBox(height: 16),
+                          _StopCard(
+                            route: route,
+                            stop: stop,
+                            busNumber: bus?.number,
+                            weekday: campusClock(now).weekday,
+                            usualDelay: learned?.delayByWeekday[campusClock(now).weekday],
+                            crowd: switch ((bus, live?.tripId)) {
+                              (final bus?, final tripId?) when running => _crowdOn(ref, tripId, bus.capacity),
+                              _ => null,
+                            },
+                          ),
+                          // Rarely needed, so last: it should not push the arrival time down.
+                          if (running) ...[
+                            const SizedBox(height: 16),
+                            const SosButton(),
+                          ],
+                        ],
                       ),
-                      // Rarely needed, so last: it should not push the arrival time down.
-                      if (running) ...[
-                        const SizedBox(height: 16),
-                        const SosButton(),
-                      ],
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          );
+                    ),
+                  ],
+                );
+              },
+            );
           },
         );
       },
+    );
+  }
+}
+
+/// The sheet that rises over the map, holding everything below it.
+class _Panel extends StatelessWidget {
+  const _Panel({required this.children});
+
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: scheme.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(Radii.sheet)),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.18), blurRadius: 16, offset: const Offset(0, -2))],
+      ),
+      child: ClipRRect(
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(Radii.sheet)),
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(20, 10, 20, 24),
+          children: [
+            Center(
+              child: Container(
+                width: 36,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 14),
+                decoration: BoxDecoration(color: scheme.outlineVariant, borderRadius: BorderRadius.circular(2)),
+              ),
+            ),
+            ...children,
+          ],
+        ),
+      ),
     );
   }
 }
@@ -217,15 +272,16 @@ class _StopCard extends StatelessWidget {
     final l10n = context.l10n;
     final text = Theme.of(context).textTheme;
     return Card.filled(
+      color: Theme.of(context).colorScheme.surfaceContainerHigh,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 12, 12, 16),
+        padding: const EdgeInsets.fromLTRB(16, 12, 12, 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                const Icon(Icons.place_outlined),
-                const SizedBox(width: 8),
+                const IconBadge(Icons.place_rounded, size: 36),
+                const SizedBox(width: 12),
                 Expanded(child: Text(l10n.yourStopTitle, style: text.labelLarge)),
                 TextButton(
                   onPressed: () => context.push(Routes.studentChooseRoute),

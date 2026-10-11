@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/clock.dart';
 import '../../../core/l10n.dart';
+import '../../../core/theme.dart';
+import '../../../core/ui.dart';
 import '../application/live_providers.dart';
 import '../domain/live_bus.dart';
 
@@ -70,18 +72,21 @@ class LiveStatusLine extends StatelessWidget {
   Widget build(BuildContext context) {
     final state = bus?.stateAt(serverNow) ?? BusLiveState.notRunning;
     final scheme = Theme.of(context).colorScheme;
-    final (icon, color) = switch (state) {
-      BusLiveState.live => (Icons.sensors, Colors.green.shade700),
-      BusLiveState.stale => (Icons.signal_cellular_alt_1_bar, scheme.onSurfaceVariant),
-      BusLiveState.offline => (Icons.signal_cellular_connected_no_internet_0_bar, scheme.onSurfaceVariant),
-      BusLiveState.notRunning => (Icons.bus_alert_outlined, scheme.onSurfaceVariant),
+    final (icon, background, foreground) = switch (state) {
+      BusLiveState.live => (Icons.sensors, scheme.successContainer, scheme.onSuccessContainer),
+      BusLiveState.stale => (Icons.signal_cellular_alt_1_bar, scheme.warningContainer, scheme.onWarningContainer),
+      BusLiveState.offline =>
+        (Icons.signal_cellular_connected_no_internet_0_bar, scheme.surfaceContainerHighest, scheme.onSurfaceVariant),
+      BusLiveState.notRunning => (Icons.bus_alert_outlined, scheme.surfaceContainerHighest, scheme.onSurfaceVariant),
     };
-    return Row(
-      children: [
-        Icon(icon, color: color, size: 20),
-        const SizedBox(width: 8),
-        Expanded(child: Text(liveStatusText(context, bus, serverNow))),
-      ],
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: StatusPill(
+        icon: icon,
+        label: liveStatusText(context, bus, serverNow),
+        background: background,
+        foreground: foreground,
+      ),
     );
   }
 }
