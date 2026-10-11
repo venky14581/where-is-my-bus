@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/l10n.dart';
+import '../../../core/theme.dart';
 import '../../live/domain/live_bus.dart';
 import '../../routes/domain/bus_route.dart';
 import '../../smart/application/smart_providers.dart';
@@ -90,52 +91,88 @@ class ArrivalPanel extends ConsumerWidget {
         : null;
 
     final stale = live.stateAt(serverNow) == BusLiveState.stale;
-    final (headline, detail, colour) = switch (arrival) {
+    final (headline, detail, background, foreground, icon) = switch (arrival) {
       Approaching() => () {
           final at = expectedAt(arrival, live, serverNow);
           final minutes = (at.difference(serverNow).inSeconds / 60).ceil().clamp(1, 999);
-          return (l10n.etaMinutes(minutes), l10n.etaAround(formatClock(context, at)), scheme.primary);
+          return (
+            l10n.etaMinutes(minutes),
+            l10n.etaAround(formatClock(context, at)),
+            scheme.primaryContainer,
+            scheme.onPrimaryContainer,
+            Icons.directions_bus_rounded,
+          );
         }(),
-      ArrivingNow() => (l10n.arrivingNow, null, Colors.green.shade700),
+      ArrivingNow() => (l10n.arrivingNow, null, scheme.successContainer, scheme.onSuccessContainer, Icons.where_to_vote_rounded),
       Passed(:final at) => (
           at == null ? l10n.passedNoTime : l10n.passedAt(formatClock(context, at)),
           null,
-          scheme.error,
+          scheme.errorContainer,
+          scheme.onErrorContainer,
+          Icons.history_rounded,
         ),
-      OffRoute() => (l10n.offRoute, null, scheme.onSurfaceVariant),
+      OffRoute() => (l10n.offRoute, null, scheme.surfaceContainerHigh, scheme.onSurfaceVariant, Icons.wrong_location_outlined),
     };
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Semantics(
         liveRegion: true,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              headline,
-              style: (arrival is OffRoute ? text.bodyLarge : text.headlineSmall)?.copyWith(color: colour),
-            ),
-            if (detail != null) Text(detail, style: text.titleMedium),
-            if (leave != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 4),
-                child: Row(
-                  children: [
-                    Icon(Icons.directions_walk, size: 20, color: scheme.tertiary),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: Text(
-                        leave.isAfter(serverNow) ? l10n.leaveBy(formatClock(context, leave)) : l10n.leaveNow,
-                        style: text.titleMedium?.copyWith(color: scheme.tertiary),
-                      ),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.fromLTRB(20, 18, 20, 18),
+          decoration: BoxDecoration(color: background, borderRadius: BorderRadius.circular(Radii.large)),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Text(
+                      headline,
+                      style: (arrival is OffRoute ? text.titleLarge : text.headlineMedium)?.copyWith(color: foreground),
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(width: 12),
+                  Icon(icon, size: 32, color: foreground),
+                ],
               ),
-            if (stale && arrival is Approaching)
-              Text(l10n.etaFromLastPosition, style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
-          ],
+              if (detail != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: Text(detail, style: text.titleMedium?.copyWith(color: foreground.withValues(alpha: 0.85))),
+                ),
+              if (leave != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 12),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: scheme.surface.withValues(alpha: 0.7),
+                      borderRadius: BorderRadius.circular(Radii.small),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.directions_walk, size: 20, color: scheme.tertiary),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            leave.isAfter(serverNow) ? l10n.leaveBy(formatClock(context, leave)) : l10n.leaveNow,
+                            style: text.titleMedium?.copyWith(color: scheme.tertiary),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              if (stale && arrival is Approaching)
+                Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child: Text(l10n.etaFromLastPosition, style: text.bodySmall?.copyWith(color: foreground.withValues(alpha: 0.8))),
+                ),
+            ],
+          ),
         ),
       ),
     );

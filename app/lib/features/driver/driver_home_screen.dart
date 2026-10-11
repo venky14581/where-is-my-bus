@@ -6,6 +6,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/l10n.dart';
+import '../../core/theme.dart';
+import '../../core/ui.dart';
 import '../auth/application/auth_providers.dart';
 import '../auth/domain/session.dart';
 import '../auth/ui/widgets.dart';
@@ -281,31 +283,74 @@ class _RunningStatusState extends State<_RunningStatus> {
     final trip = widget.trip;
     final sent = trip.lastSentAt;
     final next = trip.nextStop;
-    return Card.outlined(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+    final scheme = Theme.of(context).colorScheme;
+    // Green while positions go out, amber before the first fix, red with no
+    // signal: readable at a glance from the driver's seat.
+    final (background, foreground, icon) = !trip.online
+        ? (scheme.errorContainer, scheme.onErrorContainer, Icons.signal_cellular_connected_no_internet_0_bar)
+        : sent == null
+            ? (scheme.warningContainer, scheme.onWarningContainer, Icons.gps_not_fixed)
+            : (scheme.successContainer, scheme.onSuccessContainer, Icons.sensors);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(color: background, borderRadius: BorderRadius.circular(Radii.large)),
+          child: Row(
+            children: [
+              IconBadge(icon, size: 44, background: foreground.withValues(alpha: 0.12), foreground: foreground),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(l10n.sharingLocation, style: text.titleMedium?.copyWith(color: foreground)),
+                    Text(
+                      sent == null
+                          ? l10n.waitingForGps
+                          : l10n.lastSentSecondsAgo(DateTime.now().difference(sent).inSeconds.clamp(0, 9999)),
+                      style: text.bodyLarge?.copyWith(color: foreground),
+                    ),
+                    if (!trip.online) Text(l10n.noSignal, style: text.bodyMedium?.copyWith(color: foreground)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        Card.filled(
+          color: scheme.surfaceContainerHigh,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
               children: [
-                Icon(trip.online ? Icons.sensors : Icons.signal_cellular_connected_no_internet_0_bar,
-                    color: trip.online ? Colors.green.shade700 : Theme.of(context).colorScheme.error),
-                const SizedBox(width: 8),
-                Expanded(child: Text(l10n.sharingLocation, style: text.titleMedium)),
+                const IconBadge(Icons.flag_rounded, size: 44),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(next == null ? l10n.lastStopReached : l10n.nextStopName(next.name), style: text.titleMedium),
+                      const SizedBox(height: 8),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: LinearProgressIndicator(
+                          value: trip.totalStops == 0 ? 0 : trip.reachedCount / trip.totalStops,
+                          minHeight: 6,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(l10n.stopsReached(trip.reachedCount, trip.totalStops)),
+                    ],
+                  ),
+                ),
               ],
             ),
-            const SizedBox(height: 4),
-            Text(sent == null
-                ? l10n.waitingForGps
-                : l10n.lastSentSecondsAgo(DateTime.now().difference(sent).inSeconds.clamp(0, 9999))),
-            if (!trip.online) ...[const SizedBox(height: 8), Text(l10n.noSignal)],
-            const Divider(height: 24),
-            Text(next == null ? l10n.lastStopReached : l10n.nextStopName(next.name), style: text.titleMedium),
-            Text(l10n.stopsReached(trip.reachedCount, trip.totalStops)),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 }
@@ -388,6 +433,7 @@ class _BusCard extends StatelessWidget {
     final text = Theme.of(context).textTheme;
     final route = this.route;
     return Card.filled(
+      color: Theme.of(context).colorScheme.surfaceContainerHigh,
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -395,8 +441,8 @@ class _BusCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                const Icon(Icons.directions_bus_rounded, size: 32),
-                const SizedBox(width: 12),
+                const IconBadge(Icons.directions_bus_rounded, size: 48),
+                const SizedBox(width: 14),
                 Expanded(child: Text(bus.number, style: text.headlineSmall)),
               ],
             ),
