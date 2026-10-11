@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
+import '../../../core/firebase_bootstrap.dart';
+
 /// What the server decided about a scanned code. See scanPass in
 /// functions/src/boarding.ts.
 enum ScanResult {
@@ -60,7 +62,7 @@ class FirebasePassRepository implements PassRepository {
   Future<ScanOutcome> scan({required String tripId, required String code}) async {
     try {
       final response = await _functions
-          .httpsCallable('scanPass', options: HttpsCallableOptions(timeout: const Duration(seconds: 15)))
+          .httpsCallable('scanPass', options: HttpsCallableOptions(timeout: callTimeout(const Duration(seconds: 15))))
           .call<Map<String, dynamic>>({'tripId': tripId, 'code': code});
       final data = response.data;
       final result = ScanResult.values.where((r) => r.name == data['result']).firstOrNull;

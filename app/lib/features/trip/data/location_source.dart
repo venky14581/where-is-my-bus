@@ -60,7 +60,7 @@ class DeviceLocationSource implements LocationSource {
       TargetPlatform.android => AndroidSettings(
           accuracy: LocationAccuracy.high,
           distanceFilter: 0,
-          intervalDuration: const Duration(seconds: 3),
+          intervalDuration: const Duration(seconds: 1),
         ),
       TargetPlatform.iOS => AppleSettings(
           accuracy: LocationAccuracy.bestForNavigation,
@@ -87,7 +87,7 @@ class DeviceLocationSource implements LocationSource {
 /// Drives the bus along the route's road path, for demos and for testing
 /// without a phone. Debug builds only; see `trip_providers.dart`.
 class SimulatedDrive implements LocationSource {
-  SimulatedDrive({this.speedMps = 11, this.speedup = 5, this.tick = const Duration(seconds: 3)});
+  SimulatedDrive({this.speedMps = 11, this.speedup = 5, this.tick = const Duration(seconds: 1)});
 
   /// Reported speed, about 40 km/h.
   final double speedMps;

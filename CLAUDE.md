@@ -33,7 +33,7 @@ Users: driver (driver mode in the app), day scholar (student app), hosteller or 
 3. The target campus is Amrita Coimbatore. Day scholars travel from Coimbatore, Palakkad and other towns, so the student picks city, then route, then stop.
 4. Evening seat booking was added: students without a bus pass (hostellers, own-transport students, day scholars wanting a different route) book a spare seat on an evening bus and pay per ride.
 5. Alternate bus suggestion was added: when a student misses the assigned bus, the app offers another authorized college bus passing nearby, with live location, arrival time, nearest safe pickup point, route and seat availability. Boarding is allowed only on a bus authorized to carry that student.
-6. Live location is sent every 3 seconds during an active trip. If the bus goes offline, the marker turns grey and shows the last updated time.
+6. Live location is sent every second during an active trip (changed from 3 seconds on 11 Oct 2026, at the user's request, for smoother demos). If the bus goes offline, the marker turns grey and shows the last updated time.
 7. Booking window: opens at 6 pm the day before the trip and closes 20 to 30 minutes before departure.
 8. Removed from scope. Do not build these:
    - Hosteller permission or gate-pass check before booking
@@ -142,7 +142,8 @@ Use exactly these. Where `SPEC.md` says "Flutter Web or React", the dashboard is
 - `routeAccess/{routeId}`: routes it accepts riders from
 - `settings/safety`: speedLimitKmh (default 60, in the app's trip repository and the dashboard).
 - `segmentTimes/{routeId}`: learned seconds per stretch by weekday and half-hour slot, and the usual delay by weekday, from `ml/train.py`. `conditions/{date}`: how today's stretches compare with the expected (ratioSum, count), server-written.
-- `announcements/{id}`, `timetable/{id}`, `settings/booking`
+- `timetable/{id}`: a public bus or train for a college route (routeId, mode bus|train, name, from, to, departs HH:MM, direction, note, fare), entered by the office on the dashboard's Public transport page and shown on the app's missed-bus screen. Fixed timings, not live.
+- `announcements/{id}`, `settings/booking`
 
 ## Rules to follow while building
 
@@ -177,7 +178,8 @@ Use exactly these. Where `SPEC.md` says "Flutter Web or React", the dashboard is
 
 How to run and test everything is in `README.md`. Things that are easy to get wrong:
 
-- Local development uses the Firebase emulators on the `demo-whereismybus` project. The app and dashboard switch to the emulators by themselves whenever the project ID starts with `demo-`. Start them with `npm run emulators`, then `npm run seed` (the emulators start empty).
+- Local development uses the Firebase emulators on the `demo-whereismybus` project. The app and dashboard switch to the emulators by themselves whenever the project ID starts with `demo-`. Start them with `npm run emulators`, then `npm run seed` (the emulators start empty), then `npm run demo-ready` for a demo (student pass, guest fares, evening trips, sample public timings, functions warmed). Test mode (the app on the emulators) also offers "Verify now" at sign-up (the Auth emulator sends no email) and a Demo drive switch for drivers.
+- Never run `tests/rules` or `tests/e2e` against emulators someone is demoing on: `singleProjectMode` means the rules tests' `clearFirestore()` empties the demo data, and e2e re-seeds it. Use `npm run test:rules`, which starts its own emulators.
 - The emulators need Java 21 or newer.
 - Driver login: driver ID `DRV001` signs in to Firebase Auth as `drv001@drivers.whereismybus.invalid` with the 6-digit PIN as password (`driverEmailFor` in `app/lib/features/auth/domain/credentials.dart`). Office-created driver accounts must use the same mapping.
 - Which screens a role may open is decided only in `app/lib/routing/redirect.dart`; the rules enforce the same split on the server. Add new routes for a role under `/student/...` or `/driver/...` so they inherit it.
@@ -193,7 +195,9 @@ How to run and test everything is in `README.md`. Things that are easy to get wr
 - Cloud Functions live in `functions/` (TypeScript). `npm run emulators` builds them first and allows 60 s for a cold load. They trigger on trips, stop times, reports and announcements only. Every trigger must be safe to run twice (delivery is at least once): claim a `functionRuns/{key}` marker or use a transaction. On the emulators, notifications go to `pushLog` instead of FCM.
 - Scheduled functions (`createEveningTrips`, `expireBookings`) do not run on the emulators: there is no Pub/Sub emulator. Keep their work in plain exported functions (`scheduleEveningTrips`, `expireUnpaidBookings` in `functions/src/bookings.ts`) so tests and scripts can call them. Demo payments are accepted only when `FUNCTIONS_EMULATOR` is true; Razorpay keys go in `functions/.env`, which is git-ignored.
 - Overspeed and off-route are detected on the driver's phone (`app/lib/features/trip/domain/safety_monitor.dart`), never by a function on position updates. SOS and trip links go through the `sendSos`, `shareTrip` and `viewSharedTrip` functions; a parent's page is the dashboard's `#/share/<token>`, which needs no sign-in. The app builds the link from `--dart-define=SHARE_BASE_URL`.
-- On the emulators each Cloud Function starts its own worker the first time it fires; on this Windows machine that took over 20 s by Module 12. End-to-end tests wait up to 45 s for trigger results (`waitFor` in `tests/e2e/support.js`); a test that times out on its first trigger but passes when rerun is this, not a bug.
+- On the emulators each Cloud Function starts its own worker the first time it fires; on this Windows machine that took over 20 s by Module 12. End-to-end tests wait up to 45 s for trigger results (`waitFor` in `tests/e2e/support.js`); a test that times out on its first trigger but passes when rerun is this, not a bug. The app waits up to 60 s for callables in test mode (`callTimeout` in `firebase_bootstrap.dart`), and `npm run warm-functions` (part of `demo-ready`) wakes them all first; before that, the first pass scan, SOS or trip link timed out as "no connection".
+- Phones on USB reach the emulators through `adb reverse` (ports 9099, 8080, 9000, 5001, and 5173 for the dashboard and trip links) with `--dart-define=EMULATOR_HOST=127.0.0.1`; the app keeps an explicit host as given (the plugins would map 127.0.0.1 to 10.0.2.2) and points the native Realtime Database at the emulator by URL only.
+- The dashboard pops up new SOS and safety alerts, drivers' reports and trip starts with a sound (`LiveAlerts.tsx`, rules in `lib/liveAlerts.ts`); alerts already open when the page loads stay in the banner only.
 - Pilot tools: `npm run import-routes` (the office's CSV sheets, templates in `data/templates/`), `npm run load-base-data` (a real project), `npm run pilot-check` (readiness, emulators or `--project`), `ml/evaluate_eta.py` (arrival-time accuracy). Tests for the scripts: `npm run test:tools`. Real projects need `--database-url` for a Realtime Database outside the US.
 - `npm run seed-history` writes two weeks of synthetic past trips (`synthetic: true`) for the dashboard's reports and trip history. Stop-time triggers skip trips that have ended, so it alerts nobody.
 - Driver logins are created and their PINs reset only through the office-only callable functions `createDriver` and `setDriverPin`.

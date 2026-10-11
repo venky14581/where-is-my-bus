@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/clock.dart';
 import '../../../core/l10n.dart';
+import '../../../core/ui.dart';
 import '../../auth/application/auth_providers.dart';
 import '../../auth/domain/app_user.dart';
 import '../../auth/domain/session.dart';
@@ -15,9 +16,11 @@ import '../../live/ui/live_status.dart';
 import '../../pass/ui/pass_screen.dart';
 import '../../routes/application/route_providers.dart';
 import '../../routes/domain/bus_route.dart';
+import '../../routes/ui/scheduled_time.dart';
 import '../../trip/domain/trip_plan.dart';
 import '../application/missed_bus_providers.dart';
 import '../domain/missed_bus.dart';
+import '../domain/public_transport.dart';
 
 String formatWalk(AppLocalizations l10n, double metres) => metres < 1000
     ? l10n.distanceMetres((metres / 50).round() * 50)
@@ -39,7 +42,18 @@ class MissedBusScreen extends ConsumerWidget {
       body: user == null || user.routeId == null
           ? const SizedBox.shrink()
           : passStatusOf(user, today) != PassStatus.valid
-              ? _Note(icon: Icons.badge_outlined, text: l10n.missedBusNeedsPass)
+              // Without a pass no college bus can take them, but a public
+              // bus or train still can.
+              ? ListView(
+                  padding: const EdgeInsets.only(bottom: 20),
+                  children: [
+                    _Note(icon: Icons.badge_outlined, text: l10n.missedBusNeedsPass),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: PublicTransportSection(routeId: user.routeId!),
+                    ),
+                  ],
+                )
               : ServerClock(builder: (context, now) => _Options(user: user, serverNow: now)),
     );
   }
@@ -161,6 +175,8 @@ t.id: ?ref.watch(seatHoldProvider((tripId: t.id, uid: user.uid))).value,
                         routes[allowed.firstWhere((t) => t.id == e.key).routeId]?.stopById(e.value.stopId)?.name ?? '',
                       ),
                     ),
+                const SizedBox(height: 8),
+                PublicTransportSection(routeId: user.routeId!),
               ],
             ),
           ),
@@ -318,4 +334,58 @@ class _Note extends StatelessWidget {
           ],
         ),
       );
+}
+
+/// Public buses and trains for the student's route, next ones first.
+class PublicTransportSection extends ConsumerWidget {
+  const PublicTransportSection({super.key, required this.routeId});
+
+  final String routeId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = context.l10n;
+    final text = Theme.of(context).textTheme;
+    final scheme = Theme.of(context).colorScheme;
+    final now = ref.watch(clockProvider)();
+    final all = ref.watch(timetableProvider(routeId)).value ?? const <PublicDeparture>[];
+    final next = nextDepartures(all, direction: directionAt(now), now: now);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const IconBadge(Icons.directions_transit_rounded, size: 36),
+            const SizedBox(width: 12),
+            Expanded(child: Text(l10n.publicTransportTitle, style: text.titleMedium)),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Text(l10n.publicTransportNote, style: text.bodySmall?.copyWith(color: scheme.onSurfaceVariant)),
+        const SizedBox(height: 10),
+        if (next.isEmpty) Text(l10n.publicTransportNone),
+        for (final d in next)
+          Card.filled(
+            color: scheme.surfaceContainerHigh,
+            margin: const EdgeInsets.only(bottom: 8),
+            child: ListTile(
+              leading: Icon(d.mode == TransitMode.train ? Icons.train_rounded : Icons.directions_bus_filled_rounded),
+              title: Text(d.name, style: text.titleSmall),
+              subtitle: Text([
+                l10n.publicFromTo(d.from, d.to),
+                ?((d.note ?? '').isEmpty ? null : d.note),
+              ].join('\n')),
+              trailing: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(l10n.publicLeaves(formatScheduledTime(context, d.departs)), style: text.labelLarge),
+                  if (d.fare != null) Text(l10n.fareRupees(d.fare.toString()), style: text.bodySmall),
+                ],
+              ),
+            ),
+          ),
+      ],
+    );
+  }
 }

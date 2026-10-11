@@ -1,12 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
+import '../../../core/firebase_bootstrap.dart';
+
 import '../../trip/domain/trip_plan.dart';
 import '../domain/missed_bus.dart';
+import '../domain/public_transport.dart';
 
 abstract interface class MissedBusRepository {
   /// Trips running on [date] (YYYY-MM-DD), every route.
   Stream<List<RunningTrip>> watchRunningTrips(String date);
+
+  /// Public buses and trains the office lists for [routeId].
+  Stream<List<PublicDeparture>> watchTimetable(String routeId);
 
   /// `routeAccess`: for each route, the routes whose riders it may carry.
   Stream<Map<String, List<String>>> watchRouteAccess();
@@ -54,6 +60,13 @@ class FirebaseMissedBusRepository implements MissedBusRepository {
           ]);
 
   @override
+  Stream<List<PublicDeparture>> watchTimetable(String routeId) => _db
+      .collection('timetable')
+      .where('routeId', isEqualTo: routeId)
+      .snapshots()
+      .map((snap) => [for (final d in snap.docs) ?PublicDeparture.tryFromMap(d.id, d.data())]);
+
+  @override
   Stream<Map<String, List<String>>> watchRouteAccess() => _db.collection('routeAccess').snapshots().map((snap) => {
         for (final doc in snap.docs) doc.id: [for (final id in doc.data()['acceptsFrom'] as List? ?? const []) '$id'],
       });
@@ -78,7 +91,7 @@ class FirebaseMissedBusRepository implements MissedBusRepository {
   }
 
   HttpsCallable _callable(String name) =>
-      _functions.httpsCallable(name, options: HttpsCallableOptions(timeout: const Duration(seconds: 15)));
+      _functions.httpsCallable(name, options: HttpsCallableOptions(timeout: callTimeout(const Duration(seconds: 15))));
 
   @override
   Future<HoldResult> hold({required String tripId, required String stopId}) async {

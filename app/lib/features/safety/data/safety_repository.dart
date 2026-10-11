@@ -1,5 +1,7 @@
 import 'package:cloud_functions/cloud_functions.dart';
 
+import '../../../core/firebase_bootstrap.dart';
+
 enum SosResult {
   sent,
 
@@ -29,7 +31,7 @@ class FirebaseSafetyRepository implements SafetyRepository {
   Future<Map<String, dynamic>?> _call(String name) async {
     try {
       final response = await _functions
-          .httpsCallable(name, options: HttpsCallableOptions(timeout: const Duration(seconds: 20)))
+          .httpsCallable(name, options: HttpsCallableOptions(timeout: callTimeout(const Duration(seconds: 20))))
           .call<Map<String, dynamic>>();
       return response.data;
     } on FirebaseFunctionsException catch (e) {

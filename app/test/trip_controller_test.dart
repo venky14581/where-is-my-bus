@@ -47,8 +47,15 @@ class _Harness {
   }
 
   /// A good reading at [lat], [secondsLater] after the previous one.
-  Future<void> fix(double lat, {int secondsLater = 3, bool mocked = false, double speedMps = 10, double lng = 76.96}) async {
-    clock.advance(Duration(seconds: secondsLater));
+  Future<void> fix(
+    double lat, {
+    int secondsLater = 3,
+    int? millisLater,
+    bool mocked = false,
+    double speedMps = 10,
+    double lng = 76.96,
+  }) async {
+    clock.advance(millisLater == null ? Duration(seconds: secondsLater) : Duration(milliseconds: millisLater));
     location.emit(Fix(lat: lat, lng: lng, time: clock.now, accuracyM: 5, speedMps: speedMps, isMocked: mocked));
     await pump();
   }
@@ -88,12 +95,14 @@ void main() {
     expect(h.repo.armed, ['bus-01', 'bus-01']);
   });
 
-  test('sends a position at most every 3 seconds', () async {
+  test('sends a position about once a second, never faster', () async {
     await h.start();
+    // About 10 m a second, a bus in town.
     await h.fix(10.999);
-    await h.fix(10.9989, secondsLater: 1); // too soon
-    await h.fix(10.9986, secondsLater: 2);
-    expect(h.repo.published.map((f) => f.lat), [10.999, 10.9986]);
+    await h.fix(10.99895, millisLater: 500); // too soon
+    await h.fix(10.99889, millisLater: 600);
+    await h.fix(10.9988, secondsLater: 1);
+    expect(h.repo.published.map((f) => f.lat), [10.999, 10.99889, 10.9988]);
     expect(h.state.lastSentAt, isNotNull);
   });
 

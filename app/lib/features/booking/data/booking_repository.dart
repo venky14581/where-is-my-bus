@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
+import '../../../core/firebase_bootstrap.dart';
+
 import '../domain/booking.dart';
 
 abstract interface class BookingRepository {
@@ -88,7 +90,7 @@ class FirebaseBookingRepository implements BookingRepository {
   }
 
   HttpsCallable _callable(String name) =>
-      _functions.httpsCallable(name, options: HttpsCallableOptions(timeout: const Duration(seconds: 20)));
+      _functions.httpsCallable(name, options: HttpsCallableOptions(timeout: callTimeout(const Duration(seconds: 20))));
 
   static bool _isOffline(FirebaseFunctionsException e) =>
       e.code == 'unavailable' || e.code == 'deadline-exceeded' || e.code == 'internal';

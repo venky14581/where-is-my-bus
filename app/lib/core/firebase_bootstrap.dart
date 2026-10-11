@@ -24,6 +24,11 @@ const functionsRegion = 'asia-south1';
 /// email, so sign-up uses it to verify a new student in test mode.
 String? authEmulatorOrigin;
 
+/// How long to wait for a Cloud Function. On the emulators a function's
+/// first call starts its worker, which can take over 20 s on a slow PC, so
+/// a pass scan or an SOS must not give up as "offline" in the meantime.
+Duration callTimeout(Duration normal) => authEmulatorOrigin != null ? const Duration(seconds: 60) : normal;
+
 Future<void> initFirebase() async {
   var options = DefaultFirebaseOptions.currentPlatform;
   final useEmulators = _useEmulatorsOverride.isEmpty

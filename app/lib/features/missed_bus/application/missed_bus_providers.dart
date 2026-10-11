@@ -9,6 +9,7 @@ import 'package:latlong2/latlong.dart';
 import '../../../core/firebase_bootstrap.dart';
 import '../data/missed_bus_repository.dart';
 import '../domain/missed_bus.dart';
+import '../domain/public_transport.dart';
 
 final missedBusRepositoryProvider = Provider<MissedBusRepository>(
   (ref) => FirebaseMissedBusRepository(FirebaseFirestore.instance, FirebaseFunctions.instanceFor(region: functionsRegion)),
@@ -16,6 +17,10 @@ final missedBusRepositoryProvider = Provider<MissedBusRepository>(
 
 final runningTripsProvider = StreamProvider.autoDispose.family<List<RunningTrip>, String>(
   (ref, date) => ref.watch(missedBusRepositoryProvider).watchRunningTrips(date),
+);
+
+final timetableProvider = StreamProvider.autoDispose.family<List<PublicDeparture>, String>(
+  (ref, routeId) => ref.watch(missedBusRepositoryProvider).watchTimetable(routeId),
 );
 
 final routeAccessProvider = StreamProvider.autoDispose<Map<String, List<String>>>(

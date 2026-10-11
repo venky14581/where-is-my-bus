@@ -1081,4 +1081,58 @@ class AppLocalizationsTa extends AppLocalizations {
   @override
   String get verifyTestModeNote =>
       'சோதனை முறை: இங்கு மின்னஞ்சல் அனுப்பப்படாது. இந்தக் கணக்கை உடனே சரிபார்க்க கீழே தட்டவும்.';
+
+  @override
+  String get demoDriveTitle => 'மாதிரி ஓட்டம் (சோதனை முறை)';
+
+  @override
+  String get demoDriveSubtitle =>
+      'GPS இல்லாமல் பேருந்தை அதன் வழித்தடத்தில் நகர்த்தும்; வளாகத்திலேயே செயலியைக் காட்ட.';
+
+  @override
+  String get shareButton => 'பகிர்';
+
+  @override
+  String shareTripMessage(String link) {
+    return 'என் கல்லூரிப் பேருந்தை நேரலையில் பாருங்கள்: $link';
+  }
+
+  @override
+  String get publicTransportTitle => 'அரசுப் பேருந்து மற்றும் ரயில்';
+
+  @override
+  String get publicTransportNote =>
+      'போக்குவரத்து அலுவலகம் தந்த நிலையான நேரங்கள். நேரலைக் கண்காணிப்பு இல்லை.';
+
+  @override
+  String get publicTransportNone =>
+      'இன்று உங்கள் வழித்தடத்திற்கு வேறு அரசுப் பேருந்து அல்லது ரயில் இல்லை.';
+
+  @override
+  String publicLeaves(String time) {
+    return '$time மணிக்குப் புறப்படும்';
+  }
+
+  @override
+  String publicFromTo(String from, String to) {
+    return '$from → $to';
+  }
+
+  @override
+  String get payMethodUpi => 'UPI';
+
+  @override
+  String get payMethodCard => 'டெபிட் அல்லது கிரெடிட் கார்டு';
+
+  @override
+  String get payMethodNetbanking => 'நெட் பேங்கிங்';
+
+  @override
+  String get payMethodTitle => 'செலுத்தும் முறை';
+
+  @override
+  String get paymentProcessing => 'பணம் செலுத்தப்படுகிறது…';
+
+  @override
+  String get paymentSuccess => 'பணம் செலுத்தப்பட்டது';
 }

@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:where_is_my_bus/features/live/domain/live_bus.dart';
 import 'package:where_is_my_bus/features/missed_bus/domain/missed_bus.dart';
+import 'package:where_is_my_bus/features/missed_bus/domain/public_transport.dart';
 import 'package:where_is_my_bus/features/routes/domain/bus_route.dart';
 import 'package:where_is_my_bus/features/trip/domain/trip_plan.dart';
 
@@ -60,7 +61,31 @@ List<RideOption> _options({
       heldStops: heldStops,
     );
 
+PublicDeparture _public(String id, String departs, {TransitMode mode = TransitMode.bus, TripDirection direction = TripDirection.toCampus}) =>
+    PublicDeparture(
+      id: id,
+      routeId: 'cbe-gandhipuram',
+      mode: mode,
+      name: mode == TransitMode.train ? 'Passenger train' : 'Town bus 96',
+      from: 'Gandhipuram',
+      to: 'Ettimadai',
+      departs: departs,
+      direction: direction,
+    );
+
 void main() {
+  test('public departures: the next ones in the direction of travel, soonest first', () {
+    final all = [
+      _public('late', '08:10'),
+      _public('gone', '06:50'),
+      _public('just', '06:59'),
+      _public('train', '07:25', mode: TransitMode.train),
+      _public('evening', '17:30', direction: TripDirection.fromCampus),
+    ];
+    final next = nextDepartures(all, direction: TripDirection.toCampus, now: DateTime(2026, 10, 10, 7));
+    expect(next.map((d) => d.id), ['just', 'train', 'late']);
+  });
+
   group('ride options', () {
     test('only buses the office allows, with the nearest stop reachable in time', () {
       final options = _options(trips: const [_trip, _pkdTrip], live: {
@@ -195,6 +220,25 @@ void main() {
       expect(asha.dy, lessThan(bala.dy));
       // Already on board: no need to stop for them.
       expect(find.textContaining('Chitra'), findsNothing);
+    });
+
+    testWidgets('public buses and trains are offered too, even without a pass', (tester) async {
+      final auth = FakeAuthRepository()
+        ..addStudent(_email, 'bus-pass-123', routeId: 'cbe-gandhipuram', stopId: 'ukkadam', passValid: false);
+      final missed = FakeMissedBusRepository()
+        ..timetable.addAll([_public('t', '07:25', mode: TransitMode.train), _public('b', '07:40')]);
+      await pumpApp(tester, auth, routes: FakeRouteRepository(auth, buses: const [_ownBus]), missedBus: missed);
+      await tap(tester, find.text("I'm a student"));
+      await tester.enterText(find.widgetWithText(TextFormField, 'College email'), _email);
+      await tester.enterText(find.widgetWithText(TextFormField, 'Password'), 'bus-pass-123');
+      await tap(tester, find.widgetWithText(FilledButton, 'Sign in'));
+      await tap(tester, find.text('Missed your bus?'));
+
+      expect(find.text('You need a valid bus pass to ride another college bus.'), findsOneWidget);
+      expect(find.text('Public bus and train'), findsOneWidget);
+      expect(find.text('Passenger train'), findsOneWidget);
+      expect(find.text('Leaves 7:25 AM'), findsOneWidget);
+      expect(find.text('Leaves 7:40 AM'), findsOneWidget);
     });
 
     testWidgets('without a valid pass there is nothing to hold', (tester) async {

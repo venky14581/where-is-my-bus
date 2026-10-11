@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/firebase_bootstrap.dart';
 import '../../core/l10n.dart';
 import '../../core/theme.dart';
 import '../../core/ui.dart';
@@ -146,6 +147,20 @@ class _TripControlsState extends ConsumerState<_TripControls> {
               onPressed: _confirmEnd,
             ),
         },
+        if (trip.phase == TripPhase.idle && authEmulatorOrigin != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 12),
+            child: Card.filled(
+              color: Theme.of(context).colorScheme.surfaceContainerHigh,
+              child: SwitchListTile(
+                secondary: const Icon(Icons.route_rounded),
+                title: Text(l10n.demoDriveTitle),
+                subtitle: Text(l10n.demoDriveSubtitle),
+                value: ref.watch(demoDriveProvider),
+                onChanged: (on) => ref.read(demoDriveProvider.notifier).set(on),
+              ),
+            ),
+          ),
         const SizedBox(height: 16),
         if (trip.problem case final problem?) _ProblemBanner(problem: problem),
         if (trip.mockDetected) ErrorBanner(l10n.mockLocationWarning),

@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/clock.dart';
+import '../../../core/firebase_bootstrap.dart';
 import '../../../core/settings_store.dart';
 import '../../eta/domain/arrival.dart';
 import '../../routes/domain/bus_route.dart';
@@ -80,7 +81,7 @@ class TripState {
 /// Runs the driver's trip: start, send the bus position at most every
 /// [minSendInterval], record stop times, end.
 class TripController extends Notifier<TripState> {
-  static const minSendInterval = Duration(milliseconds: 2500);
+  static const minSendInterval = Duration(milliseconds: 900);
 
   StreamSubscription<Fix>? _fixes;
   StreamSubscription<bool>? _connection;
@@ -326,8 +327,20 @@ class TripController extends Notifier<TripState> {
 /// with a bus driving the route.
 const _simulateDrive = !kReleaseMode && bool.fromEnvironment('SIMULATE_DRIVE');
 
+/// Test mode only (the app on the emulators): the driver can switch on a
+/// demo drive, so a bus moves along its route while everyone stands on
+/// campus. Read when a trip starts.
+class DemoDrive extends Notifier<bool> {
+  @override
+  bool build() => false;
+
+  void set(bool on) => state = on && authEmulatorOrigin != null;
+}
+
+final demoDriveProvider = NotifierProvider<DemoDrive, bool>(DemoDrive.new);
+
 final locationSourceProvider = Provider<LocationSource>(
-  (ref) => _simulateDrive ? SimulatedDrive() : DeviceLocationSource(),
+  (ref) => _simulateDrive || ref.watch(demoDriveProvider) ? SimulatedDrive() : DeviceLocationSource(),
 );
 
 final tripRepositoryProvider = Provider<TripRepository>(

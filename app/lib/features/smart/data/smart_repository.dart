@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
+import '../../../core/firebase_bootstrap.dart';
+
 import '../../eta/domain/learned_times.dart';
 
 /// What setNotRiding in functions/src/smart.ts answered.
@@ -85,7 +87,7 @@ class FirebaseSmartRepository implements SmartRepository {
   Future<NotRidingResult> setNotRiding({required String tripId, required bool notRiding}) async {
     try {
       final response = await _functions
-          .httpsCallable('setNotRiding', options: HttpsCallableOptions(timeout: const Duration(seconds: 20)))
+          .httpsCallable('setNotRiding', options: HttpsCallableOptions(timeout: callTimeout(const Duration(seconds: 20))))
           .call<Map<String, dynamic>>({'tripId': tripId, 'notRiding': notRiding});
       return NotRidingResult.values.where((r) => r.name == response.data['result']).firstOrNull ?? NotRidingResult.locked;
     } on FirebaseFunctionsException catch (e) {
