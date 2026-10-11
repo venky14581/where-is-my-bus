@@ -8,7 +8,7 @@ A mobile app that shows day scholars at Amrita Vishwa Vidyapeetham, Coimbatore (
 
 Users: driver (driver mode in the app), day scholar (student app), hosteller or own-transport student (books spare evening seats), transport office (web dashboard), parent (shared trip link).
 
-## Status
+##Status
 
 - Module 1 (Setup and login): done 10 Oct 2026. See `docs/modules/module-01-setup-and-login.md`.
 - Module 2 (Route and bus data): done 10 Oct 2026. See `docs/modules/module-02-route-and-bus-data.md`. The route data in `data/base-data.json` is a placeholder until the transport office supplies the real stops and timings.
