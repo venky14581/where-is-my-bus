@@ -1,6 +1,6 @@
 // Office reports (Module 12), worked out from trips, their stop times and
 // boardings, and evening bookings. Kept free of Firebase so they can be
-// tested. Only stop times are stored, never every position (CLAUDE.md), so
+// tested. Only stop times are stored, never every position (per project spec), so
 // a trip's path between stops is estimated from them.
 
 export interface ReportStop {

@@ -1,5 +1,5 @@
 // Boarding with a digital bus pass: the driver scans the student's QR and the
-// server decides. Pass validity is never checked only in the app (CLAUDE.md).
+// server decides. Pass validity is never checked only in the app (per project spec).
 
 import { randomBytes } from 'node:crypto';
 

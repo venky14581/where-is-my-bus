@@ -26,7 +26,7 @@ on a phone (check 8). Everything after the camera reads a code is tested.
   no pass, an expired pass, not allowed on this bus, or no connection. A
   boarded count is shown. Repeated reads of the same QR are ignored for 5
   seconds.
-- **`scanPass` function** (server decides, per `CLAUDE.md`):
+- **`scanPass` function** (server decides, per the project spec):
   - It runs only for the driver of a running trip.
   - It checks the signature and time window (one window of slack either
     side), that the pass is valid and not past its last day (campus clock),
@@ -48,7 +48,7 @@ on a phone (check 8). Everything after the camera reads a code is tested.
 
 | Decision | Why |
 | --- | --- |
-| Boardings at `trips/{tripId}/boardings/{uid}`, not `boardings/{tripId}/{uid}` as `CLAUDE.md` lists | Firestore paths alternate collection and document; this sits next to the trip's stop times. |
+| Boardings at `trips/{tripId}/boardings/{uid}`, not `boardings/{tripId}/{uid}` as the project spec lists | Firestore paths alternate collection and document; this sits next to the trip's stop times. |
 | HMAC code made on the phone, checked on the server | Works without signal at the stop; cannot be forged or moved to another student; screenshots expire. |
 | One window of slack (up to about 90 s for a code's lifetime) | Covers clock drift and a slow scan without making screenshots useful. |
 | Pass end date as `YYYY-MM-DD`, valid through that day | Matches how the office thinks about terms; the server checks it on the campus clock. |

@@ -2,7 +2,7 @@
 
 Two short surveys (a Google Form is fine). The first, before the pilot,
 also checks the problem statement, which has not been confirmed with day
-scholars yet (`CLAUDE.md`). Anonymous; no names or roll numbers.
+scholars yet (the project spec). Anonymous; no names or roll numbers.
 
 ## Before the pilot (all day scholars on the pilot route)
 

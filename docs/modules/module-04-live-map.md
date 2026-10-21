@@ -40,7 +40,7 @@ them.
 | The map is the student home, not a separate screen | "Open the app and know in five seconds where the bus is." |
 | Weak signal after 30 s, not running after 2 hours | 30 s is ten missed 3-second updates. A trip never ended the evening before must not show as a bus on the road next morning. |
 | Server time for ages | Uses the Realtime Database's server time offset. |
-| The student's own location is not shown | Privacy rule in `CLAUDE.md`; the leave-home reminder (Module 11) uses it on the phone only. |
+| The student's own location is not shown | Privacy rule in the project spec; the leave-home reminder (Module 11) uses it on the phone only. |
 | Own attribution label | `flutter_map`'s built-in one cannot shrink and overflowed on narrow phones, especially in Tamil. |
 | Public OpenStreetMap tile server | Fine at project scale. A wider launch needs its own tile provider, per the OSM tile usage policy. |
 

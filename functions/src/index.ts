@@ -1,5 +1,5 @@
 // Alerts for riders. Every trigger fires on a trip, a stop time, a driver
-// report or an announcement, never on a position update (see CLAUDE.md).
+// report or an announcement, never on a position update (see project specification).
 
 export { createDriver, setDriverPin } from './drivers.js';
 export { mirrorBusDriver } from './mirror.js';

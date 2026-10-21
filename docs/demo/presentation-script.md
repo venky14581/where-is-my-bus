@@ -33,7 +33,7 @@ Passwords and PINs are in `scripts/seed-emulators.mjs`.
 3. Plug in both phones. On each, choose **File transfer** in the USB
    notification and allow USB debugging. Keep both cables in for the whole
    talk: the phones reach the server through them.
-4. Ask Claude to "reconnect" or run the port forwarding for both phones
+4. Run the port forwarding for both phones
    (`adb reverse` for 9099, 8080, 9000, 5001 and 5173).
 5. **Phone B (student):** sign in as the demo student. Choose
    Coimbatore → Gandhipuram – Campus → **Ukkadam**.

@@ -30,7 +30,7 @@ import { getFirestore as getAdminFirestore } from 'firebase-admin/firestore';
 setLogLevel('silent');
 
 export const PROJECT = 'demo-whereismybus';
-// The instance database.rules.json applies to (see CLAUDE.md).
+// The instance database.rules.json applies to (see project specification).
 const DATABASE_URL = `https://${PROJECT}-default-rtdb.firebaseio.com`;
 
 const adminApp = getApps().find((a) => a.name === 'e2e-admin')

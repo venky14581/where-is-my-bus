@@ -6,7 +6,7 @@ Done-when test below were written for this module. Confirm them.
 
 ## What was built
 
-- Firestore collections from the data model in `CLAUDE.md`:
+- Firestore collections from the data model in the project spec:
   - `routes/{routeId}`: name, city, active, ordered `stops` (id, name, lat,
     lng, scheduledTime, distanceFromStartM), `stopIds`, `path` (encoded
     polyline from OSRM), distanceM.

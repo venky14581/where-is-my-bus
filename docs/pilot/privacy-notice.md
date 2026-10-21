@@ -2,7 +2,7 @@
 
 Draft for the transport office and the college to approve; translate to
 Tamil before giving it out. It describes what the app actually does
-(see `CLAUDE.md` and the module docs).
+(see the project spec and the module docs).
 
 **Where Is My Bus** is being tried on one college bus route from
 [start date] to [end date].

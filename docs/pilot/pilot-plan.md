@@ -195,7 +195,7 @@ gaps mean the phone is stopping (battery settings, screen-off).
 
 ## Open questions this pilot should answer
 
-From `CLAUDE.md`: whether guests should pay or ride free; booking closing 20
+From the project spec: whether guests should pay or ride free; booking closing 20
 or 30 minutes before; which other towns are served; the student email
 domain; and whether the problem statement matches what day scholars say
 (the survey asks).

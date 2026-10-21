@@ -25,7 +25,7 @@ Done-when test below were written for this module. Confirm them.
   soonest.
 - **Where the student is:** the phone's location, read once on this screen
   and used only to pick the nearest stop. It is never sent anywhere, as
-  `CLAUDE.md` requires. Without location permission the student's usual stop
+  the project spec requires. Without location permission the student's usual stop
   is used, and the screen says so.
 - **Hold a seat:** the server checks the pass, the route access, that the
   bus is running and has not passed the stop, and that a seat is free. Then
@@ -45,7 +45,7 @@ Done-when test below were written for this module. Confirm them.
 - **Seat counting (server only):**
   - When a trip starts, `countTripSeats` counts the route's valid passes
     (`passHolders`). Those seats are kept for them, since pass holders keep
-    priority (`CLAUDE.md`).
+    priority (the project spec).
   - Other routes get what is left: capacity − passHolders − held seats
     (`altHeld`).
   - Every change happens in a transaction, so two students cannot get the

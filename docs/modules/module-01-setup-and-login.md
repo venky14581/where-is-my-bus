@@ -10,7 +10,7 @@ turns up.
 
 ## What was built
 
-- Repository layout from `CLAUDE.md`: `app/`, `dashboard/`, rules and
+- Repository layout from the project spec: `app/`, `dashboard/`, rules and
   `firebase.json` at the root. `functions/` and `ml/` arrive with the modules
   that need them.
 - Firebase Emulator Suite setup (Auth, Firestore, Realtime Database) on the

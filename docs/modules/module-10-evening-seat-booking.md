@@ -69,7 +69,7 @@ were written for this module. Confirm them.
   directly. A small `npm run evening-trips` script would help manual testing.
 - **Refunds** of paid seats are by the transport office, outside the app.
 - **Booking close time** is 30 minutes by default; the open question in
-  `CLAUDE.md` (20 or 30) is a setting on the dashboard.
+  the project spec (20 or 30) is a setting on the dashboard.
 - **Pass holders who say they are not riding** do not yet free their seats
   (`notRiding` in the data model); the evening count assumes every pass
   holder rides.

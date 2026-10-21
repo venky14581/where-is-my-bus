@@ -1,7 +1,7 @@
 // Evening seat booking (Module 10). Students without a pass for a route book
 // a spare seat on its evening bus and pay per ride. Booking times, seat
 // counts and payment are checked here, never only in the app, and seat
-// counts change only in transactions (CLAUDE.md).
+// counts change only in transactions (per project spec).
 
 import { FieldValue, Timestamp, type DocumentSnapshot, type Transaction } from 'firebase-admin/firestore';
 import { logger } from 'firebase-functions';

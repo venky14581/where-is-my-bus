@@ -1,7 +1,7 @@
 // Safety (Module 12): SOS, the parent's trip link, and office alerts for
 // overspeeding and leaving the route. Speed and route are checked on the
 // driver's phone, which writes one event per episode, so nothing here runs
-// on every position update (CLAUDE.md).
+// on every position update (per project spec).
 
 import { randomBytes } from 'node:crypto';
 

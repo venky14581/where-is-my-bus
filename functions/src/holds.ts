@@ -1,6 +1,6 @@
 // Missed-bus help: a student who missed their bus holds a seat on another
 // college bus the office authorized for their route. Seat counts change only
-// in transactions, so a seat cannot be given twice (CLAUDE.md).
+// in transactions, so a seat cannot be given twice (per project spec).
 
 import { FieldValue, type Transaction } from 'firebase-admin/firestore';
 import { onDocumentCreated } from 'firebase-functions/v2/firestore';

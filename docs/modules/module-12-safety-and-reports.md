@@ -18,7 +18,7 @@ list were built in Modules 1, 3, 8 and 10.
   event to `trips/{tripId}/events`. A new episode is reported only after a
   minute back within limits, so a bus hovering at the limit does not flood
   the office. Detection is on the phone because server functions must not
-  run on every position (CLAUDE.md); `onSafetyEvent` turns each event into
+  run on every position (per project spec); `onSafetyEvent` turns each event into
   a `safetyAlerts` document once. The limit is set on the dashboard
   (`settings/safety`, default 60 km/h).
 - **SOS.** One button for the driver (under Running late / Breakdown) and
@@ -52,7 +52,7 @@ stop times and boardings, and bookings (`dashboard/src/lib/reports.ts`):
   morning trips).
 - **Trip history:** any past trip on the map with its recorded stop times,
   its safety alerts, and a replay. Only stop times are stored, never every
-  position (CLAUDE.md), so the bus between stops is estimated from them,
+  position (per project spec), so the bus between stops is estimated from them,
   and the page says so.
 
 `npm run seed-history` fills the emulators with two weeks of synthetic past
